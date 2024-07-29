@@ -24,3 +24,5 @@ services:
     ports:
       - "4331:80"
     restart: unless-stopped
+    env_file:
+      - .env
