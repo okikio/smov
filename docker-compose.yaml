@@ -5,13 +5,13 @@ services:
   movieweb:
     build:
       context: .
-      # args:
+      args:
+        TMDB_READ_API_KEY: ""
+        CORS_PROXY_URL: ""
       #   PWA_ENABLED: "false"
       #   GA_ID: ""
       #   APP_DOMAIN: ""
       #   OPENSEARCH_ENABLED: "false"
-      #   TMDB_READ_API_KEY: ""
-      #   CORS_PROXY_URL: ""
       #   DMCA_EMAIL: ""
       #   NORMAL_ROUTER: "false"
       #   BACKEND_URL: ""
