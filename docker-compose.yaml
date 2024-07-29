@@ -22,5 +22,5 @@ services:
       #   CDN_REPLACEMENTS: ""
       #   TURNSTILE_KEY: ""
     ports:
-      - "80:80"
+      - "4331:80"
     restart: unless-stopped
