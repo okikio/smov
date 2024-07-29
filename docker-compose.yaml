@@ -5,7 +5,7 @@ services:
   movieweb:
     build:
       context: .
-      args:
+      # args:
       #   PWA_ENABLED: "false"
       #   GA_ID: ""
       #   APP_DOMAIN: ""
