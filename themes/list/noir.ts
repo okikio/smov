@@ -141,8 +141,8 @@ export default createTheme({
         hoverAccent: tokens.black.c250,
         hoverShadow: tokens.black.c50,
         shadow: tokens.shade.c800,
-        barColor: tokens.ash.c200,
-        barFillColor: tokens.purple.c100,
+        barColor: tokens.shade.c200,
+        barFillColor: tokens.shade.c50,
         badge: tokens.shade.c700,
         badgeText: tokens.ash.c100
       },

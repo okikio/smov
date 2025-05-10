@@ -132,6 +132,8 @@ function DetailsContent({
   const progress = useProgressStore((s) => s.items);
   const carouselRef = useRef<HTMLDivElement>(null);
   const activeEpisodeRef = useRef<HTMLAnchorElement>(null);
+  const [showVolumeBar, setShowVolumeBar] = useState(false);
+  const [volume, setVolume] = useState(0.5);
 
   const addBookmark = useBookmarkStore((s) => s.addBookmark);
   const removeBookmark = useBookmarkStore((s) => s.removeBookmark);
@@ -179,10 +181,49 @@ function DetailsContent({
 
   const toggleMute = () => {
     if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(!isMuted);
+      const newMuted = !videoRef.current.muted;
+      videoRef.current.muted = newMuted;
+      setIsMuted(newMuted);
+      setShowVolumeBar(!newMuted);
     }
   };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume;
+      if (newVolume === 0) {
+        videoRef.current.muted = true;
+        setIsMuted(true);
+        setShowVolumeBar(false);
+      } else {
+        videoRef.current.muted = false;
+        setIsMuted(false);
+        setShowVolumeBar(true);
+      }
+    }
+  };
+
+  // Hide volume bar after 2 seconds of inactivity
+  useEffect(() => {
+    if (!showVolumeBar || isMuted) return;
+    const timeout = setTimeout(() => setShowVolumeBar(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [showVolumeBar, isMuted, volume]);
+
+  // Hide volume bar when clicking outside
+  useEffect(() => {
+    if (!showVolumeBar) return;
+    const handleClick = (e: MouseEvent) => {
+      const bar = document.getElementById("vertical-volume-bar");
+      if (bar && !bar.contains(e.target as Node)) {
+        setShowVolumeBar(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showVolumeBar]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -317,6 +358,12 @@ function DetailsContent({
     }
   }, [currentSeasonEpisodes, showProgress]);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = 0.4;
+    }
+  }, []);
+
   return (
     <div className="relative h-full flex flex-col">
       {/* Backdrop - Even taller */}
@@ -336,24 +383,54 @@ function DetailsContent({
               className="absolute inset-0 w-full h-full object-cover cursor-pointer"
               autoPlay
               loop
-              muted
+              muted={isMuted}
               playsInline
               poster={data.backdrop}
               onClick={togglePlay}
             >
               <source src={imdbData.trailer_url} type="video/mp4" />
             </video>
-            <button
-              type="button"
-              onClick={toggleMute}
-              className="absolute top-4 left-4 z-10 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
-              title={isMuted ? "Unmute" : "Mute"}
-            >
-              <Icon
-                icon={isMuted ? Icons.VOLUME_X : Icons.VOLUME}
-                className="text-white"
-              />
-            </button>
+            <div className="absolute top-4 left-4 z-10 flex flex-col items-center">
+              <button
+                type="button"
+                onClick={toggleMute}
+                onMouseEnter={() => !isMuted && setShowVolumeBar(true)}
+                className="p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+                title={isMuted ? "Unmute" : "Mute"}
+              >
+                <Icon
+                  icon={isMuted ? Icons.VOLUME_X : Icons.VOLUME}
+                  className="text-white"
+                />
+              </button>
+              {/* Volume Bar */}
+              {showVolumeBar && !isMuted && (
+                <div
+                  id="vertical-volume-bar"
+                  className="mt-2 h-32 w-8 bg-black/70 rounded-full flex items-center justify-center relative shadow-lg"
+                  style={{
+                    transition: "opacity 0.2s",
+                  }}
+                >
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    className="absolute left-1/2 -translate-x-1/2 w-24 h-1.5 rotate-[-90deg] bg-mediaCard-barColor accent-mediaCard-barColor cursor-pointer"
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%) rotate(-90deg)",
+                      width: "100px",
+                    }}
+                  />
+                </div>
+              )}
+            </div>
             {isPaused && (
               <button
                 type="button"
