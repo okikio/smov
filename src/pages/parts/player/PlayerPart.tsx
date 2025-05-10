@@ -184,6 +184,7 @@ export function PlayerPart(props: PlayerPartProps) {
 
       <Player.VolumeChangedPopout />
       <Player.SubtitleDelayPopout />
+      <Player.SpeedChangedPopout />
       <UnreleasedEpisodeOverlay />
 
       <Player.NextEpisodeButton
