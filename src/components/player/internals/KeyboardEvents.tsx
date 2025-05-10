@@ -153,13 +153,8 @@ export function KeyboardEvents() {
         if (next) dataRef.current.display?.setPlaybackRate(next);
       }
 
-      // Handle spacebar hold for 2x speed
-      if (
-        k === " " &&
-        !dataRef.current.isSpaceHeldRef.current &&
-        !dataRef.current.mediaPlaying.isPaused &&
-        !dataRef.current.isPendingBoostRef.current
-      ) {
+      // Handle spacebar press for play/pause and hold for 2x speed
+      if (k === " ") {
         // Skip if a button is targeted
         if (
           evt.target &&
@@ -168,8 +163,19 @@ export function KeyboardEvents() {
           return;
         }
 
-        // Prevent the default spacebar behavior (play/pause)
+        // Prevent the default spacebar behavior
         evt.preventDefault();
+
+        // If already paused, play the video and return
+        if (dataRef.current.mediaPlaying.isPaused) {
+          dataRef.current.display?.play();
+          return;
+        }
+
+        // If we're already holding space, don't trigger boost again
+        if (dataRef.current.isSpaceHeldRef.current) {
+          return;
+        }
 
         // Save current rate
         dataRef.current.previousRateRef.current =
@@ -220,10 +226,10 @@ export function KeyboardEvents() {
 
       // Utils
       if (keyL === "f") dataRef.current.display?.toggleFullscreen();
-      if (
-        (k === " " || keyL === "k") &&
-        !dataRef.current.isSpaceHeldRef.current
-      ) {
+
+      // Remove duplicate spacebar handler that was conflicting
+      // with our improved implementation
+      if (keyL === "k" && !dataRef.current.isSpaceHeldRef.current) {
         if (
           evt.target &&
           (evt.target as HTMLInputElement).nodeName === "BUTTON"
