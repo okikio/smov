@@ -1,3 +1,5 @@
+import { t } from "i18next";
+
 import { Icon, Icons } from "@/components/Icon";
 import { Flare } from "@/components/utils/Flare";
 import { Transition } from "@/components/utils/Transition";
@@ -31,8 +33,10 @@ export function SpeedChangedPopout() {
           <div className="w-full flex items-center justify-between">
             <span className="text-sm">
               {isSpeedBoosted
-                ? "Boosted to 2x speed"
-                : `Speed: ${playbackRate}x`}
+                ? t("player.menus.playback.speedBoosted")
+                : t("player.menus.playback.speedUnboosted", {
+                    speed: playbackRate,
+                  })}
             </span>
           </div>
         </Flare.Child>

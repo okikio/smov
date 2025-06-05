@@ -13,14 +13,9 @@ export function captionIsVisible(
   end: number,
   delay: number,
   currentTime: number,
-  playbackRate: number = 1,
 ) {
-  // Calculate subtitle timing with delay adjustment
-  // When playback is sped up, we need to adjust the subtitle windows accordingly
-  // so they appear at the right time but also remain visible for the right duration
   const delayedStart = start / 1000 + delay;
   const delayedEnd = end / 1000 + delay;
-
   return (
     Math.max(0, delayedStart) <= currentTime &&
     Math.max(0, delayedEnd) >= currentTime

@@ -16,8 +16,6 @@ export function KeyboardEvents() {
   const mediaPlaying = usePlayerStore((s) => s.mediaPlaying);
   const time = usePlayerStore((s) => s.progress.time);
   const { setVolume, toggleMute } = useVolume();
-  const setSpeedBoosted = usePlayerStore((s) => s.setSpeedBoosted);
-  const setShowSpeedIndicator = usePlayerStore((s) => s.setShowSpeedIndicator);
 
   const { toggleLastUsed } = useCaptions();
   const setShowVolume = useEmpheralVolumeStore((s) => s.setShowVolume);
@@ -30,13 +28,15 @@ export function KeyboardEvents() {
   const [isRolling, setIsRolling] = useState(false);
   const volumeDebounce = useRef<ReturnType<typeof setTimeout> | undefined>();
   const subtitleDebounce = useRef<ReturnType<typeof setTimeout> | undefined>();
+
+  // Speed boost
+  const setSpeedBoosted = usePlayerStore((s) => s.setSpeedBoosted);
+  const setShowSpeedIndicator = usePlayerStore((s) => s.setShowSpeedIndicator);
   const speedIndicatorTimeoutRef = useRef<
     ReturnType<typeof setTimeout> | undefined
   >();
   const boostTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
   const isPendingBoostRef = useRef<boolean>(false);
-
-  // Tracking previous playback rate when space is held down
   const previousRateRef = useRef<number>(1);
   const isSpaceHeldRef = useRef<boolean>(false);
 

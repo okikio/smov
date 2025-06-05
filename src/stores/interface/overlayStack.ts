@@ -2,12 +2,12 @@ import { create } from "zustand";
 
 type OverlayType = "volume" | "subtitle" | "speed" | null;
 
-export interface OverlayStackState {
+interface OverlayStackStore {
   currentOverlay: OverlayType;
   setCurrentOverlay: (overlay: OverlayType) => void;
 }
 
-export const useOverlayStack = create<OverlayStackState>((set) => ({
+export const useOverlayStack = create<OverlayStackStore>((set) => ({
   currentOverlay: null,
   setCurrentOverlay: (overlay) => set({ currentOverlay: overlay }),
 }));
