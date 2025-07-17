@@ -219,15 +219,22 @@ export function DetailsBody({
           >
             <Icon icon={Icons.PLAY} className="text-white" />
             <span className="text-white text-sm pr-1">
-              {data.type === "movie"
-                ? !data.releaseDate || new Date(data.releaseDate) > new Date()
-                  ? t("media.unreleased")
+              {showProgress &&
+              data.type === "show" &&
+              showProgress.season &&
+              showProgress.episode
+                ? `${t("details.resume")} S${showProgress.season.number}:E${
+                    showProgress.episode.number
+                  }`
+                : data.type === "movie"
+                  ? !data.releaseDate || new Date(data.releaseDate) > new Date()
+                    ? t("media.unreleased")
+                    : showProgress
+                      ? t("details.resume")
+                      : t("details.play")
                   : showProgress
                     ? t("details.resume")
-                    : t("details.play")
-                : showProgress
-                  ? t("details.resume")
-                  : t("details.play")}
+                    : t("details.play")}
             </span>
           </Button>
           <div className="flex items-center gap-1 flex-shrink-0">
@@ -244,17 +251,6 @@ export function DetailsBody({
                 />
               </button>
             )}
-            <MediaBookmarkButton
-              media={{
-                id: data.id?.toString() || "",
-                title: data.title,
-                year: data.releaseDate
-                  ? new Date(data.releaseDate).getFullYear()
-                  : undefined,
-                poster: data.posterUrl,
-                type: data.type || "movie",
-              }}
-            />
             <button
               type="button"
               onClick={onShareClick}
@@ -266,6 +262,17 @@ export function DetailsBody({
                 className="transition-transform duration-300 hover:scale-110 hover:cursor-pointer"
               />
             </button>
+            <MediaBookmarkButton
+              media={{
+                id: data.id?.toString() || "",
+                title: data.title,
+                year: data.releaseDate
+                  ? new Date(data.releaseDate).getFullYear()
+                  : undefined,
+                poster: data.posterUrl,
+                type: data.type || "movie",
+              }}
+            />
           </div>
         </div>
 
