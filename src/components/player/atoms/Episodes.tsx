@@ -367,7 +367,7 @@ export function EpisodesView({
                       clickable={isAired}
                       rightSide={
                         <div className="flex items-center gap-2">
-                          {isAired && (
+                          {isAired && !isActive && (
                             <button
                               type="button"
                               onClick={(e) => toggleWatchStatus(ep.id, e)}
@@ -456,7 +456,7 @@ export function EpisodesView({
                       </div>
 
                       {/* Mark as watched button */}
-                      {isAired && (
+                      {isAired && !isActive && (
                         <div className="absolute top-2 right-2">
                           <button
                             type="button"
@@ -584,7 +584,7 @@ export function EpisodesView({
                         </div>
 
                         {/* Mark as watched button */}
-                        {isAired && (
+                        {isAired && !isActive && (
                           <div className="absolute top-2 right-2">
                             <button
                               type="button"
