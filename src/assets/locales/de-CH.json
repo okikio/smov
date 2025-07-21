@@ -54,7 +54,8 @@
             "general": "Generel",
             "playback": "Wedergobe Fehler",
             "connections": "Verbendige",
-            "language": "Sproche & Ontertetel Ischtelige"
+            "language": "Sproche & Ontertetel Ischtelige",
+            "search": "Suechi & Content verfüegbarkeit"
         },
         "q7": {
             "title": "Wie mach ich en Account?",
@@ -183,7 +184,7 @@
             "sectionTitle": "Läsezeiche"
         },
         "continueWatching": {
-            "sectionTitle": "Witer luete…"
+            "sectionTitle": "Witer luege…"
         },
         "mediaList": {
             "stopEditing": "Bearbeitig beände"
