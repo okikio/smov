@@ -18,11 +18,11 @@ import VideoTesterView from "@/pages/developer/VideoTesterView";
 import { DiscoverMore } from "@/pages/discover/AllMovieLists";
 import { Discover } from "@/pages/discover/Discover";
 import { MoreContent } from "@/pages/discover/MoreContent";
-import { DmcaPage, shouldHaveDmcaPage } from "@/pages/Dmca";
 import MaintenancePage from "@/pages/errors/MaintenancePage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
 import { JipPage } from "@/pages/Jip";
+import { LegalPage, shouldHaveLegalPage } from "@/pages/Legal";
 import { LoginPage } from "@/pages/Login";
 import { MigrationPage } from "@/pages/migration/Migration";
 import { MigrationDirectPage } from "@/pages/migration/MigrationDirect";
@@ -164,8 +164,8 @@ function App() {
           />
           <Route path="/migration/upload" element={<MigrationUploadPage />} />
 
-          {shouldHaveDmcaPage() ? (
-            <Route path="/dmca" element={<DmcaPage />} />
+          {shouldHaveLegalPage() ? (
+            <Route path="/legal" element={<LegalPage />} />
           ) : null}
           {/* Support page */}
           <Route path="/support" element={<SupportPage />} />
