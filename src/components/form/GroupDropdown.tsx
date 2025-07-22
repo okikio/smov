@@ -56,7 +56,7 @@ export function GroupDropdown({
   };
 
   return (
-    <div className="relative w-48">
+    <div className="relative min-w-[200px]">
       <button
         type="button"
         className="w-full px-3 py-2 text-xs bg-gray-700/50 border border-gray-600 rounded-lg text-white flex justify-between items-center"
@@ -88,7 +88,7 @@ export function GroupDropdown({
         </span>
       </button>
       {open && (
-        <div className="absolute z-[150] mt-1 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 text-xs">
+        <div className="absolute z-[150] mt-1 end-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 pb-3 text-sm">
           {groups.length === 0 && !showInput && (
             <div className="px-4 py-2 text-gray-400">No groups</div>
           )}
@@ -105,7 +105,7 @@ export function GroupDropdown({
                   onChange={() => handleToggleGroup(group)}
                   className="accent-purple-400"
                 />
-                <span className="w-5 h-5 flex items-center justify-center mr-2">
+                <span className="w-5 h-5 flex items-center justify-center ml-1">
                   <UserIcon
                     icon={icon}
                     className="inline-block w-full h-full"
