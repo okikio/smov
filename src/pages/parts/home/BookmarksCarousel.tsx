@@ -91,11 +91,13 @@ export function BookmarksCarousel({
 
     items.forEach((item) => {
       const bookmark = bookmarks[item.id];
-      if (bookmark?.group) {
-        if (!grouped[bookmark.group]) {
-          grouped[bookmark.group] = [];
-        }
-        grouped[bookmark.group].push(item);
+      if (Array.isArray(bookmark?.group)) {
+        bookmark.group.forEach((groupName) => {
+          if (!grouped[groupName]) {
+            grouped[groupName] = [];
+          }
+          grouped[groupName].push(item);
+        });
       } else {
         regular.push(item);
       }

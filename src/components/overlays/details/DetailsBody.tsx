@@ -30,21 +30,22 @@ export function DetailsBody({
   const [releaseInfo, setReleaseInfo] = useState<TraktReleaseResponse | null>(
     null,
   );
-  const addBookmarkWithGroup = useBookmarkStore((s) => s.addBookmarkWithGroup);
-  const removeBookmark = useBookmarkStore((s) => s.removeBookmark);
-  const addBookmark = useBookmarkStore((s) => s.addBookmark);
+  const addBookmarkWithGroups = useBookmarkStore(
+    (s) => s.addBookmarkWithGroups,
+  );
+
   const bookmarks = useBookmarkStore((s) => s.bookmarks);
-  const currentGroup = bookmarks[data.id?.toString() ?? ""]?.group;
+  const currentGroups = bookmarks[data.id?.toString() ?? ""]?.group || [];
 
   const allGroups = Array.from(
     new Set(
       Object.values(bookmarks)
-        .map((b) => b.group)
+        .flatMap((b) => b.group || [])
         .filter(Boolean),
     ),
   ) as string[];
 
-  const handleSelectGroup = (group: string) => {
+  const handleSelectGroups = (groups: string[]) => {
     if (!data.id) return;
     const meta = {
       tmdbId: data.id.toString(),
@@ -55,14 +56,14 @@ export function DetailsBody({
         : 0,
       poster: data.posterUrl,
     };
-    addBookmarkWithGroup(meta, group);
+    addBookmarkWithGroups(meta, groups);
   };
 
   const handleCreateGroup = (group: string) => {
-    handleSelectGroup(group);
+    handleSelectGroups([...currentGroups, group]);
   };
 
-  const handleRemoveGroup = () => {
+  const handleRemoveGroup = (groupToRemove?: string) => {
     if (!data.id) return;
     const meta = {
       tmdbId: data.id.toString(),
@@ -73,8 +74,13 @@ export function DetailsBody({
         : 0,
       poster: data.posterUrl,
     };
-    removeBookmark(data.id.toString());
-    addBookmark(meta);
+    if (groupToRemove) {
+      const newGroups = currentGroups.filter((g) => g !== groupToRemove);
+      addBookmarkWithGroups(meta, newGroups);
+    } else {
+      // Remove all groups
+      addBookmarkWithGroups(meta, []);
+    }
   };
 
   useEffect(() => {
@@ -266,8 +272,8 @@ export function DetailsBody({
         {/* Group Dropdown */}
         <GroupDropdown
           groups={allGroups}
-          currentGroup={currentGroup}
-          onSelectGroup={handleSelectGroup}
+          currentGroups={currentGroups}
+          onSelectGroups={handleSelectGroups}
           onCreateGroup={handleCreateGroup}
           onRemoveGroup={handleRemoveGroup}
         />

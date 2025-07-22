@@ -9,12 +9,14 @@ import { IconPatch } from "../buttons/IconPatch";
 
 interface MediaBookmarkProps {
   media: MediaItem;
-  group?: string;
+  group?: string[];
 }
 
 export function MediaBookmarkButton({ media, group }: MediaBookmarkProps) {
   const addBookmark = useBookmarkStore((s) => s.addBookmark);
-  const addBookmarkWithGroup = useBookmarkStore((s) => s.addBookmarkWithGroup);
+  const addBookmarkWithGroups = useBookmarkStore(
+    (s) => s.addBookmarkWithGroups,
+  );
   const removeBookmark = useBookmarkStore((s) => s.removeBookmark);
   const bookmarks = useBookmarkStore((s) => s.bookmarks);
   const meta: PlayerMeta | undefined = useMemo(() => {
@@ -33,13 +35,13 @@ export function MediaBookmarkButton({ media, group }: MediaBookmarkProps) {
   const toggleBookmark = useCallback(() => {
     if (!meta) return;
     if (isBookmarked) removeBookmark(meta.tmdbId);
-    else if (group) addBookmarkWithGroup(meta, group);
+    else if (group && group.length > 0) addBookmarkWithGroups(meta, group);
     else addBookmark(meta);
   }, [
     isBookmarked,
     meta,
     addBookmark,
-    addBookmarkWithGroup,
+    addBookmarkWithGroups,
     removeBookmark,
     group,
   ]);

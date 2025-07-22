@@ -10,7 +10,7 @@ export interface BookmarkMediaItem {
   poster?: string;
   type: "show" | "movie";
   updatedAt: number;
-  group?: string;
+  group?: string[];
 }
 
 export interface BookmarkUpdateItem {
@@ -20,7 +20,7 @@ export interface BookmarkUpdateItem {
   id: string;
   poster?: string;
   type?: "show" | "movie";
-  group?: string;
+  group?: string[];
   action: "delete" | "add";
 }
 
@@ -28,7 +28,7 @@ export interface BookmarkStore {
   bookmarks: Record<string, BookmarkMediaItem>;
   updateQueue: BookmarkUpdateItem[];
   addBookmark(meta: PlayerMeta): void;
-  addBookmarkWithGroup(meta: PlayerMeta, group?: string): void;
+  addBookmarkWithGroups(meta: PlayerMeta, groups?: string[]): void;
   removeBookmark(id: string): void;
   replaceBookmarks(items: Record<string, BookmarkMediaItem>): void;
   clear(): void;
@@ -77,7 +77,7 @@ export const useBookmarkStore = create(
           };
         });
       },
-      addBookmarkWithGroup(meta, group) {
+      addBookmarkWithGroups(meta, groups) {
         set((s) => {
           updateId += 1;
           s.updateQueue.push({
@@ -88,7 +88,7 @@ export const useBookmarkStore = create(
             title: meta.title,
             year: meta.releaseYear,
             poster: meta.poster,
-            group,
+            group: groups,
           });
 
           s.bookmarks[meta.tmdbId] = {
@@ -97,7 +97,7 @@ export const useBookmarkStore = create(
             year: meta.releaseYear,
             poster: meta.poster,
             updatedAt: Date.now(),
-            group,
+            group: groups,
           };
         });
       },
