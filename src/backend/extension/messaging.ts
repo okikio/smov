@@ -22,13 +22,6 @@ const isExtensionReady = new Promise<void>((resolve) => {
 
 let activeExtension = false;
 
-const EXTENSION_OVERRIDE_KEY = "___dev_extension_override";
-
-function isExtensionOverrideEnabled(): boolean {
-  if (typeof window === "undefined") return false;
-  return localStorage.getItem(EXTENSION_OVERRIDE_KEY) === "true";
-}
-
 async function sendMessage<MessageKey extends keyof MessagesMetadata>(
   message: MessageKey,
   payload: MessagesMetadata[MessageKey]["req"] | undefined = undefined,
@@ -81,12 +74,10 @@ export async function extensionInfo(): Promise<
 }
 
 export function isExtensionActiveCached(): boolean {
-  if (isExtensionOverrideEnabled()) return true;
   return activeExtension;
 }
 
 export async function isExtensionActive(): Promise<boolean> {
-  if (isExtensionOverrideEnabled()) return true;
   const info = await extensionInfo();
   if (!info?.success) return false;
   const allowedVersion = isAllowedExtensionVersion(info.version);

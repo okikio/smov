@@ -839,15 +839,7 @@
       "admin": {
         "title": "Admin panel",
         "text": "Utilize tools made for testing P-Stream's condition.",
-        "button": "Check it out",
-        "extensionOverride": {
-          "title": "Extension Override",
-          "text": "Override extension detection for testing purposes. This will make the app believe the extension is active even if it's not installed.",
-          "button": "Enable Override",
-          "buttonDisabled": "Disable Override",
-          "enabled": "Extension override is currently enabled",
-          "disabled": "Extension override is currently disabled"
-        }
+        "button": "Check it out"
       },
       "actions": {
         "delete": {
