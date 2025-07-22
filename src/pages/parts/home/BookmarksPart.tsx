@@ -16,11 +16,11 @@ function parseGroupString(group: string): { icon: UserIcons; name: string } {
   const match = group.match(/^\[([a-zA-Z0-9_]+)\](.*)$/);
   if (match) {
     const iconKey = match[1].toUpperCase() as keyof typeof UserIcons;
-    const icon = UserIcons[iconKey] || UserIcons.CAT;
+    const icon = UserIcons[iconKey] || UserIcons.BOOKMARK;
     const name = match[2].trim();
     return { icon, name };
   }
-  return { icon: UserIcons.CAT, name: group };
+  return { icon: UserIcons.BOOKMARK, name: group };
 }
 
 const LONG_PRESS_DURATION = 700; // 0.7 seconds
