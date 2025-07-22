@@ -50,7 +50,7 @@ export function M3U8ProxyItem(props: {
       <div className="flex-1">
         <p className="text-white font-bold">{props.name}</p>
         {props.errorText ? <p>{props.errorText}</p> : null}
-        {urlWithoutProtocol ? <p>{urlWithoutProtocol}</p> : null}
+        {urlWithoutProtocol ? <p>{urlWithoutProtocol}</p> : null}{" "}
       </div>
     </div>
   );
@@ -239,7 +239,8 @@ export function M3U8TestPart() {
                 name={name}
                 questionable
                 key={v.id}
-                errorText={s.error?.toString()}
+                url={v.url}
+                // errorText={s.error?.toString()}
                 enabled={enabled}
                 onToggle={(isEnabled) => handleToggleProxy(v.id, isEnabled)}
               />
