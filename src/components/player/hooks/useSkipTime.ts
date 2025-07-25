@@ -5,7 +5,7 @@ import { conf } from "@/setup/config";
 import { usePreferencesStore } from "@/stores/preferences";
 
 // Thanks Nemo for this API
-const BASE_URL = "https://skips.pstream.org";
+const BASE_URL = "https://fed-skips.pstream.mov";
 const MAX_RETRIES = 3;
 
 export function useSkipTime() {

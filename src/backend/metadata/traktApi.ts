@@ -27,7 +27,7 @@ export interface PaginatedTraktResponse {
 
 export type TraktContentType = "movie" | "episode";
 
-export const TRAKT_BASE_URL = "https://fed-airdate.pstream.org";
+export const TRAKT_BASE_URL = "https://fed-airdate.pstream.mov";
 
 export interface TraktDiscoverResponse {
   movie_tmdb_ids: number[];
