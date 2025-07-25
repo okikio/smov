@@ -512,8 +512,8 @@
           "default": "3. Default Setup",
           "defaultDescription": "Uses P-Stream's built-in proxy. It's the easiest option but might be slower due to shared bandwidth.",
           "fedapi": {
-            "fedapi": "Additional: FED API (Private) token",
-            "fedapiDescription": "Bring your own FREE Febbox account to gain access to FED API (Private), the best source with 4K quality, Dolby Atmos, skip intro and the fastest load times! Highly recommended option!"
+            "fedapi": "Additional: Febbox token",
+            "fedapiDescription": "Bring your own FREE Febbox account to gain access to FED API and CIA API, the best sources with 4K quality, Dolby Atmos, skip intro and the fastest load times! Highly recommended option!"
           },
           "outro": "If you have more questions on how this works, feel free to ask on the <0>P-Stream Discord</0> server!"
         },
@@ -522,15 +522,15 @@
           "subtitle": "Recommended Configurations:",
           "desktop": {
             "title": "Desktop:",
-            "description": "Extension + FED API (Private)"
+            "description": "Extension + Febbox token"
           },
           "iOS": {
             "title": "iOS:",
-            "description": "Custom proxy + FED API (Private)"
+            "description": "Custom proxy + Febbox token"
           },
           "android": {
             "title": "Android:",
-            "description": "Extension + FED API (Private)"
+            "description": "Extension + Febbox token"
           }
         }
       },
@@ -1092,7 +1092,7 @@
   "fedapi": {
     "onboarding": {
       "title": "Febbox token",
-      "description": "Bring your own FREE Febbox account to gain access to exclusive sources! The best sources with 4K quality, Dolby Atmos, skip intro and the fastest load times! Highly recommended option!"
+      "description": "Bring your own FREE Febbox account to gain access to FED API and CIA API, the best sources with 4K quality, Dolby Atmos, skip intro and the fastest load times! Highly recommended option!"
     },
     "setup": {
       "title": "To get your UI token:",
@@ -1102,14 +1102,14 @@
         "1": "1. Go to <0>febbox.com</0> and log in with Google (use a fresh account!)",
         "2": "2. Open DevTools or inspect the page",
         "3": "3. Go to Application tab → Cookies",
-        "4": "4. Copy the 'ui' cookie.",
+        "4": "4. Copy the 'ui' cookie's value.",
         "5": "5. Close the tab, but do NOT logout!",
         "warning": "(Do not share this token!)"
       }
     },
     "status": {
       "success": "success",
-      "api_down": "Cannot reach an API!",
+      "api_down": "Cannot reach FED API!",
       "invalid_token": "Failed to fetch a 'VIP' stream. Your token is invalid!"
     }
   },
