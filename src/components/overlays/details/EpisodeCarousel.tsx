@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/buttons/Button";
 import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
+import { ConfirmOverlay } from "@/components/overlays/details/ConfirmOverlay";
 import { hasAired } from "@/components/player/utils/aired";
 import { useProgressStore } from "@/stores/progress";
 
@@ -25,6 +26,8 @@ export function EpisodeCarousel({
   const [showEpisodeMenu, setShowEpisodeMenu] = useState(false);
   const [customSeason, setCustomSeason] = useState("");
   const [customEpisode, setCustomEpisode] = useState("");
+  const [SeasonWatched, setSeasonWatched] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [expandedEpisodes, setExpandedEpisodes] = useState<{
     [key: number]: boolean;
   }>({});
@@ -203,9 +206,65 @@ export function EpisodeCarousel({
     }
   };
 
+  // Toggle whole season watch status
+  const toggleSeasonWatchStatus = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setIsConfirmOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsConfirmOpen(false);
+  };
+
   const currentSeasonEpisodes = episodes.filter(
     (ep) => ep.season_number === selectedSeason,
   );
+
+  const handleConfirm = (event: React.MouseEvent) => {
+    try {
+      const episodeWatchedStatus: boolean[] = [];
+      currentSeasonEpisodes.forEach((episode: any) => {
+        const episodeProgress =
+          progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
+        const percentage = episodeProgress
+          ? (episodeProgress.progress.watched /
+              episodeProgress.progress.duration) *
+            100
+          : 0;
+        const isAired = hasAired(episode.air_date);
+        const isWatched = percentage > 90;
+        if (isAired && !isWatched) {
+          episodeWatchedStatus.push(isWatched);
+        }
+      });
+
+      const hasUnwatched = episodeWatchedStatus.length >= 1;
+
+      currentSeasonEpisodes.forEach((episode: any) => {
+        const episodeProgress =
+          progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
+        const percentage = episodeProgress
+          ? (episodeProgress.progress.watched /
+              episodeProgress.progress.duration) *
+            100
+          : 0;
+        const isAired = hasAired(episode.air_date);
+        const isWatched = percentage > 90;
+        if (hasUnwatched && isAired && !isWatched) {
+          toggleWatchStatus(episode.id, event); // Mark unwatched as watched
+        } else if (!hasUnwatched && isAired && isWatched) {
+          toggleWatchStatus(episode.id, event); // Mark watched as unwatched
+        }
+      });
+
+      setIsConfirmOpen(false);
+    } catch (error) {
+      console.error("Error in handleConfirm:", error);
+      setIsConfirmOpen(false);
+    }
+  };
 
   const toggleEpisodeExpansion = (
     episodeId: number,
@@ -258,6 +317,34 @@ export function EpisodeCarousel({
       window.removeEventListener("resize", handleResize);
     };
   }, [episodes, expandedEpisodes]);
+
+  useEffect(() => {
+    const episodeWatchedStatus: boolean[] = [];
+
+    currentSeasonEpisodes.forEach((episode: any) => {
+      const episodeProgress =
+        progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
+      const percentage = episodeProgress
+        ? (episodeProgress.progress.watched /
+            episodeProgress.progress.duration) *
+          100
+        : 0;
+      const isAired = hasAired(episode.air_date);
+      const isWatched = percentage > 90;
+
+      if (isAired && !isWatched) {
+        episodeWatchedStatus.push(isWatched);
+      }
+    });
+
+    let toggle: boolean;
+
+    if (episodeWatchedStatus.length >= 1) {
+      setSeasonWatched(true); // If no episodes are watched, we want to mark all as watched
+    } else {
+      setSeasonWatched(false); // if all episodes are watched, we want to mark all as unwatched
+    }
+  }, [currentSeasonEpisodes, episodes, mediaId, progress]);
 
   return (
     <div className="mt-6 md:mt-0">
@@ -323,17 +410,43 @@ export function EpisodeCarousel({
             )}
           </div>
         </div>
-        <Dropdown
-          options={seasons.map((season) => ({
-            id: season.season_number.toString(),
-            name: `${t("details.season")} ${season.season_number}`,
-          }))}
-          selectedItem={{
-            id: selectedSeason.toString(),
-            name: `${t("details.season")} ${selectedSeason}`,
-          }}
-          setSelectedItem={(item) => onSeasonChange(Number(item.id))}
-        />
+        <div className="flex items-center justify-between gap-2">
+          {isConfirmOpen && (
+            <ConfirmOverlay
+              isOpen={isConfirmOpen}
+              message={
+                SeasonWatched
+                  ? "Are you sure you want to mark the season as watched?"
+                  : "Are you sure you want to mark the season as unwatched?"
+              }
+              onConfirm={handleConfirm}
+              onCancel={handleCancel}
+            />
+          )}
+          <button
+            type="button"
+            onClick={(e) => toggleSeasonWatchStatus(e)}
+            className="p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors"
+            title={t("Mark season as watched")}
+          >
+            <Icon
+              icon={SeasonWatched ? Icons.EYE : Icons.EYE_SLASH}
+              className="h-5 w-5 text-white"
+            />
+          </button>
+
+          <Dropdown
+            options={seasons.map((season) => ({
+              id: season.season_number.toString(),
+              name: `${t("details.season")} ${season.season_number}`,
+            }))}
+            selectedItem={{
+              id: selectedSeason.toString(),
+              name: `${t("details.season")} ${selectedSeason}`,
+            }}
+            setSelectedItem={(item) => onSeasonChange(Number(item.id))}
+          />
+        </div>
       </div>
 
       {/* Episodes Carousel */}
@@ -359,7 +472,6 @@ export function EpisodeCarousel({
         >
           {/* Add padding before the first card */}
           <div className="flex-shrink-0 w-4" />
-
           {currentSeasonEpisodes.map((episode) => {
             const isActive =
               showProgress?.episode?.id === episode.id.toString();
