@@ -1105,6 +1105,14 @@
         "4": "4. Copy the 'ui' cookie's value.",
         "5": "5. Close the tab, but do NOT logout!",
         "warning": "(Do not share this token!)"
+      },
+      "tokenLabel": "Token",
+      "tokenExample": {
+        "button": "(Example)",
+        "title": "Example Token",
+        "description": "This is what a Febbox UI token looks like:",
+        "warning": "Don't try to use, it's fake.",
+        "close": "Got it"
       }
     },
     "status": {
