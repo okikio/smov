@@ -33,6 +33,7 @@ export interface BookmarkResponse {
     year: number;
     poster?: string;
     type: "show" | "movie";
+    group?: string[];
   };
   updatedAt: string;
 }
