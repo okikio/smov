@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/buttons/Button";
 import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
-import { ConfirmOverlay } from "@/components/overlays/details/ConfirmOverlay";
+import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { hasAired } from "@/components/player/utils/aired";
 import { useProgressStore } from "@/stores/progress";
 
@@ -27,7 +27,6 @@ export function EpisodeCarousel({
   const [customSeason, setCustomSeason] = useState("");
   const [customEpisode, setCustomEpisode] = useState("");
   const [SeasonWatched, setSeasonWatched] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [expandedEpisodes, setExpandedEpisodes] = useState<{
     [key: number]: boolean;
   }>({});
@@ -41,6 +40,7 @@ export function EpisodeCarousel({
     [key: number]: HTMLParagraphElement | null;
   }>({});
   const updateItem = useProgressStore((s) => s.updateItem);
+  const confirmModal = useModal("season-watch-confirm");
 
   const handleScroll = (direction: "left" | "right") => {
     if (!carouselRef.current) return;
@@ -211,11 +211,11 @@ export function EpisodeCarousel({
     event.preventDefault();
     event.stopPropagation();
 
-    setIsConfirmOpen(true);
+    confirmModal.show();
   };
 
   const handleCancel = () => {
-    setIsConfirmOpen(false);
+    confirmModal.hide();
   };
 
   const currentSeasonEpisodes = episodes.filter(
@@ -259,10 +259,10 @@ export function EpisodeCarousel({
         }
       });
 
-      setIsConfirmOpen(false);
+      confirmModal.hide();
     } catch (error) {
       console.error("Error in handleConfirm:", error);
-      setIsConfirmOpen(false);
+      confirmModal.hide();
     }
   };
 
@@ -337,8 +337,6 @@ export function EpisodeCarousel({
       }
     });
 
-    let toggle: boolean;
-
     if (episodeWatchedStatus.length >= 1) {
       setSeasonWatched(true); // If no episodes are watched, we want to mark all as watched
     } else {
@@ -410,23 +408,30 @@ export function EpisodeCarousel({
             )}
           </div>
         </div>
+
+        {/* Season Watched Confirmation */}
         <div className="flex items-center justify-between gap-2">
-          {isConfirmOpen && (
-            <ConfirmOverlay
-              isOpen={isConfirmOpen}
-              message={
-                SeasonWatched
-                  ? "Are you sure you want to mark the season as watched?"
-                  : "Are you sure you want to mark the season as unwatched?"
-              }
-              onConfirm={handleConfirm}
-              onCancel={handleCancel}
-            />
-          )}
+          <Modal id={confirmModal.id}>
+            <ModalCard>
+              <h3 className="text-lg font-semibold text-white mb-4">
+                {SeasonWatched
+                  ? t("media.seasonWatched")
+                  : t("media.seasonUnwatched")}
+              </h3>
+              <div className="flex justify-end gap-2">
+                <Button theme="secondary" onClick={handleCancel}>
+                  {t("actions.cancel")}
+                </Button>
+                <Button theme="purple" onClick={handleConfirm}>
+                  {t("actions.confirm")}
+                </Button>
+              </div>
+            </ModalCard>
+          </Modal>
           <button
             type="button"
             onClick={(e) => toggleSeasonWatchStatus(e)}
-            className="p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors"
+            className="p-1.5 bg-dropdown-background hover:bg-dropdown-hoverBackground transition-colors rounded-full"
             title={t("Mark season as watched")}
           >
             <Icon
