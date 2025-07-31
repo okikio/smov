@@ -25,6 +25,7 @@ export function useAuthData() {
   const setProxySet = useAuthStore((s) => s.setProxySet);
   const clearBookmarks = useBookmarkStore((s) => s.clear);
   const clearProgress = useProgressStore((s) => s.clear);
+  const clearGroupOrder = useGroupOrderStore((s) => s.clear);
   const setTheme = useThemeStore((s) => s.setTheme);
   const setAppLanguage = useLanguageStore((s) => s.setLanguage);
   const importSubtitleLanguage = useSubtitleStore(
@@ -87,8 +88,15 @@ export function useAuthData() {
     removeAccount();
     clearBookmarks();
     clearProgress();
+    clearGroupOrder();
     setFebboxKey(null);
-  }, [removeAccount, clearBookmarks, clearProgress, setFebboxKey]);
+  }, [
+    removeAccount,
+    clearBookmarks,
+    clearProgress,
+    clearGroupOrder,
+    setFebboxKey,
+  ]);
 
   const syncData = useCallback(
     async (
