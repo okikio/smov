@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import React, { useState } from "react";
 
 import { Icon, Icons } from "@/components/Icon";
@@ -78,7 +79,9 @@ export function GroupDropdown({
             })}
           </span>
         ) : (
-          <span className="text-white/70">Add to group</span>
+          <span className="text-white/70">
+            {t("home.bookmarks.groups.dropdown.placeholderButton")}
+          </span>
         )}
         <span className="ml-2 text-white/40">
           <Icon
@@ -90,7 +93,9 @@ export function GroupDropdown({
       {open && (
         <div className="absolute z-[150] mt-1 end-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 pb-3 text-sm">
           {groups.length === 0 && !showInput && (
-            <div className="px-4 py-2 text-gray-400">No groups</div>
+            <div className="px-4 py-2 text-gray-400">
+              {t("home.bookmarks.groups.dropdown.empty")}
+            </div>
           )}
           {groups.map((group) => {
             const { icon, name } = parseGroupString(group);
@@ -137,7 +142,7 @@ export function GroupDropdown({
                 disabled={!newGroup.trim()}
                 style={{ flexShrink: 0 }}
               >
-                Add
+                {t("home.bookmarks.groups.dropdown.addButton")}
               </button>
             </div>
             {newGroup.trim().length > 0 && (
@@ -167,7 +172,7 @@ export function GroupDropdown({
           {currentGroups.length > 0 && (
             <div className="border-t border-gray-700 pt-2 px-4">
               <div className="text-xs text-red-400 mb-1">
-                Remove from group:
+                {t("home.bookmarks.groups.dropdown.removeFromGroup")}
               </div>
               <div className="flex flex-wrap gap-2">
                 {currentGroups.map((group) => {
@@ -190,7 +195,7 @@ export function GroupDropdown({
                   className="ml-2 text-xs text-red-400 underline"
                   onClick={() => onRemoveGroup()}
                 >
-                  Remove all
+                  {t("home.bookmarks.groups.dropdown.removeAll")}
                 </button>
               </div>
             </div>

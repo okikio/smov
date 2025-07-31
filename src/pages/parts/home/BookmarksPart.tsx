@@ -2,12 +2,19 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@/components/buttons/Button";
 import { EditButton } from "@/components/buttons/EditButton";
+import { EditButtonWithText } from "@/components/buttons/EditButtonWithText";
+import { Item, SortableList } from "@/components/form/SortableList";
 import { Icons } from "@/components/Icon";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { MediaGrid } from "@/components/media/MediaGrid";
 import { WatchedMediaCard } from "@/components/media/WatchedMediaCard";
+import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
+import { Heading2, Paragraph } from "@/components/utils/Text";
+import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
+import { useAuthStore } from "@/stores/auth";
 import { useBookmarkStore } from "@/stores/bookmarks";
 import { useProgressStore } from "@/stores/progress";
 import { MediaItem } from "@/utils/mediaTypes";
@@ -35,9 +42,15 @@ export function BookmarksPart({
   const { t } = useTranslation();
   const progressItems = useProgressStore((s) => s.items);
   const bookmarks = useBookmarkStore((s) => s.bookmarks);
+  const groupOrder = useBookmarkStore((s) => s.groupOrder);
+  const setGroupOrder = useBookmarkStore((s) => s.setGroupOrder);
   const removeBookmark = useBookmarkStore((s) => s.removeBookmark);
   const [editing, setEditing] = useState(false);
   const [gridRef] = useAutoAnimate<HTMLDivElement>();
+  const editOrderModal = useModal("bookmark-edit-order");
+  const [tempGroupOrder, setTempGroupOrder] = useState<string[]>([]);
+  const backendUrl = useBackendUrl();
+  const account = useAuthStore((s) => s.account);
 
   const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -99,6 +112,109 @@ export function BookmarksPart({
     return { groupedItems: grouped, regularItems: regular };
   }, [items, bookmarks, progressItems]);
 
+  // group sorting
+  const allGroups = useMemo(() => {
+    const groups = new Set<string>();
+
+    Object.values(bookmarks).forEach((bookmark) => {
+      if (Array.isArray(bookmark.group)) {
+        bookmark.group.forEach((group) => groups.add(group));
+      }
+    });
+
+    groups.add("bookmarks");
+
+    return Array.from(groups);
+  }, [bookmarks]);
+
+  const sortableItems = useMemo(() => {
+    const currentOrder = editOrderModal.isShown ? tempGroupOrder : groupOrder;
+
+    if (currentOrder.length === 0) {
+      return allGroups.map((group) => {
+        const { name } = parseGroupString(group);
+        return {
+          id: group,
+          name: group === "bookmarks" ? t("home.bookmarks.sectionTitle") : name,
+        } as Item;
+      });
+    }
+
+    const orderMap = new Map(
+      currentOrder.map((group, index) => [group, index]),
+    );
+    const sortedGroups = allGroups.sort((groupA, groupB) => {
+      const orderA = orderMap.has(groupA)
+        ? orderMap.get(groupA)!
+        : Number.MAX_SAFE_INTEGER;
+      const orderB = orderMap.has(groupB)
+        ? orderMap.get(groupB)!
+        : Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
+
+    return sortedGroups.map((group) => {
+      const { name } = parseGroupString(group);
+      return {
+        id: group,
+        name: group === "bookmarks" ? t("home.bookmarks.sectionTitle") : name,
+      } as Item;
+    });
+  }, [allGroups, t, editOrderModal.isShown, tempGroupOrder, groupOrder]);
+
+  const sortedSections = useMemo(() => {
+    const sections: Array<{
+      type: "grouped" | "regular";
+      group?: string;
+      items: MediaItem[];
+    }> = [];
+
+    const allSections = new Map<string, MediaItem[]>();
+
+    Object.entries(groupedItems).forEach(([group, groupItems]) => {
+      allSections.set(group, groupItems);
+    });
+
+    if (regularItems.length > 0) {
+      allSections.set("bookmarks", regularItems);
+    }
+
+    if (groupOrder.length === 0) {
+      allSections.forEach((sectionItems, group) => {
+        if (group === "bookmarks") {
+          sections.push({ type: "regular", items: sectionItems });
+        } else {
+          sections.push({ type: "grouped", group, items: sectionItems });
+        }
+      });
+    } else {
+      const orderMap = new Map(
+        groupOrder.map((group, index) => [group, index]),
+      );
+
+      Array.from(allSections.entries())
+        .sort(([groupA], [groupB]) => {
+          const orderA = orderMap.has(groupA)
+            ? orderMap.get(groupA)!
+            : Number.MAX_SAFE_INTEGER;
+          const orderB = orderMap.has(groupB)
+            ? orderMap.get(groupB)!
+            : Number.MAX_SAFE_INTEGER;
+          return orderA - orderB;
+        })
+        .forEach(([group, sectionItems]) => {
+          if (group === "bookmarks") {
+            sections.push({ type: "regular", items: sectionItems });
+          } else {
+            sections.push({ type: "grouped", group, items: sectionItems });
+          }
+        });
+    }
+
+    return sections;
+  }, [groupedItems, regularItems, groupOrder]);
+  // kill me
+
   useEffect(() => {
     onItemsChange(items.length > 0);
   }, [items, onItemsChange]);
@@ -135,31 +251,122 @@ export function BookmarksPart({
     }
   };
 
+  const handleEditGroupOrder = () => {
+    // Initialize with current order or default order
+    if (groupOrder.length === 0) {
+      const defaultOrder = allGroups.map((group) => group);
+      setTempGroupOrder(defaultOrder);
+    } else {
+      setTempGroupOrder([...groupOrder]);
+    }
+    editOrderModal.show();
+  };
+
+  const handleReorderClick = () => {
+    handleEditGroupOrder();
+    // Keep editing state active by setting it to true
+    setEditing(true);
+  };
+
+  const handleCancelOrder = () => {
+    editOrderModal.hide();
+  };
+
+  const handleSaveOrderClick = () => {
+    setGroupOrder(tempGroupOrder);
+    editOrderModal.hide();
+
+    // Save to backend
+    if (backendUrl && account) {
+      useBookmarkStore.getState().saveGroupOrderToBackend(backendUrl, account);
+    }
+  };
+
   if (items.length === 0) return null;
 
   return (
     <div className="relative">
       {/* Grouped Bookmarks */}
-      {Object.entries(groupedItems).map(([group, groupItems]) => {
-        const { icon, name } = parseGroupString(group);
+      {sortedSections.map((section) => {
+        if (section.type === "grouped") {
+          const { icon, name } = parseGroupString(section.group || "");
+          return (
+            <div key={section.group || "bookmarks"} className="mb-6">
+              <SectionHeading
+                title={name}
+                customIcon={
+                  <span className="w-6 h-6 flex items-center justify-center">
+                    <UserIcon icon={icon} className="w-full h-full" />
+                  </span>
+                }
+              >
+                <div className="flex items-center gap-2">
+                  {editing && allGroups.length > 1 && (
+                    <EditButtonWithText
+                      editing={editing}
+                      onEdit={handleReorderClick}
+                      id="edit-group-order-button"
+                      text={t("home.bookmarks.groups.reorder.button")}
+                      secondaryText={t("home.bookmarks.groups.reorder.done")}
+                    />
+                  )}
+                  <EditButton
+                    editing={editing}
+                    onEdit={setEditing}
+                    id={`edit-button-bookmark-${section.group}`}
+                  />
+                </div>
+              </SectionHeading>
+              <MediaGrid>
+                {section.items.map((v) => (
+                  <div
+                    key={v.id}
+                    style={{ userSelect: "none" }}
+                    onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
+                      e.preventDefault()
+                    }
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                  >
+                    <WatchedMediaCard
+                      media={v}
+                      closable={editing}
+                      onClose={() => removeBookmark(v.id)}
+                      onShowDetails={onShowDetails}
+                    />
+                  </div>
+                ))}
+              </MediaGrid>
+            </div>
+          );
+        } // regular items
         return (
-          <div key={group} className="mb-6">
+          <div key="regular-bookmarks" className="mb-6">
             <SectionHeading
-              title={name}
-              customIcon={
-                <span className="w-6 h-6 flex items-center justify-center">
-                  <UserIcon icon={icon} className="w-full h-full" />
-                </span>
-              }
+              title={t("home.bookmarks.sectionTitle")}
+              icon={Icons.BOOKMARK}
             >
-              <EditButton
-                editing={editing}
-                onEdit={setEditing}
-                id={`edit-button-bookmark-${group}`}
-              />
+              <div className="flex items-center gap-2">
+                {editing && allGroups.length > 1 && (
+                  <EditButtonWithText
+                    editing={editing}
+                    onEdit={handleReorderClick}
+                    id="edit-group-order-button"
+                    text={t("home.bookmarks.groups.reorder.button")}
+                    secondaryText={t("home.bookmarks.groups.reorder.done")}
+                  />
+                )}
+                <EditButton
+                  editing={editing}
+                  onEdit={setEditing}
+                  id="edit-button-bookmark"
+                />
+              </div>
             </SectionHeading>
-            <MediaGrid>
-              {groupItems.map((v) => (
+            <MediaGrid ref={gridRef}>
+              {section.items.map((v) => (
                 <div
                   key={v.id}
                   style={{ userSelect: "none" }}
@@ -184,43 +391,34 @@ export function BookmarksPart({
         );
       })}
 
-      {/* Regular Bookmarks */}
-      {regularItems.length > 0 && (
-        <div>
-          <SectionHeading
-            title={t("home.bookmarks.sectionTitle")}
-            icon={Icons.BOOKMARK}
-          >
-            <EditButton
-              editing={editing}
-              onEdit={setEditing}
-              id="edit-button-bookmark"
+      {/* Edit Order Modal */}
+      <Modal id={editOrderModal.id}>
+        <ModalCard>
+          <Heading2 className="!mt-0">
+            {t("home.bookmarks.groups.reorder.title")}
+          </Heading2>
+          <Paragraph>
+            {t("home.bookmarks.groups.reorder.description")}
+          </Paragraph>
+          <div className="mt-6">
+            <SortableList
+              items={sortableItems}
+              setItems={(newItems) => {
+                const newOrder = newItems.map((item) => item.id);
+                setTempGroupOrder(newOrder);
+              }}
             />
-          </SectionHeading>
-          <MediaGrid ref={gridRef}>
-            {regularItems.map((v) => (
-              <div
-                key={v.id}
-                style={{ userSelect: "none" }}
-                onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
-                  e.preventDefault()
-                }
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-              >
-                <WatchedMediaCard
-                  media={v}
-                  closable={editing}
-                  onClose={() => removeBookmark(v.id)}
-                  onShowDetails={onShowDetails}
-                />
-              </div>
-            ))}
-          </MediaGrid>
-        </div>
-      )}
+          </div>
+          <div className="flex gap-4 mt-6 justify-end">
+            <Button theme="secondary" onClick={handleCancelOrder}>
+              {t("home.bookmarks.groups.reorder.cancel")}
+            </Button>
+            <Button theme="purple" onClick={handleSaveOrderClick}>
+              {t("home.bookmarks.groups.reorder.save")}
+            </Button>
+          </div>
+        </ModalCard>
+      </Modal>
     </div>
   );
 }

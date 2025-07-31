@@ -240,7 +240,24 @@
   },
   "home": {
     "bookmarks": {
-      "sectionTitle": "Bookmarks"
+      "sectionTitle": "Bookmarks",
+      "groups": {
+        "dropdown": {
+          "placeholderButton": "Add to group",
+          "empty": "No groups yet",
+          "addButton": "Add",
+          "removeFromGroup": "Remove from group",
+          "removeAll": "Remove all"
+        },
+        "reorder": {
+          "button": "Reorder",
+          "done": "Done",
+          "title": "Edit Group Order",
+          "description": "Drag and drop to reorder your bookmark groups.",
+          "cancel": "Cancel",
+          "save": "Save"
+        }
+      }
     },
     "continueWatching": {
       "sectionTitle": "Continue Watching..."

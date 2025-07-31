@@ -96,9 +96,14 @@ export function useAuthData() {
       progress: ProgressResponse[],
       bookmarks: BookmarkResponse[],
       settings: SettingsResponse,
+      groupOrder: { groupOrder: string[] },
     ) => {
       replaceBookmarks(bookmarkResponsesToEntries(bookmarks));
       replaceItems(progressResponsesToEntries(progress));
+
+      if (groupOrder?.groupOrder) {
+        useBookmarkStore.getState().setGroupOrder(groupOrder.groupOrder);
+      }
 
       if (settings.applicationLanguage) {
         setAppLanguage(settings.applicationLanguage);
