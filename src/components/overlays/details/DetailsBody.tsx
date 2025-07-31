@@ -251,17 +251,6 @@ export function DetailsBody({
                 />
               </button>
             )}
-            <button
-              type="button"
-              onClick={onShareClick}
-              className="p-2 opacity-75 transition-opacity duration-300 hover:scale-110 hover:cursor-pointer hover:opacity-95"
-              title="Share"
-            >
-              <IconPatch
-                icon={Icons.IOS_SHARE}
-                className="transition-transform duration-300 hover:scale-110 hover:cursor-pointer"
-              />
-            </button>
             <MediaBookmarkButton
               media={{
                 id: data.id?.toString() || "",
@@ -273,6 +262,17 @@ export function DetailsBody({
                 type: data.type || "movie",
               }}
             />
+            <button
+              type="button"
+              onClick={onShareClick}
+              className="p-2 opacity-75 transition-opacity duration-300 hover:scale-110 hover:cursor-pointer hover:opacity-95"
+              title="Share"
+            >
+              <IconPatch
+                icon={Icons.IOS_SHARE}
+                className="transition-transform duration-300 hover:scale-110 hover:cursor-pointer"
+              />
+            </button>
           </div>
         </div>
 
