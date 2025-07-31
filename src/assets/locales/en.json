@@ -141,7 +141,8 @@
   "actions": {
     "copied": "Copied",
     "copy": "Copy",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "auth": {
     "createAccount": "Don't have an account yet 😬 <0>Create an account.</0>",
@@ -333,7 +334,9 @@
       "show": "Show"
     },
     "episodeShort": "E",
-    "seasonShort": "S"
+    "seasonShort": "S",
+    "seasonWatched": "Are you sure you want to mark the season as watched?",
+    "seasonUnwatched": "Are you sure you want to mark the season as unwatched?"
   },
   "details": {
     "resume": "Resume",

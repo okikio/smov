@@ -77,10 +77,12 @@ export function OverlayPortal(props: {
   show?: boolean;
   close?: () => void;
   durationClass?: string;
+  zIndex?: number;
 }) {
   const [portalElement, setPortalElement] = useState<Element | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const close = props.close;
+  const zIndex = props.zIndex ?? 999;
 
   useEffect(() => {
     const element = ref.current?.closest(".popout-location");
@@ -93,7 +95,10 @@ export function OverlayPortal(props: {
         ? createPortal(
             <Transition show={props.show} animation="none">
               <FocusTrap>
-                <div className="popout-wrapper fixed overflow-hidden pointer-events-auto inset-0 z-[999] select-none">
+                <div
+                  className="popout-wrapper fixed overflow-hidden pointer-events-auto inset-0 select-none"
+                  style={{ zIndex }}
+                >
                   <Transition animation="fade" isChild>
                     <div
                       onClick={close}

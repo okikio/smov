@@ -5,7 +5,6 @@ import { To, useNavigate } from "react-router-dom";
 
 import { WideContainer } from "@/components/layout/WideContainer";
 import { DetailsModal } from "@/components/overlays/details/DetailsModal";
-import { useModal } from "@/components/overlays/Modal";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useRandomTranslation } from "@/hooks/useRandomTranslation";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
@@ -21,6 +20,7 @@ import { WatchingPart } from "@/pages/parts/home/WatchingPart";
 import { SearchListPart } from "@/pages/parts/search/SearchListPart";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
 import { conf } from "@/setup/config";
+import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { usePreferencesStore } from "@/stores/preferences";
 import { MediaItem } from "@/utils/mediaTypes";
 
@@ -63,7 +63,7 @@ export function HomePage() {
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [showWatching, setShowWatching] = useState(false);
   const [detailsData, setDetailsData] = useState<any>();
-  const detailsModal = useModal("details");
+  const { showModal } = useOverlayStack();
   const enableDiscover = usePreferencesStore((state) => state.enableDiscover);
   const enableFeatured = usePreferencesStore((state) => state.enableFeatured);
   const carouselRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -84,7 +84,7 @@ export function HomePage() {
       id: Number(media.id),
       type: media.type === "movie" ? "movie" : "show",
     });
-    detailsModal.show();
+    showModal("details");
   };
 
   return (

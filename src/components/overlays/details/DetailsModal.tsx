@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 
 import {
@@ -16,17 +16,23 @@ import {
 import { IconPatch } from "@/components/buttons/IconPatch";
 import { Icons } from "@/components/Icon";
 import { Flare } from "@/components/utils/Flare";
+import { useOverlayStack } from "@/stores/interface/overlayStack";
 
-import { useModal } from "../Modal";
 import { OverlayPortal } from "../OverlayDisplay";
 import { DetailsContent } from "./DetailsContent";
 import { DetailsSkeleton } from "./DetailsSkeleton";
 import { DetailsModalProps } from "./types";
 
 export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
-  const modal = useModal(id);
+  const { hideModal, isModalVisible, modalStack } = useOverlayStack();
   const [detailsData, setDetailsData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const modalIndex = modalStack.indexOf(id);
+  const zIndex = modalIndex >= 0 ? 1000 + modalIndex : 999;
+
+  const hide = useCallback(() => hideModal(id), [hideModal, id]);
+  const isShown = isModalVisible(id);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -106,23 +112,24 @@ export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
       }
     };
 
-    if (modal.isShown && data?.id) {
+    if (isShown && data?.id) {
       fetchDetails();
     }
-  }, [modal.isShown, data]);
+  }, [isShown, data]);
 
   useEffect(() => {
-    if (modal.isShown && !data?.id && !isLoading) {
-      modal.hide();
+    if (isShown && !data?.id && !isLoading) {
+      hide();
     }
-  }, [modal, data, isLoading]);
+  }, [isShown, data, isLoading, hide]);
 
   return (
     <OverlayPortal
       darken
-      close={modal.hide}
-      show={modal.isShown}
+      close={hide}
+      show={isShown}
       durationClass="duration-500"
+      zIndex={zIndex}
     >
       <Helmet>
         <html data-no-scroll />
@@ -148,7 +155,7 @@ export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
                 <button
                   type="button"
                   className="text-s font-semibold text-type-secondary hover:text-white transition-transform hover:scale-95 select-none"
-                  onClick={modal.hide}
+                  onClick={hide}
                 >
                   <IconPatch icon={Icons.X} />
                 </button>
