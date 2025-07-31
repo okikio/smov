@@ -16,6 +16,7 @@ import { Heading2, Paragraph } from "@/components/utils/Text";
 import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
 import { useAuthStore } from "@/stores/auth";
 import { useBookmarkStore } from "@/stores/bookmarks";
+import { useGroupOrderStore } from "@/stores/groupOrder";
 import { useProgressStore } from "@/stores/progress";
 import { MediaItem } from "@/utils/mediaTypes";
 
@@ -42,8 +43,8 @@ export function BookmarksPart({
   const { t } = useTranslation();
   const progressItems = useProgressStore((s) => s.items);
   const bookmarks = useBookmarkStore((s) => s.bookmarks);
-  const groupOrder = useBookmarkStore((s) => s.groupOrder);
-  const setGroupOrder = useBookmarkStore((s) => s.setGroupOrder);
+  const groupOrder = useGroupOrderStore((s) => s.groupOrder);
+  const setGroupOrder = useGroupOrderStore((s) => s.setGroupOrder);
   const removeBookmark = useBookmarkStore((s) => s.removeBookmark);
   const [editing, setEditing] = useState(false);
   const [gridRef] = useAutoAnimate<HTMLDivElement>();
@@ -278,7 +279,9 @@ export function BookmarksPart({
 
     // Save to backend
     if (backendUrl && account) {
-      useBookmarkStore.getState().saveGroupOrderToBackend(backendUrl, account);
+      useGroupOrderStore
+        .getState()
+        .saveGroupOrderToBackend(backendUrl, account);
     }
   };
 

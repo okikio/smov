@@ -25,6 +25,7 @@ import App from "@/setup/App";
 import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
 import { BookmarkSyncer } from "@/stores/bookmarks/BookmarkSyncer";
+import { GroupSyncer } from "@/stores/groupOrder/GroupSyncer";
 import { changeAppLanguage, useLanguageStore } from "@/stores/language";
 import { ProgressSyncer } from "@/stores/progress/ProgressSyncer";
 import { SettingsSyncer } from "@/stores/subtitles/SettingsSyncer";
@@ -185,6 +186,7 @@ root.render(
           <ThemeProvider applyGlobal>
             <ProgressSyncer />
             <BookmarkSyncer />
+            <GroupSyncer />
             <SettingsSyncer />
             <TheRouter>
               <MigrationRunner />

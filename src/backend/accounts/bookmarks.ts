@@ -10,12 +10,12 @@ export interface BookmarkMetaInput {
   year: number;
   poster?: string;
   type: string;
-  group?: string[];
 }
 
 export interface BookmarkInput {
   tmdbId: string;
   meta: BookmarkMetaInput;
+  group?: string[];
 }
 
 export function bookmarkMediaToInput(
@@ -30,6 +30,7 @@ export function bookmarkMediaToInput(
       year: item.year ?? 0,
     },
     tmdbId,
+    group: item.group,
   };
 }
 

@@ -11,6 +11,7 @@ import {
 } from "@/backend/accounts/user";
 import { useAuthStore } from "@/stores/auth";
 import { useBookmarkStore } from "@/stores/bookmarks";
+import { useGroupOrderStore } from "@/stores/groupOrder";
 import { useLanguageStore } from "@/stores/language";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useProgressStore } from "@/stores/progress";
@@ -102,7 +103,7 @@ export function useAuthData() {
       replaceItems(progressResponsesToEntries(progress));
 
       if (groupOrder?.groupOrder) {
-        useBookmarkStore.getState().setGroupOrder(groupOrder.groupOrder);
+        useGroupOrderStore.getState().setGroupOrder(groupOrder.groupOrder);
       }
 
       if (settings.applicationLanguage) {

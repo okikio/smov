@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { CarouselNavButtons } from "@/pages/discover/components/CarouselNavButtons";
 import { useAuthStore } from "@/stores/auth";
 import { useBookmarkStore } from "@/stores/bookmarks";
+import { useGroupOrderStore } from "@/stores/groupOrder";
 import { useProgressStore } from "@/stores/progress";
 import { MediaItem } from "@/utils/mediaTypes";
 
@@ -64,8 +65,8 @@ export function BookmarksCarousel({
   const account = useAuthStore((s) => s.account);
 
   // Group order editing state
-  const groupOrder = useBookmarkStore((s) => s.groupOrder);
-  const setGroupOrder = useBookmarkStore((s) => s.setGroupOrder);
+  const groupOrder = useGroupOrderStore((s) => s.groupOrder);
+  const setGroupOrder = useGroupOrderStore((s) => s.setGroupOrder);
   const editOrderModal = useModal("bookmark-edit-order-carousel");
   const [tempGroupOrder, setTempGroupOrder] = useState<string[]>([]);
 
@@ -323,7 +324,9 @@ export function BookmarksCarousel({
 
     // Save to backend
     if (backendUrl && account) {
-      useBookmarkStore.getState().saveGroupOrderToBackend(backendUrl, account);
+      useGroupOrderStore
+        .getState()
+        .saveGroupOrderToBackend(backendUrl, account);
     }
   };
 

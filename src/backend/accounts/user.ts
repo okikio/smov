@@ -33,8 +33,8 @@ export interface BookmarkResponse {
     year: number;
     poster?: string;
     type: "show" | "movie";
-    group?: string[];
   };
+  group: string[];
   updatedAt: string;
 }
 
@@ -63,6 +63,7 @@ export function bookmarkResponsesToEntries(responses: BookmarkResponse[]) {
   const entries = responses.map((bookmark) => {
     const item: BookmarkMediaItem = {
       ...bookmark.meta,
+      group: bookmark.group.length > 0 ? bookmark.group : undefined,
       updatedAt: new Date(bookmark.updatedAt).getTime(),
     };
     return [bookmark.tmdbId, item] as const;

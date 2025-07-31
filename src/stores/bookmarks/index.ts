@@ -2,9 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-import { getGroupOrder, updateGroupOrder } from "@/backend/accounts/groupOrder";
-import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
-import { AccountWithToken, useAuthStore } from "@/stores/auth";
 import { PlayerMeta } from "@/stores/player/slices/source";
 
 export interface BookmarkMediaItem {
@@ -30,20 +27,10 @@ export interface BookmarkUpdateItem {
 export interface BookmarkStore {
   bookmarks: Record<string, BookmarkMediaItem>;
   updateQueue: BookmarkUpdateItem[];
-  groupOrder: string[];
   addBookmark(meta: PlayerMeta): void;
   addBookmarkWithGroups(meta: PlayerMeta, groups?: string[]): void;
   removeBookmark(id: string): void;
   replaceBookmarks(items: Record<string, BookmarkMediaItem>): void;
-  setGroupOrder(order: string[]): void;
-  saveGroupOrderToBackend(
-    backendUrl: string,
-    account: AccountWithToken,
-  ): Promise<void>;
-  loadGroupOrderFromBackend(
-    backendUrl: string,
-    account: AccountWithToken,
-  ): Promise<void>;
   clear(): void;
   clearUpdateQueue(): void;
   removeUpdateItem(id: string): void;
@@ -56,7 +43,6 @@ export const useBookmarkStore = create(
     immer<BookmarkStore>((set) => ({
       bookmarks: {},
       updateQueue: [],
-      groupOrder: [],
       removeBookmark(id) {
         set((s) => {
           updateId += 1;
@@ -133,35 +119,6 @@ export const useBookmarkStore = create(
       removeUpdateItem(id: string) {
         set((s) => {
           s.updateQueue = [...s.updateQueue.filter((v) => v.id !== id)];
-        });
-      },
-      setGroupOrder(order: string[]) {
-        set((s) => {
-          s.groupOrder = order;
-        });
-      },
-      async saveGroupOrderToBackend(
-        backendUrl: string,
-        account: AccountWithToken,
-      ) {
-        if (!account || !backendUrl) {
-          throw new Error("No authenticated account or backend URL");
-        }
-
-        const currentState = useBookmarkStore.getState();
-        await updateGroupOrder(backendUrl, account, currentState.groupOrder);
-      },
-      async loadGroupOrderFromBackend(
-        backendUrl: string,
-        account: AccountWithToken,
-      ) {
-        if (!account || !backendUrl) {
-          throw new Error("No authenticated account or backend URL");
-        }
-
-        const response = await getGroupOrder(backendUrl, account);
-        set((s) => {
-          s.groupOrder = response.groupOrder;
         });
       },
     })),
