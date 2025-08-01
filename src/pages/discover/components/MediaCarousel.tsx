@@ -110,6 +110,9 @@ export function MediaCarousel({
   const { isMobile } = useIsMobile();
   const browser = !!window.chrome;
 
+  // Track overflow state
+  const [hasOverflow, setHasOverflow] = useState(false);
+
   // State for selected options
   const [selectedProviderId, setSelectedProviderId] = useState<string>("");
   const [selectedProviderName, setSelectedProviderName] = useState<string>("");
@@ -256,6 +259,38 @@ export function MediaCarousel({
   }, [showRecommendations, recommendationSources, selectedRecommendationId]);
 
   const categorySlug = `${sectionTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${isTVShow ? "tv" : "movie"}`;
+
+  // Function to check overflow for the carousel
+  const checkOverflow = (element: HTMLDivElement | null) => {
+    if (!element) {
+      setHasOverflow(false);
+      return;
+    }
+
+    const hasHorizontalOverflow = element.scrollWidth > element.clientWidth;
+    setHasOverflow(hasHorizontalOverflow);
+  };
+
+  // Function to set carousel ref and check overflow
+  const setCarouselRef = (element: HTMLDivElement | null) => {
+    carouselRefs.current[categorySlug] = element;
+
+    // Check overflow after a short delay to ensure content is rendered
+    setTimeout(() => checkOverflow(element), 100);
+  };
+
+  // Effect to recheck overflow on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const element = carouselRefs.current[categorySlug];
+      if (element) {
+        checkOverflow(element);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [carouselRefs, categorySlug]);
   let isScrolling = false;
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -498,9 +533,7 @@ export function MediaCarousel({
         <div
           id={`carousel-${categorySlug}`}
           className="grid grid-flow-col auto-cols-max gap-4 pt-0 overflow-x-scroll scrollbar-none rounded-xl overflow-y-hidden md:pl-8 md:pr-8"
-          ref={(el) => {
-            carouselRefs.current[categorySlug] = el;
-          }}
+          ref={setCarouselRef}
           onWheel={handleWheel}
         >
           <div className="md:w-12" />
@@ -555,6 +588,7 @@ export function MediaCarousel({
           <CarouselNavButtons
             categorySlug={categorySlug}
             carouselRefs={carouselRefs}
+            hasOverflow={hasOverflow}
           />
         )}
       </div>

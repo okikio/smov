@@ -26,6 +26,11 @@ export function DiscoverMore() {
   const { lastView } = useDiscoverStore();
   const { isMobile } = useIsMobile();
 
+  // Track overflow states for Letterboxd lists
+  const [overflowStates, setOverflowStates] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   useEffect(() => {
     const fetchLetterboxdLists = async () => {
       try {
@@ -62,6 +67,41 @@ export function DiscoverMore() {
       e.preventDefault();
     }
   };
+
+  // Function to check overflow for a carousel
+  const checkOverflow = (element: HTMLDivElement | null, key: string) => {
+    if (!element) {
+      setOverflowStates((prev) => ({ ...prev, [key]: false }));
+      return;
+    }
+
+    const hasOverflow = element.scrollWidth > element.clientWidth;
+    setOverflowStates((prev) => ({ ...prev, [key]: hasOverflow }));
+  };
+
+  // Function to set carousel ref and check overflow
+  const setCarouselRef = (element: HTMLDivElement | null, key: string) => {
+    carouselRefs.current[key] = element;
+
+    // Check overflow after a short delay to ensure content is rendered
+    setTimeout(() => checkOverflow(element, key), 100);
+  };
+
+  // Effect to recheck overflow on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      // Recheck overflow for all carousels
+      Object.keys(carouselRefs.current).forEach((key) => {
+        const element = carouselRefs.current[key];
+        if (element) {
+          checkOverflow(element, key);
+        }
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <SubPageLayout>
@@ -118,9 +158,7 @@ export function DiscoverMore() {
             <div className="relative overflow-hidden carousel-container md:pb-4">
               <div
                 className="grid grid-flow-col auto-cols-max gap-4 pt-0 overflow-x-scroll scrollbar-none rounded-xl overflow-y-hidden md:pl-8 md:pr-8"
-                ref={(el) => {
-                  carouselRefs.current[list.listUrl] = el;
-                }}
+                ref={(el) => setCarouselRef(el, list.listUrl)}
                 onWheel={handleWheel}
               >
                 <div className="md:w-12" />
@@ -152,6 +190,7 @@ export function DiscoverMore() {
                 <CarouselNavButtons
                   categorySlug={list.listUrl}
                   carouselRefs={carouselRefs}
+                  hasOverflow={overflowStates[list.listUrl]}
                 />
               )}
             </div>
