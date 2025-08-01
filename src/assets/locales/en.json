@@ -687,6 +687,8 @@
         "unknownLanguage": "Unknown",
         "dropSubtitleFile": "Drop subtitle file here! >_<",
         "scrapeButton": "Scrape subtitles",
+        "refresh": "Refresh External Subtitles",
+        "refreshing": "Refreshing...",
         "empty": "There are no provided subtitles for this.",
         "notFound": "None of the available options match your query",
         "useNativeSubtitles": "Use native video subtitles",

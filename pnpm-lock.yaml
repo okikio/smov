@@ -156,6 +156,9 @@ importers:
       subsrt-ts:
         specifier: ^2.1.2
         version: 2.1.2
+      wyzie-lib:
+        specifier: ^2.2.5
+        version: 2.2.5
       zustand:
         specifier: ^4.5.7
         version: 4.5.7(@types/react@18.3.23)(immer@10.1.1)(react@18.3.1)
