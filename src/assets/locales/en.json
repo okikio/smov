@@ -242,6 +242,7 @@
   "home": {
     "bookmarks": {
       "sectionTitle": "Bookmarks",
+      "showAll": "Show all",
       "groups": {
         "dropdown": {
           "placeholderButton": "Add to group",

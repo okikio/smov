@@ -1,15 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 import { Button } from "@/components/buttons/Button";
 import { EditButton } from "@/components/buttons/EditButton";
 import { EditButtonWithText } from "@/components/buttons/EditButtonWithText";
 import { Item, SortableList } from "@/components/form/SortableList";
-import { Icons } from "@/components/Icon";
+import { Icon, Icons } from "@/components/Icon";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { WatchedMediaCard } from "@/components/media/WatchedMediaCard";
 import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
+import { Flare } from "@/components/utils/Flare";
 import { Heading2, Paragraph } from "@/components/utils/Text";
 import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -39,6 +41,7 @@ interface BookmarksCarouselProps {
 }
 
 const LONG_PRESS_DURATION = 500; // 0.5 seconds
+const MAX_ITEMS_PER_SECTION = 20; // Limit items per section
 
 function MediaCardSkeleton() {
   return (
@@ -47,6 +50,36 @@ function MediaCardSkeleton() {
         <div className="w-full aspect-[2/3] bg-mediaCard-hoverBackground rounded-lg" />
         <div className="mt-2 h-4 bg-mediaCard-hoverBackground rounded w-3/4" />
       </div>
+    </div>
+  );
+}
+
+function MoreBookmarksCard() {
+  const { t } = useTranslation();
+
+  return (
+    <div className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto">
+      <Link to="/bookmarks" className="block">
+        <Flare.Base className="group -m-[0.705em] h-[20rem] hover:scale-95 transition-all rounded-xl bg-background-main duration-300 hover:bg-mediaCard-hoverBackground tabbable">
+          <Flare.Light
+            flareSize={300}
+            cssColorVar="--colors-mediaCard-hoverAccent"
+            backgroundClass="bg-mediaCard-hoverBackground duration-100"
+            className="rounded-xl bg-background-main group-hover:opacity-100"
+          />
+          <Flare.Child className="pointer-events-auto h-[20rem] relative mb-2 p-[0.4em] transition-transform duration-300">
+            <div className="flex absolute inset-0 flex-col items-center justify-center">
+              <Icon
+                icon={Icons.ARROW_RIGHT}
+                className="text-4xl mb-2 transition-transform duration-300"
+              />
+              <span className="text-sm text-center px-2">
+                {t("home.bookmarks.showAll")}
+              </span>
+            </div>
+          </Flare.Child>
+        </Flare.Base>
+      </Link>
     </div>
   );
 }
@@ -396,7 +429,7 @@ export function BookmarksCarousel({
         if (section.type === "grouped") {
           const { icon, name } = parseGroupString(section.group || "");
           return (
-            <div key={section.group || "bookmarks"}>
+            <div key={section.group}>
               <SectionHeading
                 title={name}
                 customIcon={
@@ -432,28 +465,34 @@ export function BookmarksCarousel({
                 >
                   <div className="md:w-12" />
 
-                  {section.items.map((media) => (
-                    <div
-                      key={media.id}
-                      style={{ userSelect: "none" }}
-                      onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
-                        e.preventDefault()
-                      }
-                      onTouchStart={handleTouchStart}
-                      onTouchEnd={handleTouchEnd}
-                      onMouseDown={handleMouseDown}
-                      onMouseUp={handleMouseUp}
-                      className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
-                    >
-                      <WatchedMediaCard
+                  {section.items
+                    .slice(0, MAX_ITEMS_PER_SECTION)
+                    .map((media) => (
+                      <div
                         key={media.id}
-                        media={media}
-                        onShowDetails={onShowDetails}
-                        closable={editing}
-                        onClose={() => removeBookmark(media.id)}
-                      />
-                    </div>
-                  ))}
+                        style={{ userSelect: "none" }}
+                        onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
+                          e.preventDefault()
+                        }
+                        onTouchStart={handleTouchStart}
+                        onTouchEnd={handleTouchEnd}
+                        onMouseDown={handleMouseDown}
+                        onMouseUp={handleMouseUp}
+                        className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
+                      >
+                        <WatchedMediaCard
+                          key={media.id}
+                          media={media}
+                          onShowDetails={onShowDetails}
+                          closable={editing}
+                          onClose={() => removeBookmark(media.id)}
+                        />
+                      </div>
+                    ))}
+
+                  {section.items.length > MAX_ITEMS_PER_SECTION && (
+                    <MoreBookmarksCard />
+                  )}
 
                   <div className="md:w-12" />
                 </div>
@@ -472,7 +511,7 @@ export function BookmarksCarousel({
         return (
           <div key="regular-bookmarks">
             <SectionHeading
-              title={t("home.bookmarks.sectionTitle") || "Bookmarks"}
+              title={t("home.bookmarks.sectionTitle")}
               icon={Icons.BOOKMARK}
               className="ml-4 md:ml-12 mt-2 -mb-5"
             >
@@ -503,33 +542,39 @@ export function BookmarksCarousel({
                 <div className="md:w-12" />
 
                 {section.items.length > 0
-                  ? section.items.map((media) => (
-                      <div
-                        key={media.id}
-                        style={{ userSelect: "none" }}
-                        onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
-                          e.preventDefault()
-                        }
-                        onTouchStart={handleTouchStart}
-                        onTouchEnd={handleTouchEnd}
-                        onMouseDown={handleMouseDown}
-                        onMouseUp={handleMouseUp}
-                        className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
-                      >
-                        <WatchedMediaCard
+                  ? section.items
+                      .slice(0, MAX_ITEMS_PER_SECTION)
+                      .map((media) => (
+                        <div
                           key={media.id}
-                          media={media}
-                          onShowDetails={onShowDetails}
-                          closable={editing}
-                          onClose={() => removeBookmark(media.id)}
-                        />
-                      </div>
-                    ))
+                          style={{ userSelect: "none" }}
+                          onContextMenu={(
+                            e: React.MouseEvent<HTMLDivElement>,
+                          ) => e.preventDefault()}
+                          onTouchStart={handleTouchStart}
+                          onTouchEnd={handleTouchEnd}
+                          onMouseDown={handleMouseDown}
+                          onMouseUp={handleMouseUp}
+                          className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
+                        >
+                          <WatchedMediaCard
+                            key={media.id}
+                            media={media}
+                            onShowDetails={onShowDetails}
+                            closable={editing}
+                            onClose={() => removeBookmark(media.id)}
+                          />
+                        </div>
+                      ))
                   : Array.from({ length: SKELETON_COUNT }).map(() => (
                       <MediaCardSkeleton
                         key={`skeleton-${categorySlug}-${Math.random().toString(36).substring(7)}`}
                       />
                     ))}
+
+                {section.items.length > MAX_ITEMS_PER_SECTION && (
+                  <MoreBookmarksCard />
+                )}
 
                 <div className="md:w-12" />
               </div>
