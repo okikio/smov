@@ -60,7 +60,7 @@ export function GroupDropdown({
     <div className="relative min-w-[200px]">
       <button
         type="button"
-        className="w-full px-3 py-2 text-xs bg-gray-700/50 border border-gray-600 rounded-lg text-white flex justify-between items-center"
+        className="w-full px-3 py-2 text-xs bg-background-main border border-background-secondary rounded-lg text-white flex justify-between items-center hover:bg-mediaCard-hoverBackground transition-colors"
         onClick={() => setOpen((v) => !v)}
       >
         {currentGroups.length > 0 ? (
@@ -70,7 +70,7 @@ export function GroupDropdown({
               return (
                 <span
                   key={group}
-                  className="flex items-center gap-1 bg-purple-900/30 px-2 py-1 rounded text-purple-300 text-xs"
+                  className="flex items-center gap-1 bg-type-link/20 px-2 py-1 rounded text-type-link text-xs"
                 >
                   <UserIcon icon={icon} className="inline-block w-4 h-4" />
                   {name}
@@ -79,11 +79,11 @@ export function GroupDropdown({
             })}
           </span>
         ) : (
-          <span className="text-white/70">
+          <span className="text-type-secondary">
             {t("home.bookmarks.groups.dropdown.placeholderButton")}
           </span>
         )}
-        <span className="ml-2 text-white/40">
+        <span className="ml-2 text-type-secondary">
           <Icon
             icon={open ? Icons.CHEVRON_UP : Icons.CHEVRON_DOWN}
             className="text-base"
@@ -91,9 +91,9 @@ export function GroupDropdown({
         </span>
       </button>
       {open && (
-        <div className="absolute min-w-full z-[150] mt-1 end-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 pb-3 text-sm">
+        <div className="absolute min-w-full z-[150] mt-1 end-0 bg-background-main border border-background-secondary rounded-lg shadow-lg py-1 pb-3 text-sm">
           {groups.length === 0 && !showInput && (
-            <div className="px-4 py-2 text-gray-400">
+            <div className="px-4 py-2 text-type-secondary">
               {t("home.bookmarks.groups.dropdown.empty")}
             </div>
           )}
@@ -102,13 +102,13 @@ export function GroupDropdown({
             return (
               <label
                 key={group}
-                className="flex items-center gap-2 px-4 py-2 hover:bg-purple-700/30 rounded-md cursor-pointer"
+                className="flex items-center gap-2 mx-1 px-3 py-2 hover:bg-mediaCard-hoverBackground rounded-md cursor-pointer transition-colors text-type-link/80"
               >
                 <input
                   type="checkbox"
                   checked={currentGroups.includes(group)}
                   onChange={() => handleToggleGroup(group)}
-                  className="accent-purple-400"
+                  className="accent-type-link"
                 />
                 <span className="w-5 h-5 flex items-center justify-center ml-1">
                   <UserIcon
@@ -126,7 +126,7 @@ export function GroupDropdown({
                 type="text"
                 value={newGroup}
                 onChange={(e) => setNewGroup(e.target.value)}
-                className="flex-1 px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-xs min-w-0"
+                className="flex-1 px-2 py-1 rounded bg-background-main text-white border border-background-secondary text-xs min-w-0 placeholder:text-type-secondary"
                 placeholder="Group name"
                 autoFocus
                 onKeyDown={(e) => {
@@ -137,7 +137,7 @@ export function GroupDropdown({
               />
               <button
                 type="button"
-                className="text-purple-400 font-bold px-2 py-1 min-w-[2.5rem]"
+                className="text-type-link font-bold px-2 py-1 min-w-[2.5rem]"
                 onClick={() => handleCreate(newGroup, selectedIcon)}
                 disabled={!newGroup.trim()}
                 style={{ flexShrink: 0 }}
@@ -153,15 +153,15 @@ export function GroupDropdown({
                     key={icon}
                     className={`rounded p-1 border-2 ${
                       selectedIcon === icon
-                        ? "border-purple-400 bg-gray-700"
-                        : "border-transparent hover:border-gray-500"
+                        ? "border-type-link bg-mediaCard-hoverBackground"
+                        : "border-transparent hover:border-background-secondary"
                     }`}
                     onClick={() => setSelectedIcon(icon)}
                   >
                     <span className="w-5 h-5 flex items-center justify-center">
                       <UserIcon
                         icon={icon}
-                        className={`w-full h-full ${selectedIcon === icon ? "text-purple-400" : ""}`}
+                        className={`w-full h-full ${selectedIcon === icon ? "text-type-link" : ""}`}
                       />
                     </span>
                   </button>
@@ -170,7 +170,7 @@ export function GroupDropdown({
             )}
           </div>
           {currentGroups.length > 0 && (
-            <div className="border-t border-gray-700 pt-2 px-4">
+            <div className="border-t border-background-secondary pt-2 px-4">
               <div className="text-xs text-red-400 mb-1">
                 {t("home.bookmarks.groups.dropdown.removeFromGroup")}
               </div>
@@ -181,7 +181,7 @@ export function GroupDropdown({
                     <button
                       key={group}
                       type="button"
-                      className="flex items-center gap-1 px-2 py-1 rounded bg-red-900/30 text-red-300 text-xs hover:bg-red-700/30"
+                      className="flex items-center gap-1 px-2 py-1 rounded bg-red-900/30 text-red-300 text-xs hover:bg-red-700/30 transition-colors"
                       onClick={() => onRemoveGroup(group)}
                     >
                       <UserIcon icon={icon} className="inline-block w-4 h-4" />
@@ -192,7 +192,7 @@ export function GroupDropdown({
                 })}
                 <button
                   type="button"
-                  className="ml-2 text-xs text-red-400 underline"
+                  className="ml-2 text-xs text-red-400 underline hover:text-red-300 transition-colors"
                   onClick={() => onRemoveGroup()}
                 >
                   {t("home.bookmarks.groups.dropdown.removeAll")}
