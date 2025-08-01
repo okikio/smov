@@ -1,7 +1,10 @@
 import { list } from "subsrt-ts";
 
 import { proxiedFetch } from "@/backend/helpers/fetch";
-import { convertSubtitlesToSrt } from "@/components/player/utils/captions";
+import {
+  convertSubtitlesToSrt,
+  fixUTF8Encoding,
+} from "@/components/player/utils/captions";
 import { CaptionListItem } from "@/stores/player/slices/source";
 import { SimpleCache } from "@/utils/cache";
 
@@ -62,13 +65,14 @@ export async function downloadCaption(
   }
   if (!data) throw new Error("failed to get caption data");
 
-  // Ensure the data is in UTF-8
+  // Ensure the data is in UTF-8 and fix any encoding issues
   const encoder = new TextEncoder();
   const decoder = new TextDecoder("utf-8");
   const utf8Bytes = encoder.encode(data);
   const utf8Data = decoder.decode(utf8Bytes);
+  const fixedData = fixUTF8Encoding(utf8Data);
 
-  const output = convertSubtitlesToSrt(utf8Data);
+  const output = convertSubtitlesToSrt(fixedData);
   downloadCache.set(caption.url, output, expirySeconds);
   return output;
 }
@@ -93,11 +97,12 @@ export async function downloadWebVTT(url: string): Promise<string> {
   const decoder = new TextDecoder(charset);
   const data = decoder.decode(buffer);
 
-  // Ensure the data is in UTF-8
+  // Ensure the data is in UTF-8 and fix any encoding issues
   const encoder = new TextEncoder();
   const utf8Bytes = encoder.encode(data);
   const utf8Data = decoder.decode(utf8Bytes);
+  const fixedData = fixUTF8Encoding(utf8Data);
 
-  downloadCache.set(url, utf8Data, expirySeconds);
-  return utf8Data;
+  downloadCache.set(url, fixedData, expirySeconds);
+  return fixedData;
 }

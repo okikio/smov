@@ -8,6 +8,63 @@ import { CaptionListItem } from "@/stores/player/slices/source";
 export type CaptionCueType = ContentCaption;
 export const sanitize = DOMPurify.sanitize;
 
+// UTF-8 character mapping for fixing corrupted special characters
+const utf8Map: Record<string, string> = {
+  "ÃƒÂ¤": "ä",
+  "ÃƒÂ„": "Ä",
+  "Ã¤": "ä",
+  "Ã„": "Ä",
+  "ÃƒÂ¶": "ö",
+  "Ã¶": "ö",
+  "ÃƒÂ¥": "å",
+  "Ã¥": "å",
+  "ÃƒÂ©": "é",
+  "Ã©": "é",
+  ÃƒÂº: "ú",
+  Ãº: "ú",
+  "ÃƒÂ±": "ñ",
+  "Ã±": "ñ",
+  "ÃƒÂ¡": "á",
+  "Ã¡": "á",
+  "ÃƒÂ­": "í",
+  "Ã­": "í",
+  "ÃƒÂ³": "ó",
+  "Ã³": "ó",
+  "ÃƒÂ¼": "ü",
+  "Ã¼": "ü",
+  "ÃƒÂ§": "ç",
+  "Ã§": "ç",
+  "ÃƒÂ¨": "è",
+  "Ã¨": "è",
+  "ÃƒÂ¬": "ì",
+  "Ã¬": "ì",
+  "ÃƒÂ²": "ò",
+  "Ã²": "ò",
+  "ÃƒÂ¹": "ù",
+  "Ã¹": "ù",
+  ÃƒÂ: "à",
+  Ã: "à",
+  "Ã‚": "",
+  Â: "",
+  "Â ": "",
+};
+
+/**
+ * Fixes UTF-8 encoding issues in subtitle text
+ * Handles common cases where special characters and accents get corrupted
+ *
+ * Example:
+ * Input: "HyvÃ¤ on, ohjelma oli tÃ¤ssÃ¤."
+ * Output: "Hyvä on, ohjelma oli tässä."
+ */
+export function fixUTF8Encoding(text: string): string {
+  let fixedText = text;
+  Object.keys(utf8Map).forEach((bad) => {
+    fixedText = fixedText.split(bad).join(utf8Map[bad]);
+  });
+  return fixedText;
+}
+
 export function captionIsVisible(
   start: number,
   end: number,
@@ -31,7 +88,9 @@ export function convertSubtitlesToVtt(text: string): string {
   if (textTrimmed === "") {
     throw new Error("Given text is empty");
   }
-  const vtt = convert(textTrimmed, "vtt");
+  // Fix UTF-8 encoding issues before conversion
+  const fixedText = fixUTF8Encoding(textTrimmed);
+  const vtt = convert(fixedText, "vtt");
   if (detect(vtt) === "") {
     throw new Error("Invalid subtitle format");
   }
@@ -43,7 +102,9 @@ export function convertSubtitlesToSrt(text: string): string {
   if (textTrimmed === "") {
     throw new Error("Given text is empty");
   }
-  const srt = convert(textTrimmed, "srt");
+  // Fix UTF-8 encoding issues before conversion
+  const fixedText = fixUTF8Encoding(textTrimmed);
+  const srt = convert(fixedText, "srt");
   if (detect(srt) === "") {
     throw new Error("Invalid subtitle format");
   }
