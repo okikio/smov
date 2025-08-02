@@ -6,7 +6,41 @@ import { useOverlayStack } from "@/stores/interface/overlayStack";
 
 import { FancyModal } from "./Modal";
 
-const NOTIFICATIONS_ENDPOINT = "/notifications.xml";
+const DEFAULT_FEEDS = ["/notifications.xml"];
+const CORS_PROXY = "http://api.allorigins.win/get?url=";
+
+const getAllFeeds = (): string[] => {
+  try {
+    const savedCustomFeeds = localStorage.getItem("notification-custom-feeds");
+    if (savedCustomFeeds) {
+      const customFeeds = JSON.parse(savedCustomFeeds);
+      return [...DEFAULT_FEEDS, ...customFeeds];
+    }
+  } catch (e) {
+    // Silently fail and return default feeds
+  }
+  return DEFAULT_FEEDS;
+};
+
+const getFetchUrl = (feedUrl: string): string => {
+  if (feedUrl.startsWith("/")) {
+    return feedUrl;
+  }
+  return `${CORS_PROXY}${encodeURIComponent(feedUrl)}`;
+};
+
+const getSourceName = (feedUrl: string): string => {
+  if (feedUrl === "/notifications.xml") {
+    return "P-Stream";
+  }
+
+  try {
+    const url = new URL(feedUrl);
+    return url.hostname.replace("www.", "");
+  } catch {
+    return "Unknown";
+  }
+};
 
 interface NotificationItem {
   guid: string;
@@ -15,13 +49,14 @@ interface NotificationItem {
   description: string;
   pubDate: string;
   category: string;
+  source?: string;
 }
 
 interface NotificationModalProps {
   id: string;
 }
 
-type ModalView = "list" | "detail";
+type ModalView = "list" | "detail" | "settings";
 
 // Detail view component
 function DetailView({
@@ -84,6 +119,14 @@ function DetailView({
               <span className="text-sm text-type-secondary">
                 {getCategoryLabel(selectedNotification.category)}
               </span>
+              {selectedNotification.source && (
+                <>
+                  <span className="text-sm text-type-secondary">•</span>
+                  <span className="text-sm text-type-secondary">
+                    {selectedNotification.source}
+                  </span>
+                </>
+              )}
               <span className="text-sm text-type-secondary">•</span>
               <span className="text-sm text-type-secondary">
                 {formatDate(selectedNotification.pubDate)}
@@ -91,9 +134,19 @@ function DetailView({
             </>
           )}
           {!getCategoryLabel(selectedNotification.category) && (
-            <span className="text-sm text-type-secondary">
-              {formatDate(selectedNotification.pubDate)}
-            </span>
+            <>
+              {selectedNotification.source && (
+                <>
+                  <span className="text-sm text-type-secondary">
+                    {selectedNotification.source}
+                  </span>
+                  <span className="text-sm text-type-secondary">•</span>
+                </>
+              )}
+              <span className="text-sm text-type-secondary">
+                {formatDate(selectedNotification.pubDate)}
+              </span>
+            </>
           )}
         </div>
 
@@ -131,6 +184,146 @@ function DetailView({
   );
 }
 
+// Settings view component
+function SettingsView({
+  autoReadDays,
+  setAutoReadDays,
+  customFeeds,
+  setCustomFeeds,
+  markAllAsUnread,
+  onClose,
+}: {
+  autoReadDays: number;
+  setAutoReadDays: (days: number) => void;
+  customFeeds: string[];
+  setCustomFeeds: (feeds: string[]) => void;
+  markAllAsUnread: () => void;
+  onClose: () => void;
+}) {
+  const addCustomFeed = () => {
+    setCustomFeeds([...customFeeds, ""]);
+  };
+
+  const changeCustomFeed = (index: number, val: string) => {
+    setCustomFeeds(
+      customFeeds.map((v, i) => {
+        if (i !== index) return v;
+        return val;
+      }),
+    );
+  };
+
+  const removeCustomFeed = (index: number) => {
+    setCustomFeeds(customFeeds.filter((v, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Header with back button */}
+      <div className="flex items-center gap-3 pb-4 border-b border-utils-divider">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-type-link hover:text-type-linkHover transition-colors flex items-center gap-1"
+        >
+          <Icon icon={Icons.CHEVRON_LEFT} />
+          <span>Back to notifications</span>
+        </button>
+      </div>
+
+      {/* Settings content */}
+      <div className="space-y-6 overflow-y-auto max-h-[70vh] md:max-h-[60vh]">
+        {/* Mark all as unread section */}
+        <div className="bg-background-main/30 rounded-lg p-4 border border-utils-divider">
+          <h3 className="text-white font-bold mb-3">Mark All as Unread</h3>
+          <p className="text-sm text-type-secondary mb-4">
+            Permanently mark all notifications as unread. This action cannot be
+            undone.
+          </p>
+          <button
+            type="button"
+            onClick={markAllAsUnread}
+            className="text-sm text-red-400 hover:text-red-300 transition-colors px-3 py-1 rounded-md border border-red-400/30 hover:border-red-400/50"
+          >
+            Mark All as Unread
+          </button>
+        </div>
+
+        {/* Auto-read days section */}
+        <div className="bg-background-main/30 rounded-lg p-4 border border-utils-divider">
+          <h3 className="text-white font-bold mb-3">Auto-Mark as Read</h3>
+          <p className="text-sm text-type-secondary mb-4">
+            Automatically mark notifications as read after this many days.
+          </p>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              min="1"
+              max="365"
+              value={autoReadDays}
+              onChange={(e) =>
+                setAutoReadDays(parseInt(e.target.value, 10) || 14)
+              }
+              className="bg-background-secondary border border-type-secondary rounded px-3 py-2 text-white w-20"
+            />
+            <span className="text-sm text-type-secondary">days</span>
+          </div>
+        </div>
+
+        {/* Custom feeds section */}
+        <div className="bg-background-main/30 rounded-lg p-4 border border-utils-divider">
+          <h3 className="text-white font-bold mb-3">Custom RSS Feeds</h3>
+          <p className="text-sm text-type-secondary mb-4">
+            Add custom RSS feeds to receive notifications from other sources.
+            <br />
+            <span className="text-sm text-type-danger">
+              Note: This feature is experimental and may not work for all feeds.
+            </span>
+          </p>
+
+          <div className="space-y-2 max-w-md">
+            {customFeeds.length === 0 ? (
+              <p className="text-sm text-type-secondary">
+                No custom feeds added
+              </p>
+            ) : null}
+            {customFeeds.map((feed, i) => (
+              <div
+                // eslint-disable-next-line react/no-array-index-key
+                key={i}
+                className="grid grid-cols-[1fr,auto] items-center gap-2"
+              >
+                <input
+                  type="url"
+                  value={feed}
+                  onChange={(e) => changeCustomFeed(i, e.target.value)}
+                  placeholder="https://example.com/feed.xml"
+                  className="bg-background-secondary border border-type-secondary rounded px-3 py-2 text-white text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeCustomFeed(i)}
+                  className="h-full scale-90 hover:scale-100 rounded-full aspect-square bg-authentication-inputBg hover:bg-authentication-inputBgHover flex justify-center items-center transition-transform duration-200 hover:text-white cursor-pointer"
+                >
+                  <Icon className="text-xl" icon={Icons.X} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={addCustomFeed}
+            className="mt-3 text-sm text-type-link hover:text-type-linkHover transition-colors px-3 py-1 rounded-md border border-type-link/30 hover:border-type-link/50"
+          >
+            Add Custom Feed
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // List view component
 function ListView({
   notifications,
@@ -143,6 +336,7 @@ function ListView({
   markAllAsUnread,
   isShiftHeld,
   onRefresh,
+  onOpenSettings,
   openNotificationDetail,
   getCategoryColor,
   getCategoryLabel,
@@ -158,6 +352,7 @@ function ListView({
   markAllAsUnread: () => void;
   isShiftHeld: boolean;
   onRefresh: () => void;
+  onOpenSettings: () => void;
   openNotificationDetail: (notification: NotificationItem) => void;
   getCategoryColor: (category: string) => string;
   getCategoryLabel: (category: string) => string;
@@ -167,31 +362,40 @@ function ListView({
     <div className="space-y-4">
       {/* Header with refresh and mark all buttons */}
       <div className="flex gap-4 items-center pb-4 border-b border-utils-divider">
-        <span className="text-sm text-type-secondary">
-          {unreadCount} unread notification{unreadCount !== 1 ? "s" : ""}
-        </span>
-        <div className="flex gap-2">
-          {isShiftHeld ? (
-            <button
-              type="button"
-              onClick={markAllAsUnread}
-              className="text-sm text-red-400 hover:text-red-300 transition-colors"
-            >
-              Mark all as unread
-            </button>
-          ) : (
-            unreadCount > 0 && (
+        <div className="flex flex-col md:flex-row justify-start md:gap-2">
+          <span className="text-sm text-type-secondary">
+            {unreadCount} unread notification{unreadCount !== 1 ? "s" : ""}
+          </span>
+          <div className="flex gap-2">
+            {isShiftHeld ? (
               <button
                 type="button"
-                onClick={markAllAsRead}
-                className="text-sm text-type-link hover:text-type-linkHover transition-colors"
+                onClick={markAllAsUnread}
+                className="text-sm text-red-400 hover:text-red-300 transition-colors"
               >
-                Mark all as read
+                Mark all as unread
               </button>
-            )
-          )}
+            ) : (
+              unreadCount > 0 && (
+                <button
+                  type="button"
+                  onClick={markAllAsRead}
+                  className="text-sm text-type-link hover:text-type-linkHover transition-colors"
+                >
+                  Mark all as read
+                </button>
+              )
+            )}
+          </div>
         </div>
-        <div className="flex-1 flex justify-end mr-4">
+        <div className="flex-1 flex justify-end gap-2 md:mr-4">
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="text-sm text-type-secondary hover:text-white transition-colors"
+          >
+            <Icon icon={Icons.SETTINGS} />
+          </button>
           <button
             type="button"
             onClick={onRefresh}
@@ -268,20 +472,54 @@ function ListView({
                             <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
                           )}
                         </div>
-                        <div className="flex items-center gap-2 order-1 sm:order-2">
-                          {getCategoryColor(notification.category) && (
-                            <span
-                              className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(
-                                notification.category,
-                              )}`}
-                            />
-                          )}
-                          <span className="text-xs text-type-secondary">
-                            {getCategoryLabel(notification.category)}
-                          </span>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 order-1 sm:order-2">
+                          {/* Mobile: Source • Category */}
+                          <div className="flex items-center gap-1 sm:hidden">
+                            {getCategoryColor(notification.category) && (
+                              <span
+                                className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(
+                                  notification.category,
+                                )}`}
+                              />
+                            )}
+                            <span className="text-xs text-type-secondary">
+                              {getCategoryLabel(notification.category)}
+                            </span>
+                            {notification.source && (
+                              <>
+                                <span className="text-xs text-type-secondary">
+                                  •
+                                </span>
+                                <span className="text-xs text-type-secondary">
+                                  {notification.source}
+                                </span>
+                              </>
+                            )}
+                          </div>
+
+                          {/* Desktop: Source above Category */}
+                          <div className="hidden sm:flex sm:flex-col sm:items-start sm:gap-1">
+                            {notification.source && (
+                              <span className="text-xs text-type-secondary font-medium">
+                                {notification.source}
+                              </span>
+                            )}
+                            <div className="flex items-center gap-2">
+                              {getCategoryColor(notification.category) && (
+                                <span
+                                  className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(
+                                    notification.category,
+                                  )}`}
+                                />
+                              )}
+                              <span className="text-xs text-type-secondary">
+                                {getCategoryLabel(notification.category)}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <p className="text-sm text-type-secondary mb-2 line-clamp-2">
+                      <p className="text-sm text-type-secondary mb-2 line-clamp-2 max-w-[12rem] md:max-w-[30rem] md:pr-8">
                         {notification.description
                           .replace(/\n/g, " ")
                           .substring(0, 150)}
@@ -321,7 +559,11 @@ export function NotificationModal({ id }: NotificationModalProps) {
   const [isShiftHeld, setIsShiftHeld] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Load read notifications from cookie
+  // Settings state
+  const [autoReadDays, setAutoReadDays] = useState<number>(14);
+  const [customFeeds, setCustomFeeds] = useState<string[]>([]);
+
+  // Load read notifications and settings from localStorage
   useEffect(() => {
     const savedRead = localStorage.getItem("read-notifications");
     if (savedRead) {
@@ -330,6 +572,27 @@ export function NotificationModal({ id }: NotificationModalProps) {
         setReadNotifications(new Set(readArray));
       } catch (e) {
         console.error("Failed to parse read notifications:", e);
+      }
+    }
+
+    // Load settings
+    const savedAutoReadDays = localStorage.getItem(
+      "notification-auto-read-days",
+    );
+    if (savedAutoReadDays) {
+      try {
+        setAutoReadDays(parseInt(savedAutoReadDays, 10));
+      } catch (e) {
+        console.error("Failed to parse auto read days:", e);
+      }
+    }
+
+    const savedCustomFeeds = localStorage.getItem("notification-custom-feeds");
+    if (savedCustomFeeds) {
+      try {
+        setCustomFeeds(JSON.parse(savedCustomFeeds));
+      } catch (e) {
+        console.error("Failed to parse custom feeds:", e);
       }
     }
   }, []);
@@ -363,97 +626,103 @@ export function NotificationModal({ id }: NotificationModalProps) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(NOTIFICATIONS_ENDPOINT);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseText = await response.text();
-
-      // Handle CORS proxy response (JSON wrapper)
-      let xmlText = responseText;
-      try {
-        const jsonResponse = JSON.parse(responseText);
-        if (jsonResponse.contents) {
-          xmlText = jsonResponse.contents;
-        }
-      } catch {
-        // If it's not JSON, assume it's direct XML
-        xmlText = responseText;
-      }
-
-      // Basic validation that we got XML content
-      if (
-        !xmlText ||
-        (!xmlText.includes("<rss") && !xmlText.includes("<feed"))
-      ) {
-        throw new Error("Invalid RSS feed format");
-      }
-
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-
-      // Check for parsing errors
-      const parserError = xmlDoc.querySelector("parsererror");
-      if (parserError) {
-        throw new Error("Failed to parse RSS feed");
-      }
-
-      // Ensure we have a valid document
-      if (!xmlDoc || !xmlDoc.documentElement) {
-        throw new Error("Invalid XML document");
-      }
-
-      const items = xmlDoc.querySelectorAll("item");
-      if (!items || items.length === 0) {
-        throw new Error("No items found in RSS feed");
-      }
-      const parsedNotifications: NotificationItem[] = [];
+      const allNotifications: NotificationItem[] = [];
       const autoReadGuids: string[] = [];
 
-      // Mark notifications older than 14 days as read
-      const fourteenDaysAgo = new Date();
-      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      // Mark notifications older than autoReadDays as read
+      const autoReadDate = new Date();
+      autoReadDate.setDate(autoReadDate.getDate() - autoReadDays);
 
-      items.forEach((item) => {
+      // Get all feeds (default + custom)
+      const feeds = getAllFeeds();
+
+      // Fetch from all feeds
+      for (const feedUrl of feeds) {
+        if (!feedUrl.trim()) continue;
+
         try {
-          const guid = item.querySelector("guid")?.textContent || "";
-          const title = item.querySelector("title")?.textContent || "";
-          const link = item.querySelector("link")?.textContent || "";
-          const description =
-            item.querySelector("description")?.textContent || "";
-          const pubDate = item.querySelector("pubDate")?.textContent || "";
-          const category = item.querySelector("category")?.textContent || "";
+          const fetchUrl = getFetchUrl(feedUrl);
+          const response = await fetch(fetchUrl);
+          if (response.ok) {
+            const responseText = await response.text();
 
-          // Skip items without essential data
-          if (!guid || !title) {
-            return;
+            // Handle CORS proxy response (JSON wrapper)
+            let xmlText = responseText;
+            try {
+              const jsonResponse = JSON.parse(responseText);
+              if (jsonResponse.contents) {
+                xmlText = jsonResponse.contents;
+              }
+            } catch {
+              // If it's not JSON, assume it's direct XML
+              xmlText = responseText;
+            }
+
+            // Basic validation that we got XML content
+            if (
+              xmlText &&
+              (xmlText.includes("<rss") || xmlText.includes("<feed"))
+            ) {
+              const parser = new DOMParser();
+              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+              // Check for parsing errors
+              const parserError = xmlDoc.querySelector("parsererror");
+              if (!parserError && xmlDoc && xmlDoc.documentElement) {
+                const items = xmlDoc.querySelectorAll("item");
+                if (items && items.length > 0) {
+                  items.forEach((item) => {
+                    try {
+                      const guid =
+                        item.querySelector("guid")?.textContent || "";
+                      const title =
+                        item.querySelector("title")?.textContent || "";
+                      const link =
+                        item.querySelector("link")?.textContent || "";
+                      const description =
+                        item.querySelector("description")?.textContent || "";
+                      const pubDate =
+                        item.querySelector("pubDate")?.textContent || "";
+                      const category =
+                        item.querySelector("category")?.textContent || "";
+
+                      // Skip items without essential data
+                      if (!guid || !title) {
+                        return;
+                      }
+
+                      // Parse the publication date
+                      const notificationDate = new Date(pubDate);
+
+                      allNotifications.push({
+                        guid,
+                        title,
+                        link,
+                        description,
+                        pubDate,
+                        category,
+                        source: getSourceName(feedUrl),
+                      });
+
+                      // Collect GUIDs of notifications older than autoReadDays
+                      if (notificationDate <= autoReadDate) {
+                        autoReadGuids.push(guid);
+                      }
+                    } catch (itemError) {
+                      // Skip malformed items
+                      console.warn("Skipping malformed RSS item:", itemError);
+                    }
+                  });
+                }
+              }
+            }
           }
-
-          // Parse the publication date
-          const notificationDate = new Date(pubDate);
-
-          // Include all notifications, but collect old ones to mark as read
-          parsedNotifications.push({
-            guid,
-            title,
-            link,
-            description,
-            pubDate,
-            category,
-          });
-
-          // Collect GUIDs of notifications older than 14 days
-          if (notificationDate <= fourteenDaysAgo) {
-            autoReadGuids.push(guid);
-          }
-        } catch (itemError) {
-          // Skip malformed items
-          console.warn("Skipping malformed RSS item:", itemError);
+        } catch (customFeedError) {
+          // Silently fail for individual feed errors
         }
-      });
+      }
 
-      setNotifications(parsedNotifications);
+      setNotifications(allNotifications);
 
       // Update read notifications after setting notifications
       if (autoReadGuids.length > 0) {
@@ -480,7 +749,7 @@ export function NotificationModal({ id }: NotificationModalProps) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [autoReadDays]);
 
   // Initial fetch
   useEffect(() => {
@@ -533,6 +802,26 @@ export function NotificationModal({ id }: NotificationModalProps) {
   const goBackToList = () => {
     setCurrentView("list");
     setSelectedNotification(null);
+  };
+
+  // Settings functions
+  const openSettings = () => {
+    setCurrentView("settings");
+  };
+
+  const closeSettings = () => {
+    setCurrentView("list");
+  };
+
+  // Save settings functions
+  const saveAutoReadDays = (days: number) => {
+    setAutoReadDays(days);
+    localStorage.setItem("notification-auto-read-days", days.toString());
+  };
+
+  const saveCustomFeeds = (feeds: string[]) => {
+    setCustomFeeds(feeds);
+    localStorage.setItem("notification-custom-feeds", JSON.stringify(feeds));
   };
 
   // Scroll to last read notification
@@ -633,7 +922,13 @@ export function NotificationModal({ id }: NotificationModalProps) {
     <FancyModal
       id={id}
       title={
-        currentView === "list" ? "Notifications" : selectedNotification?.title
+        currentView === "list"
+          ? "Notifications"
+          : currentView === "detail" && selectedNotification
+            ? selectedNotification.title
+            : currentView === "settings"
+              ? "Settings"
+              : "Notifications"
       }
       size="lg"
     >
@@ -649,12 +944,13 @@ export function NotificationModal({ id }: NotificationModalProps) {
           markAllAsUnread={markAllAsUnread}
           isShiftHeld={isShiftHeld}
           onRefresh={handleRefresh}
+          onOpenSettings={openSettings}
           openNotificationDetail={openNotificationDetail}
           getCategoryColor={getCategoryColor}
           getCategoryLabel={getCategoryLabel}
           formatDate={formatDate}
         />
-      ) : selectedNotification ? (
+      ) : currentView === "detail" && selectedNotification ? (
         <DetailView
           selectedNotification={selectedNotification}
           goBackToList={goBackToList}
@@ -678,6 +974,15 @@ export function NotificationModal({ id }: NotificationModalProps) {
             }
           }}
         />
+      ) : currentView === "settings" ? (
+        <SettingsView
+          autoReadDays={autoReadDays}
+          setAutoReadDays={saveAutoReadDays}
+          customFeeds={customFeeds}
+          setCustomFeeds={saveCustomFeeds}
+          markAllAsUnread={markAllAsUnread}
+          onClose={closeSettings}
+        />
       ) : null}
     </FancyModal>
   );
@@ -693,36 +998,89 @@ export function useNotifications() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(NOTIFICATIONS_ENDPOINT);
-        if (!response.ok) return;
+        const allNotifications: NotificationItem[] = [];
 
-        const xmlText = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+        // Get all feeds (default + custom)
+        const feeds = getAllFeeds();
 
-        const items = xmlDoc.querySelectorAll("item");
-        const parsedNotifications: NotificationItem[] = [];
+        // Fetch from all feeds
+        for (const feedUrl of feeds) {
+          if (!feedUrl.trim()) continue;
 
-        items.forEach((item) => {
-          const guid = item.querySelector("guid")?.textContent || "";
-          const title = item.querySelector("title")?.textContent || "";
-          const link = item.querySelector("link")?.textContent || "";
-          const description =
-            item.querySelector("description")?.textContent || "";
-          const pubDate = item.querySelector("pubDate")?.textContent || "";
-          const category = item.querySelector("category")?.textContent || "";
+          try {
+            const fetchUrl = getFetchUrl(feedUrl);
+            const response = await fetch(fetchUrl);
+            if (response.ok) {
+              const responseText = await response.text();
 
-          parsedNotifications.push({
-            guid,
-            title,
-            link,
-            description,
-            pubDate,
-            category,
-          });
-        });
+              // Handle CORS proxy response (JSON wrapper)
+              let xmlText = responseText;
+              try {
+                const jsonResponse = JSON.parse(responseText);
+                if (jsonResponse.contents) {
+                  xmlText = jsonResponse.contents;
+                }
+              } catch {
+                // If it's not JSON, assume it's direct XML
+                xmlText = responseText;
+              }
 
-        setNotifications(parsedNotifications);
+              // Basic validation that we got XML content
+              if (
+                xmlText &&
+                (xmlText.includes("<rss") || xmlText.includes("<feed"))
+              ) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+                // Check for parsing errors
+                const parserError = xmlDoc.querySelector("parsererror");
+                if (!parserError && xmlDoc && xmlDoc.documentElement) {
+                  const items = xmlDoc.querySelectorAll("item");
+                  if (items && items.length > 0) {
+                    items.forEach((item) => {
+                      try {
+                        const guid =
+                          item.querySelector("guid")?.textContent || "";
+                        const title =
+                          item.querySelector("title")?.textContent || "";
+                        const link =
+                          item.querySelector("link")?.textContent || "";
+                        const description =
+                          item.querySelector("description")?.textContent || "";
+                        const pubDate =
+                          item.querySelector("pubDate")?.textContent || "";
+                        const category =
+                          item.querySelector("category")?.textContent || "";
+
+                        // Skip items without essential data
+                        if (!guid || !title) {
+                          return;
+                        }
+
+                        allNotifications.push({
+                          guid,
+                          title,
+                          link,
+                          description,
+                          pubDate,
+                          category,
+                          source: getSourceName(feedUrl),
+                        });
+                      } catch (itemError) {
+                        // Skip malformed items silently
+                      }
+                    });
+                  }
+                }
+              }
+            }
+          } catch (customFeedError) {
+            // Silently fail for individual feed errors
+          }
+        }
+
+        setNotifications(allNotifications);
       } catch (err) {
         // Silently fail for badge count
       }
@@ -747,7 +1105,7 @@ export function useNotifications() {
   const getUnreadCount = () => {
     try {
       const savedRead = localStorage.getItem("read-notifications");
-      if (!savedRead) return notifications.length; // Return total count if no read data
+      if (!savedRead) return notifications.length;
 
       const readArray = JSON.parse(savedRead);
       const readSet = new Set(readArray);
