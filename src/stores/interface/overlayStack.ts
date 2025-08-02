@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
-type OverlayType = "volume" | "subtitle" | null;
+type OverlayType = "volume" | "subtitle" | "speed" | null;
 
 interface OverlayStackStore {
   currentOverlay: OverlayType;

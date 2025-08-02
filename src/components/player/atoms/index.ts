@@ -18,3 +18,4 @@ export * from "./NextEpisodeButton";
 export * from "./Chromecast";
 export * from "./CastingNotification";
 export * from "./Captions";
+export * from "./SpeedChangedPopout";
