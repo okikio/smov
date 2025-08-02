@@ -80,6 +80,7 @@ export function OverlayPortal(props: {
   zIndex?: number;
 }) {
   const [portalElement, setPortalElement] = useState<Element | null>(null);
+  const [isReady, setIsReady] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const close = props.close;
   const zIndex = props.zIndex ?? 999;
@@ -87,6 +88,44 @@ export function OverlayPortal(props: {
   useEffect(() => {
     const element = ref.current?.closest(".popout-location");
     setPortalElement(element ?? document.body);
+
+    // Ensure DOM is ready before enabling focus trap
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100); // Increased delay to ensure DOM is fully rendered
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Add global error handler for unhandled promise rejections
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (
+        event.reason &&
+        typeof event.reason === "object" &&
+        "message" in event.reason
+      ) {
+        const message = event.reason.message;
+        if (
+          message &&
+          typeof message === "string" &&
+          message.includes("matches.call")
+        ) {
+          console.warn(
+            "Caught focus-trap matches.call error, preventing crash:",
+            event.reason,
+          );
+          event.preventDefault();
+        }
+      }
+    };
+
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    return () =>
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection,
+      );
   }, []);
 
   return (
@@ -94,7 +133,19 @@ export function OverlayPortal(props: {
       {portalElement
         ? createPortal(
             <Transition show={props.show} animation="none">
-              <FocusTrap>
+              <FocusTrap
+                active={isReady && !!props.show}
+                focusTrapOptions={{
+                  allowOutsideClick: true,
+                  clickOutsideDeactivates: true,
+                  fallbackFocus: () => document.body,
+                  returnFocusOnDeactivate: true,
+                  escapeDeactivates: true,
+                  preventScroll: true,
+                  // Disable the problematic check that causes the matches.call error
+                  checkCanFocusTrap: () => Promise.resolve(),
+                }}
+              >
                 <div
                   className="popout-wrapper fixed overflow-hidden pointer-events-auto inset-0 select-none"
                   style={{ zIndex }}
