@@ -498,7 +498,7 @@ function ListView({
                           </div>
 
                           {/* Desktop: Source above Category */}
-                          <div className="hidden sm:flex sm:flex-col sm:items-start sm:gap-1">
+                          <div className="hidden sm:flex sm:flex-col sm:items-end sm:gap-1">
                             {notification.source && (
                               <span className="text-xs text-type-secondary font-medium">
                                 {notification.source}
