@@ -635,7 +635,9 @@
       "playback": {
         "speedLabel": "Playback speed",
         "title": "Playback settings",
-        "disabled": "(Disabled in watch party)"
+        "disabled": "(Disabled in watch party)",
+        "speedBoosted": "Playback speed boosted to 2x",
+        "speedUnboosted": "Playback speed reset to {{speed}}x"
       },
       "quality": {
         "automaticLabel": "Automatic quality",

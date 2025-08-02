@@ -159,8 +159,8 @@ export function KeyboardEvents() {
         if (next) dataRef.current.display?.setPlaybackRate(next);
       }
 
-      // Handle spacebar press for play/pause and hold for 2x speed
-      if (k === " ") {
+      // Handle spacebar press for play/pause and hold for 2x speed - disabled in watch party
+      if (k === " " && !dataRef.current.isInWatchParty) {
         // Skip if a button is targeted
         if (
           evt.target &&
@@ -214,6 +214,24 @@ export function KeyboardEvents() {
             dataRef.current.display?.setPlaybackRate(2);
           }
         }, 300); // 300ms delay before boost takes effect
+      }
+
+      // Handle spacebar press for play/pause only in watch party mode
+      if (k === " " && dataRef.current.isInWatchParty) {
+        // Skip if a button is targeted
+        if (
+          evt.target &&
+          (evt.target as HTMLInputElement).nodeName === "BUTTON"
+        ) {
+          return;
+        }
+
+        // Prevent the default spacebar behavior
+        evt.preventDefault();
+
+        // Simple play/pause toggle
+        const action = dataRef.current.mediaPlaying.isPaused ? "play" : "pause";
+        dataRef.current.display?.[action]();
       }
 
       // Video progress
@@ -284,8 +302,8 @@ export function KeyboardEvents() {
     const keyupEventHandler = (evt: KeyboardEvent) => {
       const k = evt.key;
 
-      // Handle spacebar release
-      if (k === " ") {
+      // Handle spacebar release - only handle speed boost logic when not in watch party
+      if (k === " " && !dataRef.current.isInWatchParty) {
         // If we haven't applied the boost yet but were about to, cancel it
         if (dataRef.current.isPendingBoostRef.current) {
           dataRef.current.isPendingBoostRef.current = false;
