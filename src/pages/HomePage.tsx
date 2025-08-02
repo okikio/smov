@@ -102,7 +102,7 @@ export function HomePage() {
         {/* Page Header */}
         {enableFeatured ? (
           <FeaturedCarousel
-            forcedCategory="editorpicks"
+            forcedCategory="movies"
             onShowDetails={handleShowDetails}
             searching={s.searching}
             shorter
