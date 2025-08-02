@@ -11,6 +11,7 @@ import {
 
 import { convertLegacyUrl, isLegacyUrl } from "@/backend/metadata/getmeta";
 import { generateQuickSearchMediaUrl } from "@/backend/metadata/tmdb";
+import { NotificationModal } from "@/components/overlays/NotificationModal";
 import { useOnlineListener } from "@/hooks/usePing";
 import { AboutPage } from "@/pages/About";
 import { AdminPage } from "@/pages/admin/AdminPage";
@@ -117,6 +118,7 @@ function App() {
   return (
     <Layout>
       <LanguageProvider />
+      <NotificationModal id="notifications" />
       {!showDowntime && (
         <Routes>
           {/* functional routes */}

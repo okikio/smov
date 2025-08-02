@@ -6,6 +6,7 @@ import { NoUserAvatar, UserAvatar } from "@/components/Avatar";
 import { IconPatch } from "@/components/buttons/IconPatch";
 import { Icons } from "@/components/Icon";
 import { LinksDropdown } from "@/components/LinksDropdown";
+import { useNotifications } from "@/components/overlays/NotificationModal";
 import { Lightbar } from "@/components/utils/Lightbar";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { BlurEllipsis } from "@/pages/layouts/SubPageLayout";
@@ -27,6 +28,7 @@ export function Navigation(props: NavigationProps) {
   const navigate = useNavigate();
   const { loggedIn } = useAuth();
   const [scrollPosition, setScrollPosition] = useState(0);
+  const { openNotifications, getUnreadCount } = useNotifications();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -182,6 +184,18 @@ export function Navigation(props: NavigationProps) {
                     />
                   </a>
                 ))}
+              <a
+                onClick={() => openNotifications()}
+                rel="noreferrer"
+                className="text-xl text-white tabbable rounded-full backdrop-blur-lg relative"
+              >
+                <IconPatch icon={Icons.BELL} clickable downsized navigation />
+                {getUnreadCount() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                    {getUnreadCount()}
+                  </span>
+                )}
+              </a>
             </div>
             <div className="relative pointer-events-auto">
               <LinksDropdown>
