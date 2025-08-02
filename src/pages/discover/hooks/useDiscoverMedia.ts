@@ -242,7 +242,7 @@ export function useDiscoverOptions(mediaType: MediaType) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const userLanguage = useLanguageStore.getState().language;
+  const userLanguage = useLanguageStore((s) => s.language);
   const formattedLanguage = getTmdbLanguageCode(userLanguage);
 
   const providers = mediaType === "movie" ? MOVIE_PROVIDERS : TV_PROVIDERS;
@@ -297,7 +297,7 @@ export function useDiscoverMedia({
     useState<string>(contentType);
 
   const { t } = useTranslation();
-  const userLanguage = useLanguageStore.getState().language;
+  const userLanguage = useLanguageStore((s) => s.language);
   const formattedLanguage = getTmdbLanguageCode(userLanguage);
 
   // Reset media when content type or media type changes

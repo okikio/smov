@@ -145,22 +145,26 @@ export function MediaCarousel({
   });
 
   // Handle provider/genre selection
-  const handleProviderChange = (id: string, name: string) => {
+  const handleProviderChange = React.useCallback((id: string, name: string) => {
     setSelectedProviderId(id);
     setSelectedProviderName(name);
-  };
+  }, []);
 
-  const handleGenreChange = (id: string, name: string) => {
+  const handleGenreChange = React.useCallback((id: string, name: string) => {
     setSelectedGenreId(id);
     setSelectedGenreName(name);
-  };
+  }, []);
 
   // Get related buttons based on type
-  const relatedButtons = showProviders
-    ? providers.map((p) => ({ id: p.id, name: p.name }))
-    : showGenres
-      ? genres.map((g) => ({ id: g.id.toString(), name: g.name }))
-      : undefined;
+  const relatedButtons = React.useMemo(() => {
+    if (showProviders) {
+      return providers.map((p) => ({ id: p.id, name: p.name }));
+    }
+    if (showGenres) {
+      return genres.map((g) => ({ id: g.id.toString(), name: g.name }));
+    }
+    return undefined;
+  }, [showProviders, showGenres, providers, genres]);
 
   // Set initial provider/genre selection
   useEffect(() => {
@@ -177,14 +181,16 @@ export function MediaCarousel({
     genres,
     selectedProviderId,
     selectedGenreId,
+    handleProviderChange,
+    handleGenreChange,
   ]);
 
   // Get the appropriate button click handler
-  const onButtonClick = showProviders
-    ? handleProviderChange
-    : showGenres
-      ? handleGenreChange
-      : undefined;
+  const onButtonClick = React.useMemo(() => {
+    if (showProviders) return handleProviderChange;
+    if (showGenres) return handleGenreChange;
+    return undefined;
+  }, [showProviders, showGenres, handleProviderChange, handleGenreChange]);
 
   // Split buttons into visible and dropdown based on window width
   const { visibleButtons, dropdownButtons } = React.useMemo(() => {
@@ -198,14 +204,21 @@ export function MediaCarousel({
   }, [relatedButtons, windowWidth]);
 
   // Determine content type and ID based on selection
-  const contentType =
-    showProviders && selectedProviderId
-      ? "provider"
-      : showGenres && selectedGenreId
-        ? "genre"
-        : showRecommendations && selectedRecommendationId
-          ? "recommendations"
-          : content.type;
+  const contentType = React.useMemo(() => {
+    if (showProviders && selectedProviderId) return "provider";
+    if (showGenres && selectedGenreId) return "genre";
+    if (showRecommendations && selectedRecommendationId)
+      return "recommendations";
+    return content.type;
+  }, [
+    showProviders,
+    selectedProviderId,
+    showGenres,
+    selectedGenreId,
+    showRecommendations,
+    selectedRecommendationId,
+    content.type,
+  ]);
 
   // Fetch media using our hook
   const { media, sectionTitle } = useDiscoverMedia({
@@ -220,17 +233,21 @@ export function MediaCarousel({
   });
 
   // Find active button
-  const activeButton = relatedButtons?.find(
-    (btn) =>
-      btn.name === selectedGenre?.name ||
-      btn.name === sectionTitle.split(" on ")[1],
-  );
+  const activeButton = React.useMemo(() => {
+    return relatedButtons?.find(
+      (btn) =>
+        btn.name === selectedGenre?.name ||
+        btn.name === sectionTitle.split(" on ")[1],
+    );
+  }, [relatedButtons, selectedGenre?.name, sectionTitle]);
 
   // Convert buttons to dropdown options
-  const dropdownOptions: OptionItem[] = dropdownButtons.map((button) => ({
-    id: button.id,
-    name: button.name,
-  }));
+  const dropdownOptions: OptionItem[] = React.useMemo(() => {
+    return dropdownButtons.map((button) => ({
+      id: button.id,
+      name: button.name,
+    }));
+  }, [dropdownButtons]);
 
   // Set selected genre if active button is in dropdown
   React.useEffect(() => {
@@ -258,10 +275,12 @@ export function MediaCarousel({
     }
   }, [showRecommendations, recommendationSources, selectedRecommendationId]);
 
-  const categorySlug = `${sectionTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${isTVShow ? "tv" : "movie"}`;
+  const categorySlug = React.useMemo(() => {
+    return `${sectionTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${isTVShow ? "tv" : "movie"}`;
+  }, [sectionTitle, isTVShow]);
 
   // Function to check overflow for the carousel
-  const checkOverflow = (element: HTMLDivElement | null) => {
+  const checkOverflow = React.useCallback((element: HTMLDivElement | null) => {
     if (!element) {
       setHasOverflow(false);
       return;
@@ -269,15 +288,18 @@ export function MediaCarousel({
 
     const hasHorizontalOverflow = element.scrollWidth > element.clientWidth;
     setHasOverflow(hasHorizontalOverflow);
-  };
+  }, []);
 
   // Function to set carousel ref and check overflow
-  const setCarouselRef = (element: HTMLDivElement | null) => {
-    carouselRefs.current[categorySlug] = element;
+  const setCarouselRef = React.useCallback(
+    (element: HTMLDivElement | null) => {
+      carouselRefs.current[categorySlug] = element;
 
-    // Check overflow after a short delay to ensure content is rendered
-    setTimeout(() => checkOverflow(element), 100);
-  };
+      // Check overflow after a short delay to ensure content is rendered
+      setTimeout(() => checkOverflow(element), 100);
+    },
+    [carouselRefs, categorySlug, checkOverflow],
+  );
 
   // Effect to recheck overflow on window resize
   useEffect(() => {
@@ -290,50 +312,63 @@ export function MediaCarousel({
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [carouselRefs, categorySlug]);
-  let isScrolling = false;
+  }, [carouselRefs, categorySlug, checkOverflow]);
+  const isScrollingRef = React.useRef(false);
 
-  const handleWheel = (e: React.WheelEvent) => {
-    if (isScrolling) return;
-    isScrolling = true;
+  const handleWheel = React.useCallback(
+    (e: React.WheelEvent) => {
+      if (isScrollingRef.current) return;
+      isScrollingRef.current = true;
 
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      e.stopPropagation();
-      e.preventDefault();
-    }
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
 
-    if (browser) {
-      setTimeout(() => {
-        isScrolling = false;
-      }, 345);
-    } else {
-      isScrolling = false;
-    }
-  };
+      if (browser) {
+        setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 345);
+      } else {
+        isScrollingRef.current = false;
+      }
+    },
+    [browser],
+  );
 
-  const handleMoreClick = () => {
+  const handleMoreClick = React.useCallback(() => {
     setLastView({
       url: window.location.pathname,
       scrollPosition: window.scrollY,
     });
-  };
+  }, [setLastView]);
 
   // Generate more link
-  const generatedMoreLink =
-    moreLink ||
-    (() => {
-      const baseLink = `/discover/more`;
-      if (showProviders && selectedProviderId) {
-        return `${baseLink}/provider/${selectedProviderId}/${mediaType}`;
-      }
-      if (showGenres && selectedGenreId) {
-        return `${baseLink}/genre/${selectedGenreId}/${mediaType}`;
-      }
-      if (showRecommendations && selectedRecommendationId) {
-        return `${baseLink}/recommendations/${selectedRecommendationId}/${mediaType}`;
-      }
-      return `${baseLink}/${content.type}/${mediaType}`;
-    })();
+  const generatedMoreLink = React.useMemo(() => {
+    if (moreLink) return moreLink;
+
+    const baseLink = `/discover/more`;
+    if (showProviders && selectedProviderId) {
+      return `${baseLink}/provider/${selectedProviderId}/${mediaType}`;
+    }
+    if (showGenres && selectedGenreId) {
+      return `${baseLink}/genre/${selectedGenreId}/${mediaType}`;
+    }
+    if (showRecommendations && selectedRecommendationId) {
+      return `${baseLink}/recommendations/${selectedRecommendationId}/${mediaType}`;
+    }
+    return `${baseLink}/${content.type}/${mediaType}`;
+  }, [
+    moreLink,
+    showProviders,
+    selectedProviderId,
+    showGenres,
+    selectedGenreId,
+    showRecommendations,
+    selectedRecommendationId,
+    mediaType,
+    content.type,
+  ]);
 
   // Loading state
   if (!isIntersecting || !sectionTitle) {

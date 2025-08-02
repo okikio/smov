@@ -142,7 +142,7 @@ export function FeaturedCarousel({
   const enableImageLogos = usePreferencesStore(
     (state) => state.enableImageLogos,
   );
-  const userLanguage = useLanguageStore.getState().language;
+  const userLanguage = useLanguageStore((s) => s.language);
   const formattedLanguage = getTmdbLanguageCode(userLanguage);
   const { width: windowWidth, height: windowHeight } = useWindowSize();
   const [releaseInfo, setReleaseInfo] = useState<TraktReleaseResponse | null>(
