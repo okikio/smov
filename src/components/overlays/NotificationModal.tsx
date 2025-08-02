@@ -30,29 +30,47 @@ function DetailView({
   getCategoryColor,
   getCategoryLabel,
   formatDate,
+  isRead,
+  toggleReadStatus,
 }: {
   selectedNotification: NotificationItem;
   goBackToList: () => void;
   getCategoryColor: (category: string) => string;
   getCategoryLabel: (category: string) => string;
   formatDate: (dateString: string) => string;
+  isRead: boolean;
+  toggleReadStatus: () => void;
 }) {
   return (
     <div className="space-y-4">
-      {/* Header with back button */}
-      <div className="flex items-center gap-3 pb-4 border-b border-utils-divider">
+      {/* Header with back button and toggle read status */}
+      <div className="flex md:flex-row flex-col items-start justify-between gap-4 pb-4 border-b border-utils-divider">
         <button
           type="button"
           onClick={goBackToList}
-          className="text-type-link hover:text-type-linkHover transition-colors flex items-center gap-2"
+          className="text-type-link hover:text-type-linkHover transition-colors flex items-center gap-1"
         >
           <Icon icon={Icons.CHEVRON_LEFT} />
           <span>Back to notifications</span>
         </button>
+        <div>
+          <button
+            type="button"
+            onClick={toggleReadStatus}
+            className={`text-sm transition-colors flex items-center gap-2 px-3 py-1 rounded-md ${
+              isRead
+                ? "text-type-link hover:text-type-linkHover bg-background-main/50 hover:bg-background-main/70"
+                : "text-type-secondary hover:text-white bg-background-main/30 hover:bg-background-main/50"
+            }`}
+          >
+            <Icon icon={isRead ? Icons.EYE_SLASH : Icons.EYE} />
+            <span>{isRead ? "Mark as unread" : "Mark as read"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Notification content */}
-      <div className="space-y-4">
+      <div className="space-y-4 overflow-y-auto max-h-[70vh] md:max-h-[60vh]">
         <div className="flex items-center gap-2">
           {getCategoryColor(selectedNotification.category) && (
             <span
@@ -212,7 +230,7 @@ function ListView({
       {!loading && !error && (
         <div
           ref={containerRef}
-          className="space-y-4 max-h-[calc(100vh-100px)] md:max-h-[calc(100vh-300px)] overflow-y-auto"
+          className="space-y-4 overflow-y-auto max-h-[70vh] md:max-h-[60vh]"
         >
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 gap-2">
@@ -237,17 +255,31 @@ function ListView({
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3
-                          className={`font-medium ${
-                            isRead ? "text-type-secondary" : "text-white"
-                          }`}
-                        >
-                          {notification.title}
-                        </h3>
-                        {!isRead && (
-                          <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
-                        )}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 flex-wrap order-2 sm:order-1">
+                          <h3
+                            className={`font-medium ${
+                              isRead ? "text-type-secondary" : "text-white"
+                            }`}
+                          >
+                            {notification.title}
+                          </h3>
+                          {!isRead && (
+                            <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 order-1 sm:order-2">
+                          {getCategoryColor(notification.category) && (
+                            <span
+                              className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(
+                                notification.category,
+                              )}`}
+                            />
+                          )}
+                          <span className="text-xs text-type-secondary">
+                            {getCategoryLabel(notification.category)}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-sm text-type-secondary mb-2 line-clamp-2">
                         {notification.description
@@ -255,19 +287,6 @@ function ListView({
                           .substring(0, 150)}
                         {notification.description.length > 150 ? "..." : ""}
                       </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {getCategoryColor(notification.category) && (
-                        <span
-                          className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(
-                            notification.category,
-                          )}`}
-                        />
-                      )}
-                      <span className="text-xs text-type-secondary">
-                        {getCategoryLabel(notification.category)}
-                      </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
@@ -642,6 +661,22 @@ export function NotificationModal({ id }: NotificationModalProps) {
           getCategoryColor={getCategoryColor}
           getCategoryLabel={getCategoryLabel}
           formatDate={formatDate}
+          isRead={readNotifications.has(selectedNotification.guid)}
+          toggleReadStatus={() => {
+            if (readNotifications.has(selectedNotification.guid)) {
+              // Mark as unread
+              const newReadSet = new Set(readNotifications);
+              newReadSet.delete(selectedNotification.guid);
+              setReadNotifications(newReadSet);
+              localStorage.setItem(
+                "read-notifications",
+                JSON.stringify(Array.from(newReadSet)),
+              );
+            } else {
+              // Mark as read
+              markAsRead(selectedNotification.guid);
+            }
+          }}
         />
       ) : null}
     </FancyModal>
