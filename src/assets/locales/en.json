@@ -255,7 +255,7 @@
           "button": "Reorder",
           "done": "Done",
           "title": "Edit Group Order",
-          "description": "Drag and drop to reorder your bookmark groups.",
+          "description": "Drag and drop to reorder your bookmark groups",
           "cancel": "Cancel",
           "save": "Save"
         }

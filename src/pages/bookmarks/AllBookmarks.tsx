@@ -6,16 +6,17 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/buttons/Button";
 import { EditButton } from "@/components/buttons/EditButton";
 import { EditButtonWithText } from "@/components/buttons/EditButtonWithText";
-import { Item, SortableList } from "@/components/form/SortableList";
+import { Item } from "@/components/form/SortableList";
 import { Icon, Icons } from "@/components/Icon";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaGrid } from "@/components/media/MediaGrid";
 import { WatchedMediaCard } from "@/components/media/WatchedMediaCard";
 import { DetailsModal } from "@/components/overlays/detailsModal/DetailsModal";
-import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
+import { EditGroupOrderModal } from "@/components/overlays/EditGroupOrderModal";
+import { useModal } from "@/components/overlays/Modal";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
-import { Heading1, Heading2, Paragraph } from "@/components/utils/Text";
+import { Heading1 } from "@/components/utils/Text";
 import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
 import { useRandomTranslation } from "@/hooks/useRandomTranslation";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
@@ -419,33 +420,17 @@ export function AllBookmarks({ onShowDetails }: AllBookmarksProps) {
         </div>
 
         {/* Edit Order Modal */}
-        <Modal id={editOrderModal.id}>
-          <ModalCard>
-            <Heading2 className="!mt-0">
-              {t("home.bookmarks.groups.reorder.title")}
-            </Heading2>
-            <Paragraph>
-              {t("home.bookmarks.groups.reorder.description")}
-            </Paragraph>
-            <div className="mt-6">
-              <SortableList
-                items={sortableItems}
-                setItems={(newItems) => {
-                  const newOrder = newItems.map((item) => item.id);
-                  setTempGroupOrder(newOrder);
-                }}
-              />
-            </div>
-            <div className="flex gap-4 mt-6 justify-end">
-              <Button theme="secondary" onClick={handleCancelOrder}>
-                {t("home.bookmarks.groups.reorder.cancel")}
-              </Button>
-              <Button theme="purple" onClick={handleSaveOrderClick}>
-                {t("home.bookmarks.groups.reorder.save")}
-              </Button>
-            </div>
-          </ModalCard>
-        </Modal>
+        <EditGroupOrderModal
+          id={editOrderModal.id}
+          isShown={editOrderModal.isShown}
+          items={sortableItems}
+          onCancel={handleCancelOrder}
+          onSave={handleSaveOrderClick}
+          onItemsChange={(newItems) => {
+            const newOrder = newItems.map((item) => item.id);
+            setTempGroupOrder(newOrder);
+          }}
+        />
 
         {detailsData && <DetailsModal id="details" data={detailsData} />}
       </WideContainer>

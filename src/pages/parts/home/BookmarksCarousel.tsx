@@ -2,17 +2,16 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
-import { Button } from "@/components/buttons/Button";
 import { EditButton } from "@/components/buttons/EditButton";
 import { EditButtonWithText } from "@/components/buttons/EditButtonWithText";
-import { Item, SortableList } from "@/components/form/SortableList";
+import { Item } from "@/components/form/SortableList";
 import { Icon, Icons } from "@/components/Icon";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { WatchedMediaCard } from "@/components/media/WatchedMediaCard";
-import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
+import { EditGroupOrderModal } from "@/components/overlays/EditGroupOrderModal";
+import { useModal } from "@/components/overlays/Modal";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
 import { Flare } from "@/components/utils/Flare";
-import { Heading2, Paragraph } from "@/components/utils/Text";
 import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { CarouselNavButtons } from "@/pages/discover/components/CarouselNavButtons";
@@ -595,33 +594,17 @@ export function BookmarksCarousel({
       })}
 
       {/* Edit Order Modal */}
-      <Modal id={editOrderModal.id}>
-        <ModalCard>
-          <Heading2 className="!mt-0">
-            {t("home.bookmarks.groups.reorder.title")}
-          </Heading2>
-          <Paragraph>
-            {t("home.bookmarks.groups.reorder.description")}
-          </Paragraph>
-          <div className="mt-6">
-            <SortableList
-              items={sortableItems}
-              setItems={(newItems) => {
-                const newOrder = newItems.map((item) => item.id);
-                setTempGroupOrder(newOrder);
-              }}
-            />
-          </div>
-          <div className="flex gap-4 mt-6 justify-end">
-            <Button theme="secondary" onClick={handleCancelOrder}>
-              {t("home.bookmarks.groups.reorder.cancel")}
-            </Button>
-            <Button theme="purple" onClick={handleSaveOrderClick}>
-              {t("home.bookmarks.groups.reorder.save")}
-            </Button>
-          </div>
-        </ModalCard>
-      </Modal>
+      <EditGroupOrderModal
+        id={editOrderModal.id}
+        isShown={editOrderModal.isShown}
+        items={sortableItems}
+        onCancel={handleCancelOrder}
+        onSave={handleSaveOrderClick}
+        onItemsChange={(newItems) => {
+          const newOrder = newItems.map((item) => item.id);
+          setTempGroupOrder(newOrder);
+        }}
+      />
     </>
   );
 }
