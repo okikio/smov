@@ -330,8 +330,11 @@ export function BookmarksCarousel({
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Prevent default mouse action
-    pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
+    // Only trigger long press for left mouse button (button 0)
+    if (e.button === 0) {
+      e.preventDefault(); // Prevent default mouse action
+      pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
+    }
   };
 
   const handleMouseUp = () => {
