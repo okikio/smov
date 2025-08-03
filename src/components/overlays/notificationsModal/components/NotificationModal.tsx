@@ -8,11 +8,11 @@ import { SettingsView } from "./SettingsView";
 import { FancyModal } from "../../Modal";
 import { ModalView, NotificationItem, NotificationModalProps } from "../types";
 import {
+  fetchRssFeed,
   formatDate,
   getAllFeeds,
   getCategoryColor,
   getCategoryLabel,
-  getFetchUrl,
   getSourceName,
 } from "../utils";
 
@@ -111,79 +111,61 @@ export function NotificationModal({ id }: NotificationModalProps) {
         if (!feedUrl.trim()) continue;
 
         try {
-          const fetchUrl = getFetchUrl(feedUrl);
-          const response = await fetch(fetchUrl);
-          if (response.ok) {
-            const responseText = await response.text();
+          const xmlText = await fetchRssFeed(feedUrl);
 
-            // Handle CORS proxy response (JSON wrapper)
-            let xmlText = responseText;
-            try {
-              const jsonResponse = JSON.parse(responseText);
-              if (jsonResponse.contents) {
-                xmlText = jsonResponse.contents;
-              }
-            } catch {
-              // If it's not JSON, assume it's direct XML
-              xmlText = responseText;
-            }
+          // Basic validation that we got XML content
+          if (
+            xmlText &&
+            (xmlText.includes("<rss") || xmlText.includes("<feed"))
+          ) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
 
-            // Basic validation that we got XML content
-            if (
-              xmlText &&
-              (xmlText.includes("<rss") || xmlText.includes("<feed"))
-            ) {
-              const parser = new DOMParser();
-              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            // Check for parsing errors
+            const parserError = xmlDoc.querySelector("parsererror");
+            if (!parserError && xmlDoc && xmlDoc.documentElement) {
+              const items = xmlDoc.querySelectorAll("item");
+              if (items && items.length > 0) {
+                items.forEach((item) => {
+                  try {
+                    const guid = item.querySelector("guid")?.textContent || "";
+                    const title =
+                      item.querySelector("title")?.textContent || "";
+                    const link = item.querySelector("link")?.textContent || "";
+                    const description =
+                      item.querySelector("description")?.textContent || "";
+                    const pubDate =
+                      item.querySelector("pubDate")?.textContent || "";
+                    const category =
+                      item.querySelector("category")?.textContent || "";
 
-              // Check for parsing errors
-              const parserError = xmlDoc.querySelector("parsererror");
-              if (!parserError && xmlDoc && xmlDoc.documentElement) {
-                const items = xmlDoc.querySelectorAll("item");
-                if (items && items.length > 0) {
-                  items.forEach((item) => {
-                    try {
-                      const guid =
-                        item.querySelector("guid")?.textContent || "";
-                      const title =
-                        item.querySelector("title")?.textContent || "";
-                      const link =
-                        item.querySelector("link")?.textContent || "";
-                      const description =
-                        item.querySelector("description")?.textContent || "";
-                      const pubDate =
-                        item.querySelector("pubDate")?.textContent || "";
-                      const category =
-                        item.querySelector("category")?.textContent || "";
-
-                      // Skip items without essential data
-                      if (!guid || !title) {
-                        return;
-                      }
-
-                      // Parse the publication date
-                      const notificationDate = new Date(pubDate);
-
-                      allNotifications.push({
-                        guid,
-                        title,
-                        link,
-                        description,
-                        pubDate,
-                        category,
-                        source: getSourceName(feedUrl),
-                      });
-
-                      // Collect GUIDs of notifications older than autoReadDays
-                      if (notificationDate <= autoReadDate) {
-                        autoReadGuids.push(guid);
-                      }
-                    } catch (itemError) {
-                      // Skip malformed items
-                      console.warn("Skipping malformed RSS item:", itemError);
+                    // Skip items without essential data
+                    if (!guid || !title) {
+                      return;
                     }
-                  });
-                }
+
+                    // Parse the publication date
+                    const notificationDate = new Date(pubDate);
+
+                    allNotifications.push({
+                      guid,
+                      title,
+                      link,
+                      description,
+                      pubDate,
+                      category,
+                      source: getSourceName(feedUrl),
+                    });
+
+                    // Collect GUIDs of notifications older than autoReadDays
+                    if (notificationDate <= autoReadDate) {
+                      autoReadGuids.push(guid);
+                    }
+                  } catch (itemError) {
+                    // Skip malformed items
+                    console.warn("Skipping malformed RSS item:", itemError);
+                  }
+                });
               }
             }
           }

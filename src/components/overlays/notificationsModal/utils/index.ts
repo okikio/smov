@@ -1,5 +1,6 @@
+import { proxiedFetch } from "@/backend/helpers/fetch";
+
 const DEFAULT_FEEDS = ["/notifications.xml"];
-// const CORS_PROXY = "http://api.allorigins.win/get?url="; // temporarily disabled
 
 export const getAllFeeds = (): string[] => {
   try {
@@ -18,7 +19,24 @@ export const getFetchUrl = (feedUrl: string): string => {
   if (feedUrl.startsWith("/")) {
     return feedUrl;
   }
-  return feedUrl; //  return `${CORS_PROXY}${encodeURIComponent(feedUrl)}`;
+  return feedUrl;
+};
+
+// New function to fetch RSS feeds using proxiedFetch
+export const fetchRssFeed = async (feedUrl: string): Promise<string> => {
+  if (feedUrl.startsWith("/")) {
+    // For local feeds, use regular fetch
+    const response = await fetch(feedUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.text();
+  }
+  // For external feeds, use proxiedFetch
+  const response = await proxiedFetch(feedUrl, {
+    responseType: "text",
+  });
+  return response as string;
 };
 
 export const getSourceName = (feedUrl: string): string => {
