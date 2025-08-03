@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Icon, Icons } from "@/components/Icon";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
@@ -36,6 +36,29 @@ export function GroupDropdown({
   const [newGroup, setNewGroup] = useState("");
   const [showInput, setShowInput] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<UserIcons>(userIconList[0]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+        setShowInput(false);
+        setNewGroup("");
+        setSelectedIcon(userIconList[0]);
+      }
+    };
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
   const handleToggleGroup = (group: string) => {
     let newGroups;
@@ -57,7 +80,7 @@ export function GroupDropdown({
   };
 
   return (
-    <div className="relative min-w-[200px]">
+    <div ref={dropdownRef} className="relative min-w-[200px]">
       <button
         type="button"
         className="w-full px-3 py-2 text-xs bg-background-main border border-background-secondary rounded-lg text-white flex justify-between items-center hover:bg-mediaCard-hoverBackground transition-colors"
