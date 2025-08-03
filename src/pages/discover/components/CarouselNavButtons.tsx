@@ -6,6 +6,7 @@ interface CarouselNavButtonsProps {
   carouselRefs: React.MutableRefObject<{
     [key: string]: HTMLDivElement | null;
   }>;
+  hasOverflow?: boolean;
 }
 
 interface NavButtonProps {
@@ -42,6 +43,7 @@ function NavButton({ direction, onClick }: NavButtonProps) {
 export function CarouselNavButtons({
   categorySlug,
   carouselRefs,
+  hasOverflow = true,
 }: CarouselNavButtonsProps) {
   const handleScroll = (direction: "left" | "right") => {
     const carousel = carouselRefs.current[categorySlug];
@@ -73,6 +75,11 @@ export function CarouselNavButtons({
       });
     });
   };
+
+  // Don't render buttons if there's no overflow
+  if (!hasOverflow) {
+    return null;
+  }
 
   return (
     <>

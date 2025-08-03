@@ -4,7 +4,7 @@ import { PROVIDER_TO_IMAGE_MAP } from "@/backend/metadata/traktApi";
 import { Icon, Icons } from "@/components/Icon";
 import { getRTIcon } from "@/utils/rottenTomatoesScraper";
 
-import { DetailsRatingsProps } from "./types";
+import { DetailsRatingsProps } from "../../types";
 
 export function DetailsRatings({
   rtData,

@@ -11,6 +11,7 @@ import {
 } from "@/backend/accounts/user";
 import { useAuthStore } from "@/stores/auth";
 import { useBookmarkStore } from "@/stores/bookmarks";
+import { useGroupOrderStore } from "@/stores/groupOrder";
 import { useLanguageStore } from "@/stores/language";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useProgressStore } from "@/stores/progress";
@@ -24,6 +25,7 @@ export function useAuthData() {
   const setProxySet = useAuthStore((s) => s.setProxySet);
   const clearBookmarks = useBookmarkStore((s) => s.clear);
   const clearProgress = useProgressStore((s) => s.clear);
+  const clearGroupOrder = useGroupOrderStore((s) => s.clear);
   const setTheme = useThemeStore((s) => s.setTheme);
   const setAppLanguage = useLanguageStore((s) => s.setLanguage);
   const importSubtitleLanguage = useSubtitleStore(
@@ -86,8 +88,15 @@ export function useAuthData() {
     removeAccount();
     clearBookmarks();
     clearProgress();
+    clearGroupOrder();
     setFebboxKey(null);
-  }, [removeAccount, clearBookmarks, clearProgress, setFebboxKey]);
+  }, [
+    removeAccount,
+    clearBookmarks,
+    clearProgress,
+    clearGroupOrder,
+    setFebboxKey,
+  ]);
 
   const syncData = useCallback(
     async (
@@ -96,9 +105,14 @@ export function useAuthData() {
       progress: ProgressResponse[],
       bookmarks: BookmarkResponse[],
       settings: SettingsResponse,
+      groupOrder: { groupOrder: string[] },
     ) => {
       replaceBookmarks(bookmarkResponsesToEntries(bookmarks));
       replaceItems(progressResponsesToEntries(progress));
+
+      if (groupOrder?.groupOrder) {
+        useGroupOrderStore.getState().setGroupOrder(groupOrder.groupOrder);
+      }
 
       if (settings.applicationLanguage) {
         setAppLanguage(settings.applicationLanguage);

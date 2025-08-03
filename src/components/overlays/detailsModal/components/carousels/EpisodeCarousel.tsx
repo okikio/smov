@@ -6,10 +6,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/buttons/Button";
 import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
+import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { hasAired } from "@/components/player/utils/aired";
 import { useProgressStore } from "@/stores/progress";
 
-import { EpisodeCarouselProps } from "./types";
+import { EpisodeCarouselProps } from "../../types";
 
 export function EpisodeCarousel({
   episodes,
@@ -25,6 +26,7 @@ export function EpisodeCarousel({
   const [showEpisodeMenu, setShowEpisodeMenu] = useState(false);
   const [customSeason, setCustomSeason] = useState("");
   const [customEpisode, setCustomEpisode] = useState("");
+  const [SeasonWatched, setSeasonWatched] = useState(false);
   const [expandedEpisodes, setExpandedEpisodes] = useState<{
     [key: number]: boolean;
   }>({});
@@ -38,6 +40,7 @@ export function EpisodeCarousel({
     [key: number]: HTMLParagraphElement | null;
   }>({});
   const updateItem = useProgressStore((s) => s.updateItem);
+  const confirmModal = useModal("season-watch-confirm");
 
   const handleScroll = (direction: "left" | "right") => {
     if (!carouselRef.current) return;
@@ -203,9 +206,65 @@ export function EpisodeCarousel({
     }
   };
 
+  // Toggle whole season watch status
+  const toggleSeasonWatchStatus = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    confirmModal.show();
+  };
+
+  const handleCancel = () => {
+    confirmModal.hide();
+  };
+
   const currentSeasonEpisodes = episodes.filter(
     (ep) => ep.season_number === selectedSeason,
   );
+
+  const handleConfirm = (event: React.MouseEvent) => {
+    try {
+      const episodeWatchedStatus: boolean[] = [];
+      currentSeasonEpisodes.forEach((episode: any) => {
+        const episodeProgress =
+          progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
+        const percentage = episodeProgress
+          ? (episodeProgress.progress.watched /
+              episodeProgress.progress.duration) *
+            100
+          : 0;
+        const isAired = hasAired(episode.air_date);
+        const isWatched = percentage > 90;
+        if (isAired && !isWatched) {
+          episodeWatchedStatus.push(isWatched);
+        }
+      });
+
+      const hasUnwatched = episodeWatchedStatus.length >= 1;
+
+      currentSeasonEpisodes.forEach((episode: any) => {
+        const episodeProgress =
+          progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
+        const percentage = episodeProgress
+          ? (episodeProgress.progress.watched /
+              episodeProgress.progress.duration) *
+            100
+          : 0;
+        const isAired = hasAired(episode.air_date);
+        const isWatched = percentage > 90;
+        if (hasUnwatched && isAired && !isWatched) {
+          toggleWatchStatus(episode.id, event); // Mark unwatched as watched
+        } else if (!hasUnwatched && isAired && isWatched) {
+          toggleWatchStatus(episode.id, event); // Mark watched as unwatched
+        }
+      });
+
+      confirmModal.hide();
+    } catch (error) {
+      console.error("Error in handleConfirm:", error);
+      confirmModal.hide();
+    }
+  };
 
   const toggleEpisodeExpansion = (
     episodeId: number,
@@ -258,6 +317,32 @@ export function EpisodeCarousel({
       window.removeEventListener("resize", handleResize);
     };
   }, [episodes, expandedEpisodes]);
+
+  useEffect(() => {
+    const episodeWatchedStatus: boolean[] = [];
+
+    currentSeasonEpisodes.forEach((episode: any) => {
+      const episodeProgress =
+        progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
+      const percentage = episodeProgress
+        ? (episodeProgress.progress.watched /
+            episodeProgress.progress.duration) *
+          100
+        : 0;
+      const isAired = hasAired(episode.air_date);
+      const isWatched = percentage > 90;
+
+      if (isAired && !isWatched) {
+        episodeWatchedStatus.push(isWatched);
+      }
+    });
+
+    if (episodeWatchedStatus.length >= 1) {
+      setSeasonWatched(true); // If no episodes are watched, we want to mark all as watched
+    } else {
+      setSeasonWatched(false); // if all episodes are watched, we want to mark all as unwatched
+    }
+  }, [currentSeasonEpisodes, episodes, mediaId, progress]);
 
   return (
     <div className="mt-6 md:mt-0">
@@ -323,17 +408,50 @@ export function EpisodeCarousel({
             )}
           </div>
         </div>
-        <Dropdown
-          options={seasons.map((season) => ({
-            id: season.season_number.toString(),
-            name: `${t("details.season")} ${season.season_number}`,
-          }))}
-          selectedItem={{
-            id: selectedSeason.toString(),
-            name: `${t("details.season")} ${selectedSeason}`,
-          }}
-          setSelectedItem={(item) => onSeasonChange(Number(item.id))}
-        />
+
+        {/* Season Watched Confirmation */}
+        <div className="flex items-center justify-between gap-2">
+          <Modal id={confirmModal.id}>
+            <ModalCard>
+              <h3 className="text-lg font-semibold text-white mb-4">
+                {SeasonWatched
+                  ? t("media.seasonWatched")
+                  : t("media.seasonUnwatched")}
+              </h3>
+              <div className="flex justify-end gap-2">
+                <Button theme="secondary" onClick={handleCancel}>
+                  {t("actions.cancel")}
+                </Button>
+                <Button theme="purple" onClick={handleConfirm}>
+                  {t("actions.confirm")}
+                </Button>
+              </div>
+            </ModalCard>
+          </Modal>
+          <button
+            type="button"
+            onClick={(e) => toggleSeasonWatchStatus(e)}
+            className="p-1.5 bg-dropdown-background hover:bg-dropdown-hoverBackground transition-colors rounded-full"
+            title={t("Mark season as watched")}
+          >
+            <Icon
+              icon={SeasonWatched ? Icons.EYE : Icons.EYE_SLASH}
+              className="h-5 w-5 text-white"
+            />
+          </button>
+
+          <Dropdown
+            options={seasons.map((season) => ({
+              id: season.season_number.toString(),
+              name: `${t("details.season")} ${season.season_number}`,
+            }))}
+            selectedItem={{
+              id: selectedSeason.toString(),
+              name: `${t("details.season")} ${selectedSeason}`,
+            }}
+            setSelectedItem={(item) => onSeasonChange(Number(item.id))}
+          />
+        </div>
       </div>
 
       {/* Episodes Carousel */}
@@ -359,7 +477,6 @@ export function EpisodeCarousel({
         >
           {/* Add padding before the first card */}
           <div className="flex-shrink-0 w-4" />
-
           {currentSeasonEpisodes.map((episode) => {
             const isActive =
               showProgress?.episode?.id === episode.id.toString();
@@ -414,7 +531,7 @@ export function EpisodeCarousel({
                         {episode.episode_number}
                       </span>
                       {!isAired && (
-                        <span className="text-video-context-type-main/70 text-sm">
+                        <span className="bg-video-context-hoverColor/50 text-video-context-type-main/80 text-sm px-1 py-0.5 rounded-md">
                           {episode.air_date
                             ? `(${t("details.airs")} - ${new Date(episode.air_date).toLocaleDateString()})`
                             : `(${t("media.unreleased")})`}

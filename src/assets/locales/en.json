@@ -141,7 +141,8 @@
   "actions": {
     "copied": "Copied",
     "copy": "Copy",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "auth": {
     "createAccount": "Don't have an account yet 😬 <0>Create an account.</0>",
@@ -240,7 +241,25 @@
   },
   "home": {
     "bookmarks": {
-      "sectionTitle": "Bookmarks"
+      "sectionTitle": "Bookmarks",
+      "showAll": "Show all",
+      "groups": {
+        "dropdown": {
+          "placeholderButton": "Add to group",
+          "empty": "No groups yet",
+          "addButton": "Add",
+          "removeFromGroup": "Remove from group",
+          "removeAll": "Remove all"
+        },
+        "reorder": {
+          "button": "Reorder",
+          "done": "Done",
+          "title": "Edit Group Order",
+          "description": "Drag and drop to reorder your bookmark groups",
+          "cancel": "Cancel",
+          "save": "Save"
+        }
+      }
     },
     "continueWatching": {
       "sectionTitle": "Continue Watching..."
@@ -316,7 +335,9 @@
       "show": "Show"
     },
     "episodeShort": "E",
-    "seasonShort": "S"
+    "seasonShort": "S",
+    "seasonWatched": "Are you sure you want to mark the season as watched?",
+    "seasonUnwatched": "Are you sure you want to mark the season as unwatched?"
   },
   "details": {
     "resume": "Resume",
@@ -614,7 +635,9 @@
       "playback": {
         "speedLabel": "Playback speed",
         "title": "Playback settings",
-        "disabled": "(Disabled in watch party)"
+        "disabled": "(Disabled in watch party)",
+        "speedBoosted": "Playback speed boosted to 2x",
+        "speedUnboosted": "Playback speed reset to {{speed}}x"
       },
       "quality": {
         "automaticLabel": "Automatic quality",
@@ -667,6 +690,8 @@
         "unknownLanguage": "Unknown",
         "dropSubtitleFile": "Drop subtitle file here! >_<",
         "scrapeButton": "Scrape subtitles",
+        "refresh": "Refresh External Subtitles",
+        "refreshing": "Refreshing...",
         "empty": "There are no provided subtitles for this.",
         "notFound": "None of the available options match your query",
         "useNativeSubtitles": "Use native video subtitles",
@@ -724,6 +749,8 @@
         "errorNetwork": "Some kind of network error occurred which prevented the media from being successfully fetched, despite having previously been available.",
         "errorNotSupported": "The media or media provider object is not supported."
       },
+      "copyDebugInfo": "Copy debug info",
+      "debugInfo": "Check console for more details.",
       "homeButton": "Go home",
       "text": "There was an error trying to play the media 😖. Please try again or try a different source!",
       "title": "Failed to play video!"

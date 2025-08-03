@@ -11,9 +11,11 @@ import {
 
 import { convertLegacyUrl, isLegacyUrl } from "@/backend/metadata/getmeta";
 import { generateQuickSearchMediaUrl } from "@/backend/metadata/tmdb";
+import { NotificationModal } from "@/components/overlays/notificationsModal";
 import { useOnlineListener } from "@/hooks/usePing";
 import { AboutPage } from "@/pages/About";
 import { AdminPage } from "@/pages/admin/AdminPage";
+import { AllBookmarks } from "@/pages/bookmarks/AllBookmarks";
 import VideoTesterView from "@/pages/developer/VideoTesterView";
 import { DiscoverMore } from "@/pages/discover/AllMovieLists";
 import { Discover } from "@/pages/discover/Discover";
@@ -116,6 +118,7 @@ function App() {
   return (
     <Layout>
       <LanguageProvider />
+      <NotificationModal id="notifications" />
       {!showDowntime && (
         <Routes>
           {/* functional routes */}
@@ -182,6 +185,8 @@ function App() {
           />
           <Route path="/discover/more/:category" element={<MoreContent />} />
           <Route path="/discover/all" element={<DiscoverMore />} />
+          {/* Bookmarks page */}
+          <Route path="/bookmarks" element={<AllBookmarks />} />
           {/* Settings page */}
           <Route
             path="/settings"

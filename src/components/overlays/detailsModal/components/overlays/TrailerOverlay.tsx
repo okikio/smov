@@ -1,6 +1,6 @@
 import { Icon, Icons } from "@/components/Icon";
 
-import { TrailerOverlayProps } from "./types";
+import { TrailerOverlayProps } from "../../types";
 
 export function TrailerOverlay({ trailerUrl, onClose }: TrailerOverlayProps) {
   return (

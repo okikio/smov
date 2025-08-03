@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EditButton } from "@/components/buttons/EditButton";
@@ -41,6 +41,9 @@ export function WatchingCarousel({
   const [editing, setEditing] = useState(false);
   const removeItem = useProgressStore((s) => s.removeItem);
   const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Track overflow state
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   const { isMobile } = useIsMobile();
 
@@ -108,8 +111,11 @@ export function WatchingCarousel({
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Prevent default mouse action
-    pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
+    // Only trigger long press for left mouse button (button 0)
+    if (e.button === 0) {
+      e.preventDefault(); // Prevent default mouse action
+      pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
+    }
   };
 
   const handleMouseUp = () => {
@@ -118,6 +124,38 @@ export function WatchingCarousel({
       pressTimerRef.current = null;
     }
   };
+
+  // Function to check overflow for the carousel
+  const checkOverflow = (element: HTMLDivElement | null) => {
+    if (!element) {
+      setHasOverflow(false);
+      return;
+    }
+
+    const hasHorizontalOverflow = element.scrollWidth > element.clientWidth;
+    setHasOverflow(hasHorizontalOverflow);
+  };
+
+  // Function to set carousel ref and check overflow
+  const setCarouselRef = (element: HTMLDivElement | null) => {
+    carouselRefs.current[categorySlug] = element;
+
+    // Check overflow after a short delay to ensure content is rendered
+    setTimeout(() => checkOverflow(element), 100);
+  };
+
+  // Effect to recheck overflow on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const element = carouselRefs.current[categorySlug];
+      if (element) {
+        checkOverflow(element);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [carouselRefs, categorySlug]);
 
   if (itemsLength === 0) return null;
 
@@ -140,9 +178,7 @@ export function WatchingCarousel({
         <div
           id={`carousel-${categorySlug}`}
           className="grid grid-flow-col auto-cols-max gap-4 pt-0 overflow-x-scroll scrollbar-none rounded-xl overflow-y-hidden md:pl-8 md:pr-8"
-          ref={(el) => {
-            carouselRefs.current[categorySlug] = el;
-          }}
+          ref={setCarouselRef}
           onWheel={handleWheel}
         >
           <div className="md:w-12" />
@@ -183,6 +219,7 @@ export function WatchingCarousel({
           <CarouselNavButtons
             categorySlug={categorySlug}
             carouselRefs={carouselRefs}
+            hasOverflow={hasOverflow}
           />
         )}
       </div>

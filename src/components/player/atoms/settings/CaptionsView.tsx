@@ -10,6 +10,7 @@ import { Icon, Icons } from "@/components/Icon";
 import { useCaptions } from "@/components/player/hooks/useCaptions";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
+import { fixUTF8Encoding } from "@/components/player/utils/captions";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { usePlayerStore } from "@/stores/player/store";
 import { useSubtitleStore } from "@/stores/subtitles";
@@ -151,13 +152,14 @@ export function CustomCaptionOption() {
             if (!event.target || typeof event.target.result !== "string")
               return;
 
-            // Ensure the data is in UTF-8
+            // Ensure the data is in UTF-8 and fix any encoding issues
             const encoder = new TextEncoder();
             const decoder = new TextDecoder("utf-8");
             const utf8Bytes = encoder.encode(event.target.result);
             const utf8Data = decoder.decode(utf8Bytes);
+            const fixedData = fixUTF8Encoding(utf8Data);
 
-            const converted = convert(utf8Data, "srt");
+            const converted = convert(fixedData, "srt");
             setCaption({
               language: "custom",
               srtData: converted,
@@ -203,13 +205,14 @@ export function CaptionsView({
     reader.addEventListener("load", (e) => {
       if (!e.target || typeof e.target.result !== "string") return;
 
-      // Ensure the data is in UTF-8
+      // Ensure the data is in UTF-8 and fix any encoding issues
       const encoder = new TextEncoder();
       const decoder = new TextDecoder("utf-8");
       const utf8Bytes = encoder.encode(e.target.result);
       const utf8Data = decoder.decode(utf8Bytes);
+      const fixedData = fixUTF8Encoding(utf8Data);
 
-      const converted = convert(utf8Data, "srt");
+      const converted = convert(fixedData, "srt");
 
       setCaption({
         language: "custom",

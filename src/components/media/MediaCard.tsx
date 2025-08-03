@@ -9,14 +9,14 @@ import { mediaItemToId } from "@/backend/metadata/tmdb";
 import { DotList } from "@/components/text/DotList";
 import { Flare } from "@/components/utils/Flare";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
+import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { usePreferencesStore } from "@/stores/preferences";
 import { MediaItem } from "@/utils/mediaTypes";
 
 import { MediaBookmarkButton } from "./MediaBookmark";
 import { IconPatch } from "../buttons/IconPatch";
 import { Icon, Icons } from "../Icon";
-import { DetailsModal } from "../overlays/details/DetailsModal";
-import { useModal } from "../overlays/Modal";
+import { DetailsModal } from "../overlays/detailsModal";
 
 export interface MediaCardProps {
   media: MediaItem;
@@ -223,7 +223,7 @@ export function MediaCard(props: MediaCardProps) {
     id: number;
     type: "movie" | "show";
   } | null>(null);
-  const detailsModal = useModal("details");
+  const { showModal } = useOverlayStack();
   const enableDetailsModal = usePreferencesStore(
     (state) => state.enableDetailsModal,
   );
@@ -258,8 +258,8 @@ export function MediaCard(props: MediaCardProps) {
       id: Number(media.id),
       type: media.type === "movie" ? "movie" : "show",
     });
-    detailsModal.show();
-  }, [media, detailsModal, onShowDetails]);
+    showModal("details");
+  }, [media, showModal, onShowDetails]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (enableDetailsModal && canLink) {

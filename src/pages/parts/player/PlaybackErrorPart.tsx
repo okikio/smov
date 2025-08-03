@@ -29,12 +29,35 @@ export function PlaybackErrorPart() {
     }
   }, [playbackError, settingsRouter]);
 
+  const handleOpenSourcePicker = () => {
+    settingsRouter.open();
+    settingsRouter.navigate("/source");
+  };
+
   return (
     <ErrorLayout>
       <ErrorContainer>
         <IconPill icon={Icons.WAND}>{t("player.playbackError.badge")}</IconPill>
         <Title>{t("player.playbackError.title")}</Title>
         <Paragraph>{t("player.playbackError.text")}</Paragraph>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => modal.show()}
+            theme="danger"
+            padding="md:px-12 p-2.5"
+            className="mt-6"
+          >
+            {t("errors.showError")}
+          </Button>
+          <Button
+            onClick={handleOpenSourcePicker}
+            theme="purple"
+            padding="md:px-12 p-2.5"
+            className="mt-6"
+          >
+            {t("player.menus.sources.title")}
+          </Button>
+        </div>
         <div className="flex gap-3">
           <Button
             href="/"
@@ -45,25 +68,17 @@ export function PlaybackErrorPart() {
             {t("player.playbackError.homeButton")}
           </Button>
           <Button
-            onClick={() => modal.show()}
-            theme="purple"
+            theme="secondary"
             padding="md:px-12 p-2.5"
             className="mt-6"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.reload();
+            }}
           >
-            {t("errors.showError")}
+            {t("errors.reloadPage")}
           </Button>
         </div>
-        <Button
-          theme="secondary"
-          padding="md:px-12 p-2.5"
-          className="mt-6"
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.reload();
-          }}
-        >
-          {t("errors.reloadPage")}
-        </Button>
       </ErrorContainer>
       {/* Error */}
       <ErrorCardInModal
