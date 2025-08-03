@@ -749,6 +749,8 @@
         "errorNetwork": "Some kind of network error occurred which prevented the media from being successfully fetched, despite having previously been available.",
         "errorNotSupported": "The media or media provider object is not supported."
       },
+      "copyDebugInfo": "Copy debug info",
+      "debugInfo": "Check console for more details.",
       "homeButton": "Go home",
       "text": "There was an error trying to play the media 😖. Please try again or try a different source!",
       "title": "Failed to play video!"
