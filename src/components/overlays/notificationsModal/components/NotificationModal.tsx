@@ -124,18 +124,32 @@ export function NotificationModal({ id }: NotificationModalProps) {
             // Check for parsing errors
             const parserError = xmlDoc.querySelector("parsererror");
             if (!parserError && xmlDoc && xmlDoc.documentElement) {
-              const items = xmlDoc.querySelectorAll("item");
+              // Handle both RSS (item) and Atom (entry) feeds
+              const items = xmlDoc.querySelectorAll("item, entry");
               if (items && items.length > 0) {
                 items.forEach((item) => {
                   try {
-                    const guid = item.querySelector("guid")?.textContent || "";
+                    // Handle both RSS and Atom formats
+                    const guid =
+                      item.querySelector("guid")?.textContent ||
+                      item.querySelector("id")?.textContent ||
+                      "";
                     const title =
                       item.querySelector("title")?.textContent || "";
-                    const link = item.querySelector("link")?.textContent || "";
+                    const link =
+                      item.querySelector("link")?.textContent ||
+                      item.querySelector("link")?.getAttribute("href") ||
+                      "";
                     const description =
-                      item.querySelector("description")?.textContent || "";
+                      item.querySelector("description")?.textContent ||
+                      item.querySelector("content")?.textContent ||
+                      item.querySelector("summary")?.textContent ||
+                      "";
                     const pubDate =
-                      item.querySelector("pubDate")?.textContent || "";
+                      item.querySelector("pubDate")?.textContent ||
+                      item.querySelector("published")?.textContent ||
+                      item.querySelector("updated")?.textContent ||
+                      "";
                     const category =
                       item.querySelector("category")?.textContent || "";
 
@@ -163,7 +177,10 @@ export function NotificationModal({ id }: NotificationModalProps) {
                     }
                   } catch (itemError) {
                     // Skip malformed items
-                    console.warn("Skipping malformed RSS item:", itemError);
+                    console.warn(
+                      "Skipping malformed RSS/Atom item:",
+                      itemError,
+                    );
                   }
                 });
               }
