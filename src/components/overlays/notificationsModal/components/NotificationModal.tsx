@@ -154,7 +154,9 @@ export function NotificationModal({ id }: NotificationModalProps) {
                       item.querySelector("category")?.textContent || "";
 
                     // Skip items without essential data
-                    if (!guid || !title) {
+                    // Use link as fallback for guid if guid is missing
+                    const itemGuid = guid || link;
+                    if (!itemGuid || !title) {
                       return;
                     }
 
@@ -162,7 +164,7 @@ export function NotificationModal({ id }: NotificationModalProps) {
                     const notificationDate = new Date(pubDate);
 
                     allNotifications.push({
-                      guid,
+                      guid: itemGuid,
                       title,
                       link,
                       description,
@@ -173,7 +175,7 @@ export function NotificationModal({ id }: NotificationModalProps) {
 
                     // Collect GUIDs of notifications older than autoReadDays
                     if (notificationDate <= autoReadDate) {
-                      autoReadGuids.push(guid);
+                      autoReadGuids.push(itemGuid);
                     }
                   } catch (itemError) {
                     // Skip malformed items

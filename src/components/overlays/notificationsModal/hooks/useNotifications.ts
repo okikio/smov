@@ -68,12 +68,14 @@ export function useNotifications() {
                         item.querySelector("category")?.textContent || "";
 
                       // Skip items without essential data
-                      if (!guid || !title) {
+                      // Use link as fallback for guid if guid is missing
+                      const itemGuid = guid || link;
+                      if (!itemGuid || !title) {
                         return;
                       }
 
                       allNotifications.push({
-                        guid,
+                        guid: itemGuid,
                         title,
                         link,
                         description,
