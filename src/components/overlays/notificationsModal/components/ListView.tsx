@@ -111,7 +111,7 @@ export function ListView({
               return (
                 <div
                   key={notification.guid}
-                  className={`p-4 rounded-lg border transition-all cursor-pointer hover:bg-background-main/50 mr-2 ${
+                  className={`p-4 rounded-lg border transition-all cursor-pointer hover:bg-background-main/50 md:mr-2 ${
                     isRead
                       ? "bg-background-main border-utils-divider opacity-75"
                       : "bg-background-main border-type-link/70 shadow-sm"

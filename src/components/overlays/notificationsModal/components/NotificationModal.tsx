@@ -310,7 +310,20 @@ export function NotificationModal({ id }: NotificationModalProps) {
           lastReadIndex
         ] as HTMLElement;
         if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          // Use scrollTop instead of scrollIntoView to avoid scrolling the modal container
+          const container = containerRef.current;
+          const elementTop = element.offsetTop;
+          const containerHeight = container.clientHeight;
+          const elementHeight = element.clientHeight;
+
+          // Calculate the scroll position to center the element
+          const scrollTop =
+            elementTop - containerHeight / 2 + elementHeight / 2;
+
+          container.scrollTo({
+            top: Math.max(0, scrollTop),
+            behavior: "smooth",
+          });
         }
       }
     }
