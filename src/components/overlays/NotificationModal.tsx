@@ -7,7 +7,7 @@ import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { FancyModal } from "./Modal";
 
 const DEFAULT_FEEDS = ["/notifications.xml"];
-const CORS_PROXY = "http://api.allorigins.win/get?url=";
+// const CORS_PROXY = "http://api.allorigins.win/get?url="; // temporarily disabled
 
 const getAllFeeds = (): string[] => {
   try {
@@ -26,7 +26,7 @@ const getFetchUrl = (feedUrl: string): string => {
   if (feedUrl.startsWith("/")) {
     return feedUrl;
   }
-  return `${CORS_PROXY}${encodeURIComponent(feedUrl)}`;
+  return feedUrl; //  return `${CORS_PROXY}${encodeURIComponent(feedUrl)}`;
 };
 
 const getSourceName = (feedUrl: string): string => {
