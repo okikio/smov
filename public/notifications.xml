@@ -9,15 +9,28 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
-      <guid>notification-8-1-25</guid>
-      <title>Welcome to the P-Stream Beta!</title>
-      <description>P-Stream is now in beta! This is a test of the new notification system.
+      <guid>notification-8-4-25</guid>
+      <title>P-Stream v5.1.0 released!</title>
+      <link>https://pstream.mov/</link>
+      <description>A bigger one this time. Tons of new quality-of-life features and changes!
 
-You can now receive notifications for new updates and important announcements.
+In no particular order:
+- As you may have noticed, there is a new notifications menu for viewing updates and news on the site! Works through RSS, so you can add movie release dates! Check out the settings page to add custom feeds!
+- Added bookmark groups. Open the details modal to add any item to a group, even multiple! Sort your groups by tapping the pencil icon on the home page!
+- Added a dedicated bookmarks page. Useful when you have many bookmarks, enabling Carousel view allows them to be limited to 20 items, just like the Discover carousels.
+- You can now hold space or hold the screen to 2x the video!
+- Numerous updates to the details modal. A new mark the whole season as watched button and general design updates.
+- Updated the featured carousel to have smoother transitions and show trending movies if you enable it on the homepage. (instead of editor picks)
+- Improved corrupt UTF-8 subtitle handling.
+- Added example Febbox token modal.
+- Fixed an issue that prevented logging in with a custom passphrase.
+- Minor design improvements all over the site.
+- LOTTTSSS of under-the-hood changes and improvements! Sources will now load a LOT faster.
+- Countless bugfixes!
 
-You can also view the notifications in the notifications page.</description>
-      <pubDate>Fri, 01 Aug 2025 21:00:00 GMT</pubDate>
-      <category>announcement</category>
+Thanks to everyone who has been testing the beta and providing feedback!</description>
+      <pubDate>Sun, 03 Aug 2025 16:00:00 MST</pubDate>
+      <category>update</category>
     </item>
 
     <item>
