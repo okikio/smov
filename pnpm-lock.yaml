@@ -44,7 +44,7 @@ importers:
         version: 1.8.0
       '@p-stream/providers':
         specifier: github:p-stream/providers#production
-        version: https://codeload.github.com/p-stream/providers/tar.gz/062d8bfda6688cf0812c5edd9d3e03e7e69e2bab
+        version: https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c
       '@plasmohq/messaging':
         specifier: ^0.6.2
         version: 0.6.2(react@18.3.1)
@@ -876,6 +876,10 @@ packages:
     resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/runtime@7.28.2':
+    resolution: {integrity: sha512-KHp2IflsnGywDjBWDkR9iEqiWSpc8GIi0lgTT3mOElT0PP1tG26P4tmFI2YvAdzgq9RGyoHZQEIEdZy6Ec5xCA==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/template@7.27.2':
     resolution: {integrity: sha512-LPDZ85aEJyYSd18/DkjNh4/y1ntkE5KwUHWTiqgRxruuZL2F1yuHligVHLvcHY2vMHXttKFpJn6LwfI7cw7ODw==}
     engines: {node: '>=6.9.0'}
@@ -1189,9 +1193,9 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
 
-  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/062d8bfda6688cf0812c5edd9d3e03e7e69e2bab':
-    resolution: {tarball: https://codeload.github.com/p-stream/providers/tar.gz/062d8bfda6688cf0812c5edd9d3e03e7e69e2bab}
-    version: 2.3.0
+  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c':
+    resolution: {tarball: https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c}
+    version: 3.1.0
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3820,6 +3824,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   sourcemap-codec@1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
@@ -5196,6 +5201,8 @@ snapshots:
 
   '@babel/runtime@7.27.6': {}
 
+  '@babel/runtime@7.28.2': {}
+
   '@babel/template@7.27.2':
     dependencies:
       '@babel/code-frame': 7.27.1
@@ -5462,7 +5469,7 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
-  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/062d8bfda6688cf0812c5edd9d3e03e7e69e2bab':
+  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c':
     dependencies:
       abort-controller: 3.0.0
       cheerio: 1.0.0-rc.12
@@ -5476,7 +5483,6 @@ snapshots:
       node-fetch: 3.3.2
       set-cookie-parser: 2.7.1
       unpacker: 1.0.1
-      wyzie-lib: 2.2.5
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -8879,7 +8885,7 @@ snapshots:
       '@apideck/better-ajv-errors': 0.3.6(ajv@8.17.1)
       '@babel/core': 7.28.0
       '@babel/preset-env': 7.28.0(@babel/core@7.28.0)
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.2
       '@rollup/plugin-babel': 5.3.1(@babel/core@7.28.0)(@types/babel__core@7.20.5)(rollup@4.43.0)
       '@rollup/plugin-node-resolve': 15.3.1(rollup@4.43.0)
       '@rollup/plugin-replace': 2.4.2(rollup@4.43.0)
