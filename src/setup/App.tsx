@@ -11,7 +11,7 @@ import {
 
 import { convertLegacyUrl, isLegacyUrl } from "@/backend/metadata/getmeta";
 import { generateQuickSearchMediaUrl } from "@/backend/metadata/tmdb";
-import { NotificationModal } from "@/components/overlays/NotificationModal";
+import { NotificationModal } from "@/components/overlays/notificationsModal";
 import { useOnlineListener } from "@/hooks/usePing";
 import { AboutPage } from "@/pages/About";
 import { AdminPage } from "@/pages/admin/AdminPage";

@@ -6,7 +6,7 @@ import { NoUserAvatar, UserAvatar } from "@/components/Avatar";
 import { IconPatch } from "@/components/buttons/IconPatch";
 import { Icons } from "@/components/Icon";
 import { LinksDropdown } from "@/components/LinksDropdown";
-import { useNotifications } from "@/components/overlays/NotificationModal";
+import { useNotifications } from "@/components/overlays/notificationsModal";
 import { Lightbar } from "@/components/utils/Lightbar";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { BlurEllipsis } from "@/pages/layouts/SubPageLayout";
