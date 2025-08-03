@@ -16,7 +16,7 @@ import { MediaItem } from "@/utils/mediaTypes";
 import { MediaBookmarkButton } from "./MediaBookmark";
 import { IconPatch } from "../buttons/IconPatch";
 import { Icon, Icons } from "../Icon";
-import { DetailsModal } from "../overlays/details/DetailsModal";
+import { DetailsModal } from "../overlays/detailsModal/DetailsModal";
 
 export interface MediaCardProps {
   media: MediaItem;
