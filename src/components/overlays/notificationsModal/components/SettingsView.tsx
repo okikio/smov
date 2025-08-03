@@ -129,6 +129,22 @@ export function SettingsView({
             Add Custom Feed
           </button>
         </div>
+
+        {/* Recommended feeds section */}
+        <div className="bg-background-main/30 rounded-lg p-4 border border-utils-divider">
+          <h3 className="text-white font-bold mb-3">Recommended Feeds</h3>
+          <code className="text-type-secondary text-xs md:text-sm">
+            https://www.moviefone.com/feeds/movie-news.rss
+            <br />
+            https://www.moviefone.com/feeds/tv-news.rss
+            <br />
+            https://www.filmjabber.com/rss/rss-dvd-reviews.php
+            <br />
+            https://screenrant.com/feed/
+            <br />
+            https://www.darkhorizons.com/feed/
+          </code>
+        </div>
       </div>
     </div>
   );
