@@ -9,7 +9,7 @@ import { Icon, Icons } from "@/components/Icon";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaCard } from "@/components/media/MediaCard";
 import { MediaGrid } from "@/components/media/MediaGrid";
-import { DetailsModal } from "@/components/overlays/detailsModal/DetailsModal";
+import { DetailsModal } from "@/components/overlays/detailsModal";
 import { useModal } from "@/components/overlays/Modal";
 import { Heading1 } from "@/components/utils/Text";
 import {

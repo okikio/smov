@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
 import { DetailsRatings } from "./DetailsRatings";
-import { DetailsInfoProps } from "./types";
+import { DetailsInfoProps } from "../../types";
 
 export function DetailsInfo({
   data,
@@ -66,7 +66,7 @@ export function DetailsInfo({
   };
 
   return (
-    <div className="md:col-span-1 bg-video-context-border p-4 rounded-lg border-buttons-primary bg-opacity-80">
+    <div className="md:col-span-1 bg-background-secondary/50 group-hover:bg-background-secondary/80 p-4 rounded-lg border-buttons-primary transition-colors duration-300">
       <div className="space-y-3 text-xs">
         {data.runtime && (
           <div className="flex flex-wrap items-center gap-2 text-white/80">

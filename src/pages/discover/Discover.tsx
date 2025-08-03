@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 
-import { DetailsModal } from "@/components/overlays/detailsModal/DetailsModal";
+import { DetailsModal } from "@/components/overlays/detailsModal";
 import { useModal } from "@/components/overlays/Modal";
 
 import { SubPageLayout } from "../layouts/SubPageLayout";

@@ -13,7 +13,7 @@ import { Icon, Icons } from "@/components/Icon";
 import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
 import { useBookmarkStore } from "@/stores/bookmarks";
 
-import { DetailsBodyProps } from "./types";
+import { DetailsBodyProps } from "../../types";
 
 export function DetailsBody({
   data,

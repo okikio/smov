@@ -13,12 +13,12 @@ import { scrapeIMDb } from "@/utils/imdbScraper";
 import { getTmdbLanguageCode } from "@/utils/language";
 import { scrapeRottenTomatoes } from "@/utils/rottenTomatoesScraper";
 
-import { DetailsBody } from "./DetailsBody";
-import { DetailsInfo } from "./DetailsInfo";
-import { EpisodeCarousel } from "./EpisodeCarousel";
-import { CastCarousel } from "./PeopleCarousel";
-import { TrailerOverlay } from "./TrailerOverlay";
-import { DetailsContentProps } from "./types";
+import { DetailsContentProps } from "../../types";
+import { EpisodeCarousel } from "../carousels/EpisodeCarousel";
+import { CastCarousel } from "../carousels/PeopleCarousel";
+import { TrailerOverlay } from "../overlays/TrailerOverlay";
+import { DetailsBody } from "../sections/DetailsBody";
+import { DetailsInfo } from "../sections/DetailsInfo";
 
 export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
   const [imdbData, setImdbData] = useState<any>(null);

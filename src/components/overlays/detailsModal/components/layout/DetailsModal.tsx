@@ -18,10 +18,10 @@ import { Icons } from "@/components/Icon";
 import { Flare } from "@/components/utils/Flare";
 import { useOverlayStack } from "@/stores/interface/overlayStack";
 
-import { OverlayPortal } from "../OverlayDisplay";
 import { DetailsContent } from "./DetailsContent";
 import { DetailsSkeleton } from "./DetailsSkeleton";
-import { DetailsModalProps } from "./types";
+import { OverlayPortal } from "../../../OverlayDisplay";
+import { DetailsModalProps } from "../../types";
 
 export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
   const { hideModal, isModalVisible, modalStack } = useOverlayStack();
@@ -139,27 +139,28 @@ export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
           className={classNames(
             "group -m-[0.705em] rounded-3xl bg-background-main",
             "max-h-[900px] max-w-[1200px]",
-            "bg-mediaCard-hoverBackground bg-opacity-60 backdrop-filter backdrop-blur-lg shadow-lg overflow-hidden",
+            "bg-mediaCard-hoverBackground/60 backdrop-filter backdrop-blur-lg shadow-lg overflow-hidden",
             "h-[97%] w-[95%]",
+            "relative",
           )}
         >
-          <div className="transition-transform duration-300 h-full">
+          <div className="transition-transform duration-300 h-full relative">
             <Flare.Light
               flareSize={300}
               cssColorVar="--colors-mediaCard-hoverAccent"
               backgroundClass="bg-mediaCard-hoverBackground duration-100"
-              className="rounded-3xl bg-background-main group-hover:opacity-100"
+              className="rounded-3xl bg-background-main group-hover:opacity-30 transition-opacity duration-300"
             />
+            <div className="absolute right-4 top-4 z-50 pointer-events-auto">
+              <button
+                type="button"
+                className="text-s font-semibold text-type-secondary hover:text-white transition-transform hover:scale-95 select-none"
+                onClick={hide}
+              >
+                <IconPatch icon={Icons.X} />
+              </button>
+            </div>
             <Flare.Child className="pointer-events-auto relative h-full overflow-y-auto scrollbar-none select-text">
-              <div className="absolute right-4 top-4 z-50">
-                <button
-                  type="button"
-                  className="text-s font-semibold text-type-secondary hover:text-white transition-transform hover:scale-95 select-none"
-                  onClick={hide}
-                >
-                  <IconPatch icon={Icons.X} />
-                </button>
-              </div>
               <div className="select-text">
                 {isLoading || !detailsData ? (
                   <DetailsSkeleton />

@@ -10,7 +10,7 @@ import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { hasAired } from "@/components/player/utils/aired";
 import { useProgressStore } from "@/stores/progress";
 
-import { EpisodeCarouselProps } from "./types";
+import { EpisodeCarouselProps } from "../../types";
 
 export function EpisodeCarousel({
   episodes,

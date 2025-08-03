@@ -6,7 +6,7 @@ import { TmdbMovie, getLetterboxdLists } from "@/backend/metadata/letterboxd";
 import { Icon, Icons } from "@/components/Icon";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaCard } from "@/components/media/MediaCard";
-import { DetailsModal } from "@/components/overlays/detailsModal/DetailsModal";
+import { DetailsModal } from "@/components/overlays/detailsModal";
 import { useModal } from "@/components/overlays/Modal";
 import { Heading1 } from "@/components/utils/Text";
 import { useIsMobile } from "@/hooks/useIsMobile";
