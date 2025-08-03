@@ -15,11 +15,11 @@ export function DetailView({
   return (
     <div className="space-y-4">
       {/* Header with back button and toggle read status */}
-      <div className="flex md:flex-row flex-col items-start justify-between gap-4 pb-4 border-b border-utils-divider">
+      <div className="flex md:flex-row flex-col items-start md:items-center justify-between gap-4 pb-4 border-b border-utils-divider">
         <button
           type="button"
           onClick={goBackToList}
-          className="text-type-link hover:text-type-linkHover transition-colors flex items-center gap-1"
+          className="text-type-link hover:text-type-linkHover transition-colors flex items-center gap-1 text-sm"
         >
           <Icon icon={Icons.CHEVRON_LEFT} />
           <span>Back to notifications</span>
@@ -58,7 +58,7 @@ export function DetailView({
               {selectedNotification.source && (
                 <>
                   <span className="text-sm text-type-secondary">•</span>
-                  <span className="text-sm text-type-secondary">
+                  <span className="text-sm text-type-secondary text-nowrap">
                     {selectedNotification.source}
                   </span>
                 </>

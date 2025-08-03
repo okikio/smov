@@ -34,7 +34,7 @@ export function SettingsView({
         <button
           type="button"
           onClick={onClose}
-          className="text-type-link hover:text-type-linkHover transition-colors flex items-center gap-1"
+          className="text-type-link hover:text-type-linkHover transition-colors flex items-center gap-1 text-sm"
         >
           <Icon icon={Icons.CHEVRON_LEFT} />
           <span>Back to notifications</span>
@@ -42,7 +42,7 @@ export function SettingsView({
       </div>
 
       {/* Settings content */}
-      <div className="space-y-6 overflow-y-auto max-h-[70vh] md:max-h-[60vh]">
+      <div className="space-y-6 overflow-y-auto max-h-[70vh] md:max-h-[60vh] md:pr-2">
         {/* Mark all as unread section */}
         <div className="bg-background-main/30 rounded-lg p-4 border border-utils-divider">
           <h3 className="text-white font-bold mb-3">Mark All as Unread</h3>
