@@ -180,12 +180,32 @@ export function ListView({
                           </div>
                         </div>
                       </div>
-                      <p className="text-sm text-type-secondary mb-2 line-clamp-2 max-w-[12rem] md:max-w-[30rem] md:pr-8">
-                        {notification.description
-                          .replace(/\n/g, " ")
-                          .substring(0, 150)}
-                        {notification.description.length > 150 ? "..." : ""}
-                      </p>
+                      <div
+                        className="text-sm text-type-secondary mb-2 line-clamp-2 max-w-[12rem] md:max-w-[30rem] md:pr-8"
+                        // eslint-disable-next-line react/no-danger
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            notification.description
+                              .replace(/\n\n/g, "</p><p>")
+                              .replace(/\n- /g, "</p><p>• ")
+                              .replace(
+                                /\n\*\*([^*]+)\*\*/g,
+                                "</p><h4>$1</h4><p>",
+                              )
+                              .replace(/^/, "<p>")
+                              .replace(/$/, "</p>")
+                              .replace(/<p><\/p>/g, "")
+                              .replace(
+                                /<p>• /g,
+                                '<p class="flex items-start gap-2"><span class="text-type-link mt-1">•</span><span>',
+                              )
+                              .replace(/<\/p>/g, "</span></p>")
+                              .substring(0, 150) +
+                            (notification.description.length > 150
+                              ? "..."
+                              : ""),
+                        }}
+                      />
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
