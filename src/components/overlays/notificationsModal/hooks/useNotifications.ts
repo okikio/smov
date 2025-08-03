@@ -118,14 +118,20 @@ export function useNotifications() {
   const getUnreadCount = () => {
     try {
       const savedRead = localStorage.getItem("read-notifications");
-      if (!savedRead) return notifications.length;
+      if (!savedRead) {
+        const count = notifications.length;
+        return count > 99 ? "99+" : count;
+      }
 
       const readArray = JSON.parse(savedRead);
       const readSet = new Set(readArray);
 
       // Get the actual count from the notifications state
-      return notifications.filter((n: NotificationItem) => !readSet.has(n.guid))
-        .length;
+      const count = notifications.filter(
+        (n: NotificationItem) => !readSet.has(n.guid),
+      ).length;
+
+      return count > 99 ? "99+" : count;
     } catch {
       return 0;
     }
