@@ -447,7 +447,7 @@ export function EpisodesView({
                           E{ep.number}
                         </span>
                         {!isAired && (
-                          <span className="text-video-context-type-main/70 text-sm">
+                          <span className="bg-video-context-hoverColor/50 text-video-context-type-main/80 text-sm px-1 py-0.5 rounded-md">
                             {ep.air_date
                               ? `(${t("details.airs")} - ${new Date(ep.air_date).toLocaleDateString()})`
                               : `(${t("media.unreleased")})`}
@@ -575,7 +575,7 @@ export function EpisodesView({
                             E{ep.number}
                           </span>
                           {!isAired && (
-                            <span className="text-video-context-type-main/70 text-sm">
+                            <span className="bg-video-context-hoverColor/50 text-video-context-type-main/80 text-sm px-1 py-0.5 rounded-md">
                               {ep.air_date
                                 ? `(${t("details.airs")} - ${new Date(ep.air_date).toLocaleDateString()})`
                                 : `(${t("media.unreleased")})`}

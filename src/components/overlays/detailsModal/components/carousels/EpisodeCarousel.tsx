@@ -531,7 +531,7 @@ export function EpisodeCarousel({
                         {episode.episode_number}
                       </span>
                       {!isAired && (
-                        <span className="text-video-context-type-main/70 text-sm">
+                        <span className="bg-video-context-hoverColor/50 text-video-context-type-main/80 text-sm px-1 py-0.5 rounded-md">
                           {episode.air_date
                             ? `(${t("details.airs")} - ${new Date(episode.air_date).toLocaleDateString()})`
                             : `(${t("media.unreleased")})`}
