@@ -114,14 +114,18 @@
         },
         "q22": {
             "title": "Pourquoi ai-je besoin d'une extension ou d'un proxy personnalisé ?",
-            "section": "connexions"
+            "section": "connexions",
+            "body": "Certaines sources bloquent les \"scrapers\". Cette extension agit comme un proxy local et contourne tel bloquage utilisant votre IP, en-têtes, et cookies."
         },
         "q23": {
             "title": "Qu'est ce que l'extension ? Est-elle sûre ?",
-            "section": "connexions"
+            "section": "connexions",
+            "body": "C'est un outil de proxy local utilisé pour acceder a des streams qui restrictent des scrapers. Il reproduit votre session de navigation. Il est également entièrement open source et est disponible sur notre GitHub."
         },
         "q24": {
-            "section": "connexions"
+            "section": "connexions",
+            "title": "Mon token Febbox échoue lors de l'installation. Que dois-je faire ?",
+            "body": "Votre FAI bloque peut-être l'API FED. Définissez un DNS personnalisé comme 1.1.1.1 ou NextDNS. Vous pouvez également modifier votre région dans le panneau d'administration."
         },
         "q25": {
             "title": "Comment puis-je changer de langue ?",
@@ -130,12 +134,15 @@
         },
         "q26": {
             "title": "Mes sous-titres ne sont pas synchronisés.",
-            "section": "langue"
+            "section": "langue",
+            "body": "Utilisez l'option «Personnaliser» dans les paramètres des sous-titres ou appuyez sur [ et ] sur votre clavier pour ajuster. Vous pouvez également importer votre propre fichier de sous-titres."
         }
     },
     "actions": {
         "copied": "Copié",
-        "copy": "Copier"
+        "copy": "Copier",
+        "confirm": "Confirmer",
+        "cancel": "Annuler"
     },
     "auth": {
         "createAccount": "Vous n'avez-vous pas encore de compte ? <0>Créer un compte.</0>",
@@ -145,7 +152,13 @@
             "description": "Le nom d'utilisateur et le mot de passe sont obtenus à partir de votre phrase d'accès. Vous devrez la saisir pour accéder à votre compte,<bold>alors gardez-la précieusement !</bold>",
             "next": "J'ai sauvegardé ma phrase d'accès",
             "passphraseFrameLabel": "Phrase d'accès",
-            "title": "Votre phrase d'accès"
+            "title": "Votre phrase d'accès",
+            "customPassphrasePlaceholder": "Entrez votre phrase secrète personnalisée",
+            "invalidPassphraseCharacters": "Caractères de phrase secrète non valides. Seuls les lettres anglaises, les chiffres de 1 à 10 et les symboles normaux sont autorisés.",
+            "useCustomPassphrase": "Utiliser une phrase secrète personnalisée",
+            "passphraseTooShort": "La phrase secrète doit comporter au moins 8 caractères.",
+            "customPassphraseLabel": "Phrase secrète personnalisée",
+            "custom": "Personaliser"
         },
         "hasAccount": "Vous avez déjà un compte ? <0>Connectez-vous ici.</0>",
         "login": {
@@ -227,7 +240,25 @@
     },
     "home": {
         "bookmarks": {
-            "sectionTitle": "Favoris"
+            "sectionTitle": "Favoris",
+            "groups": {
+                "dropdown": {
+                    "removeFromGroup": "Supprimer du groupe",
+                    "placeholderButton": "Ajouter au groupe",
+                    "empty": "Pas encore de groupe",
+                    "addButton": "Ajouter",
+                    "removeAll": "Supprimer tout"
+                },
+                "reorder": {
+                    "button": "Réorganiser",
+                    "done": "Fait",
+                    "title": "Modifier l'ordre du groupe",
+                    "description": "Faites glisser et déposez pour réorganiser vos groupes de marque-page",
+                    "cancel": "Annuler",
+                    "save": "Enregistrer"
+                }
+            },
+            "showAll": "Afficher tout"
         },
         "continueWatching": {
             "sectionTitle": "Reprendre la lecture"
@@ -249,7 +280,7 @@
                     "P-Stream est le meilleur site au monde !",
                     "Qu'est-ce que tu as prévu de regarder aujourd'hui ?",
                     "Comment s'est passée ta journée ?",
-                    null,
+                    "C'est ma faute, le site ne fonctionne jamais...",
                     "Est-ce que P-Stream n'est pas tout simplement le meilleur ?",
                     ">ᴗ<"
                 ]
@@ -289,7 +320,8 @@
             "420": {
                 "extra": [
                     "Joyeux 4/20 🥳!"
-                ]
+                ],
+                "default": "Qu'aimeriez-vous regarder ce 20/4?"
             },
             "69": {
                 "default": "Partant pour quelque chose de corsé ?",
@@ -312,7 +344,9 @@
         },
         "unreleased": "Non publié",
         "episodeShort": "E",
-        "seasonShort": "S"
+        "seasonShort": "S",
+        "seasonUnwatched": "Êtes-vous sûr de vouloir marquer la saison comme non regardée ?",
+        "seasonWatched": "Êtes-vous sûr de vouloir marquer la saison comme regardée ?"
     },
     "navigation": {
         "banner": {
@@ -427,7 +461,8 @@
                     "options": "Vos Options :",
                     "proxy": "2. Proxy",
                     "default": "3. Configuration par défaut",
-                    "defaultDescription": "Utilise le proxy intégré de P-Stream. C’est l’option la plus simple, mais elle peut être plus lente en raison de la bande passante partagée."
+                    "defaultDescription": "Utilise le proxy intégré de P-Stream. C’est l’option la plus simple, mais elle peut être plus lente en raison de la bande passante partagée.",
+                    "extensionDescription": "L'extension vous donne accès à la plupart des sources. Elle agit comme un proxy local et peut gérer les sites nécessitant des cookies ou des en-têtes spécifiques pour se charger."
                 },
                 "title": "Comprendre le paramétrage"
             }
@@ -468,7 +503,9 @@
                 },
                 "title": "Télécharger",
                 "hlsDownloader": "Ou rendez-vous sur le site <0>HLS Downloader Website</0> et collez l’URL de la playlist ci-dessous.",
-                "button": "Essayer de télécharger"
+                "button": "Essayer de télécharger",
+                "vlc": "VLC",
+                "openIn": "Ouvrir dans..."
             },
             "episodes": {
                 "button": "Épisodes",
@@ -910,12 +947,15 @@
             "title": "Téléverser les données",
             "status": {
                 "processing": "Traitement des données en cours...",
-                "success": "Vos données ont été téléchargées avec succès! 🎉"
+                "success": "Vos données ont été téléchargées avec succès! 🎉",
+                "error": "Impossible de télécharger vos données. 😿",
+                "successLocal": "Vos données ont été enregistrées localement ! 🎉"
             },
             "file": {
                 "select": "Choisir un fichier",
                 "change": "Changer de fichier",
-                "name": "Nom du fichier"
+                "name": "Nom du fichier",
+                "description": "Sélectionnez le fichier que vous souhaitez télécharger"
             },
             "dataPreview": "Aperçu :",
             "items": {
@@ -927,7 +967,8 @@
                 "import": "Importer des données",
                 "processing": "Traitement en cours...",
                 "success": "Importation terminée",
-                "home": "Continuer vers l’accueil"
+                "home": "Continuer vers l’accueil",
+                "saveLocal": "Enregistrer localement"
             }
         },
         "direct": {
