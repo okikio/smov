@@ -39,6 +39,31 @@ export interface ErrorDebugInfo {
     downlink?: number;
     rtt?: number;
   };
+  hls?: {
+    details: string;
+    fatal: boolean;
+    level?: number;
+    levelDetails?: {
+      url: string;
+      width: number;
+      height: number;
+      bitrate: number;
+    };
+    frag?: {
+      url: string;
+      baseurl: string;
+      duration: number;
+      start: number;
+      sn: number;
+    };
+    type: string;
+    url?: string;
+  };
+  url: {
+    pathname: string;
+    search: string;
+    hash: string;
+  };
 
   performance: {
     memory?: {
@@ -115,6 +140,37 @@ export function gatherErrorDebugInfo(error: any): ErrorDebugInfo {
       downlink: connection?.downlink,
       rtt: connection?.rtt,
     },
+    hls: error?.hls
+      ? {
+          details: error.hls.details,
+          fatal: error.hls.fatal,
+          level: error.hls.level,
+          levelDetails: error.hls.levelDetails
+            ? {
+                url: error.hls.levelDetails.url,
+                width: error.hls.levelDetails.width,
+                height: error.hls.levelDetails.height,
+                bitrate: error.hls.levelDetails.bitrate,
+              }
+            : undefined,
+          frag: error.hls.frag
+            ? {
+                url: error.hls.frag.url,
+                baseurl: error.hls.frag.baseurl,
+                duration: error.hls.frag.duration,
+                start: error.hls.frag.start,
+                sn: error.hls.frag.sn,
+              }
+            : undefined,
+          type: error.hls.type,
+          url: error.hls.url,
+        }
+      : undefined,
+    url: {
+      pathname: window.location.pathname,
+      search: window.location.search,
+      hash: window.location.hash,
+    },
     performance: {
       memory: memory
         ? {
@@ -180,6 +236,42 @@ export function formatErrorDebugInfo(info: ErrorDebugInfo): string {
       : "",
     info.network.downlink ? `Downlink: ${info.network.downlink} Mbps` : "",
     info.network.rtt ? `RTT: ${info.network.rtt} ms` : "",
+    ``,
+    `=== URL INFO ===`,
+    `Path: ${info.url.pathname}`,
+    info.url.search ? `Query: ${info.url.search}` : "",
+    info.url.hash ? `Hash: ${info.url.hash}` : "",
+    ``,
+    info.hls
+      ? [
+          `=== HLS ERROR DETAILS ===`,
+          `Details: ${info.hls.details}`,
+          `Fatal: ${info.hls.fatal}`,
+          `Type: ${info.hls.type}`,
+          info.hls.level !== undefined ? `Level: ${info.hls.level}` : "",
+          info.hls.url ? `URL: ${info.hls.url}` : "",
+          info.hls.levelDetails
+            ? [
+                `Level Details:`,
+                `  URL: ${info.hls.levelDetails.url}`,
+                `  Resolution: ${info.hls.levelDetails.width}x${info.hls.levelDetails.height}`,
+                `  Bitrate: ${info.hls.levelDetails.bitrate} bps`,
+              ].join("\n")
+            : "",
+          info.hls.frag
+            ? [
+                `Fragment Details:`,
+                `  URL: ${info.hls.frag.url}`,
+                `  Base URL: ${info.hls.frag.baseurl}`,
+                `  Duration: ${info.hls.frag.duration}s`,
+                `  Start: ${info.hls.frag.start}s`,
+                `  Sequence: ${info.hls.frag.sn}`,
+              ].join("\n")
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : "",
     ``,
     `=== PERFORMANCE ===`,
     info.performance.memory

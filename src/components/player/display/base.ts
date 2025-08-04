@@ -203,6 +203,33 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         ];
         hls?.on(Hls.Events.ERROR, (event, data) => {
           console.error("HLS error", data);
+
+          // Extract detailed HLS error information
+          const hlsErrorInfo = {
+            details: data.details,
+            fatal: data.fatal,
+            level: data.level,
+            levelDetails: (data as any).levelDetails
+              ? {
+                  url: (data as any).levelDetails.url,
+                  width: (data as any).levelDetails.width,
+                  height: (data as any).levelDetails.height,
+                  bitrate: (data as any).levelDetails.bitrate,
+                }
+              : undefined,
+            frag: data.frag
+              ? {
+                  url: data.frag.url,
+                  baseurl: data.frag.baseurl,
+                  duration: data.frag.duration,
+                  start: data.frag.start,
+                  sn: data.frag.sn,
+                }
+              : undefined,
+            type: data.type,
+            url: (data as any).url,
+          };
+
           if (
             data.fatal &&
             src?.url === data.frag?.baseurl &&
@@ -213,6 +240,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
               stackTrace: data.error.stack,
               errorName: data.error.name,
               type: "hls",
+              hls: hlsErrorInfo,
             });
           } else if (data.details === "manifestLoadError") {
             // Handle manifest load errors specifically
@@ -221,6 +249,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
               stackTrace: data.error?.stack || "",
               errorName: data.error?.name || "ManifestLoadError",
               type: "hls",
+              hls: hlsErrorInfo,
             });
           }
         });
