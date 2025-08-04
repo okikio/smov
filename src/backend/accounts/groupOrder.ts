@@ -25,5 +25,10 @@ export function getGroupOrder(url: string, account: AccountWithToken) {
     method: "GET",
     baseURL: url,
     headers: getAuthHeaders(account.token),
+  }).catch((err) => {
+    if (err?.response?.status === 404) {
+      return { groupOrder: [] };
+    }
+    throw err;
   });
 }
