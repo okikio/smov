@@ -141,7 +141,8 @@
     "actions": {
         "copied": "Cawpied",
         "copy": "Cawpy",
-        "cancel": "Cwancel"
+        "cancel": "Cwancel",
+        "confirm": "Confiwm"
     },
     "auth": {
         "createAccount": "Don't have an account yet 😬 <0>Cweate an account.</0>",
