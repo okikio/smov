@@ -6,6 +6,7 @@ import { useShouldShowVideoElement } from "@/components/player/internals/VideoCo
 import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { PlayerHoverState } from "@/stores/player/slices/interface";
 import { usePlayerStore } from "@/stores/player/store";
+import { useWatchPartyStore } from "@/stores/watchParty";
 
 export function VideoClickTarget(props: { showingControls: boolean }) {
   const show = useShouldShowVideoElement();
@@ -19,6 +20,7 @@ export function VideoClickTarget(props: { showingControls: boolean }) {
   const setShowSpeedIndicator = usePlayerStore((s) => s.setShowSpeedIndicator);
   const hovering = usePlayerStore((s) => s.interface.hovering);
   const setCurrentOverlay = useOverlayStack((s) => s.setCurrentOverlay);
+  const isInWatchParty = useWatchPartyStore((s) => s.enabled);
 
   const [_, cancel, reset] = useTimeoutFn(() => {
     updateInterfaceHovering(PlayerHoverState.NOT_HOVERING);
@@ -82,7 +84,13 @@ export function VideoClickTarget(props: { showingControls: boolean }) {
 
   const handlePointerDown = useCallback(
     (e: PointerEvent<HTMLDivElement>) => {
-      if (e.pointerType === "mouse" && e.button === 0 && !isPaused) {
+      if (
+        ((e.pointerType === "mouse" && e.button === 0) ||
+          e.pointerType === "touch") &&
+        !isInWatchParty
+      ) {
+        if (isPaused) return; // Don't boost if video is paused
+
         // Store current rate before changing
         previousRateRef.current = playbackRate;
 
@@ -119,6 +127,7 @@ export function VideoClickTarget(props: { showingControls: boolean }) {
       setSpeedBoosted,
       setShowSpeedIndicator,
       setCurrentOverlay,
+      isInWatchParty,
     ],
   );
 
@@ -132,7 +141,11 @@ export function VideoClickTarget(props: { showingControls: boolean }) {
         return;
       }
 
-      if (isHoldingRef.current && e.pointerType === "mouse" && e.button === 0) {
+      if (
+        isHoldingRef.current &&
+        ((e.pointerType === "mouse" && e.button === 0) ||
+          e.pointerType === "touch")
+      ) {
         // Restore previous rate
         display?.setPlaybackRate(previousRateRef.current);
         isHoldingRef.current = false;
