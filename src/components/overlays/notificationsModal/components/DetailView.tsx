@@ -2,6 +2,7 @@ import { Icon, Icons } from "@/components/Icon";
 import { Link } from "@/pages/migration/utils";
 
 import { DetailViewProps } from "../types";
+import { formatNotificationDescription } from "../utils";
 
 export function DetailView({
   selectedNotification,
@@ -91,18 +92,9 @@ export function DetailView({
             className="text-type-secondary leading-relaxed"
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
-              __html: selectedNotification.description
-                .replace(/\n\n/g, "</p><p>")
-                .replace(/\n- /g, "</p><p>• ")
-                .replace(/\n\*\*([^*]+)\*\*/g, "</p><h4>$1</h4><p>")
-                .replace(/^/, "<p>")
-                .replace(/$/, "</p>")
-                .replace(/<p><\/p>/g, "")
-                .replace(
-                  /<p>• /g,
-                  '<p class="flex items-start gap-2"><span class="text-type-link mt-1">•</span><span>',
-                )
-                .replace(/<\/p>/g, "</span></p>"),
+              __html: formatNotificationDescription(
+                selectedNotification.description,
+              ),
             }}
           />
         </div>

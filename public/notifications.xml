@@ -9,10 +9,29 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-032</guid>
+      <title>Bug fixes and source updates!</title>
+      <description>
+- Fixed speed boost not working on mobile! You should now be able to hold the screen to 2x the video!
+
+I also briefly broke the site for a few minutes, sorry about that!
+
+Source updates:
+- Added Flicky (thanks lew!)
+- Fixed VidSrcCx
+- Disabled SpeedStrm
+
+If you are interested in adding a new source to P-Stream, I recently created a new guide for it! Check the link below.</description>
+<link>https://providers.pstream.mov/in-depth/development</link>
+      <pubDate>Tue, 05 Aug 2025 10:55:00 MST</pubDate>
+      <category>bugfix</category>
+    </item>
+
+
+    <item>
       <guid>notification-30</guid>
       <title>Digital Privacy Survey</title>
-      <description>
-      I am conducting a survey to understand how people use privacy features in their daily lives and how it affects them mentally.
+      <description>I am conducting a survey to understand how people use privacy features in their daily lives and how it affects them mentally.
 
 If you have a few minutes, please take the survey linked below!
       </description>

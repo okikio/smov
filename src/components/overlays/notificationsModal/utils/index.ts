@@ -136,3 +136,32 @@ export const getCategoryLabel = (category: string) => {
       return category;
   }
 };
+export function formatNotificationDescription(description: string): string {
+  return (
+    description
+      // First, normalize multiple consecutive line breaks to single line breaks
+      .replace(/\n{3,}/g, "\n\n")
+      // Handle bullet points before paragraph breaks
+      .replace(/\n- /g, "</p><p>• ")
+      // Handle bold text (headers)
+      .replace(/\n\*\*([^*]+)\*\*/g, "</p><h4>$1</h4><p>")
+      // Handle paragraph breaks (double line breaks)
+      .replace(/\n\n/g, "</p><br /><p>")
+      // Handle single line breaks within paragraphs
+      .replace(/\n/g, "<br />")
+      // Wrap in paragraph tags
+      .replace(/^/, "<p>")
+      .replace(/$/, "</p>")
+      // Remove empty paragraphs
+      .replace(/<p><\/p>/g, "")
+      // Clean up consecutive paragraph tags
+      .replace(/<\/p><p><\/p>/g, "</p>")
+      .replace(/<p><\/p><p>/g, "<p>")
+      // Style bullet points
+      .replace(
+        /<p>• /g,
+        '<p class="flex items-start gap-2"><span class="text-type-link mt-1">•</span><span>',
+      )
+      .replace(/<\/p>/g, "</span></p>")
+  );
+}
