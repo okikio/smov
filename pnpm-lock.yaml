@@ -44,7 +44,7 @@ importers:
         version: 1.8.0
       '@p-stream/providers':
         specifier: github:p-stream/providers#production
-        version: https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c
+        version: https://codeload.github.com/p-stream/providers/tar.gz/0ac4e1b0837280dc61f712a802c32e16853b52b1
       '@plasmohq/messaging':
         specifier: ^0.6.2
         version: 0.6.2(react@18.3.1)
@@ -1193,8 +1193,8 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
 
-  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c':
-    resolution: {tarball: https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c}
+  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/0ac4e1b0837280dc61f712a802c32e16853b52b1':
+    resolution: {tarball: https://codeload.github.com/p-stream/providers/tar.gz/0ac4e1b0837280dc61f712a802c32e16853b52b1}
     version: 3.1.0
 
   '@pkgjs/parseargs@0.11.0':
@@ -2898,8 +2898,8 @@ packages:
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
 
-  jake@10.9.2:
-    resolution: {integrity: sha512-2P4SQ0HrLQ+fw6llpLnOaGAvN2Zu6778SJMrCUwns4fOoG9ayrTiZk3VV8sCPkVZF8ab0zksVpS8FDY5pRCNBA==}
+  jake@10.9.4:
+    resolution: {integrity: sha512-wpHYzhxiVQL+IV05BLE2Xn34zW1S223hvjtqk0+gsPrwd/8JNLXJgZZM/iPFsYc1xyphF+6M6EvdE5E9MBGkDA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -5469,7 +5469,7 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
-  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/0ab5588d9501f10aba5aeaa336f31215d915473c':
+  '@p-stream/providers@https://codeload.github.com/p-stream/providers/tar.gz/0ac4e1b0837280dc61f712a802c32e16853b52b1':
     dependencies:
       abort-controller: 3.0.0
       cheerio: 1.0.0-rc.12
@@ -6502,7 +6502,7 @@ snapshots:
 
   ejs@3.1.10:
     dependencies:
-      jake: 10.9.2
+      jake: 10.9.4
 
   electron-to-chromium@1.5.182: {}
 
@@ -7374,12 +7374,11 @@ snapshots:
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
-  jake@10.9.2:
+  jake@10.9.4:
     dependencies:
       async: 3.2.6
-      chalk: 4.1.2
       filelist: 1.0.4
-      minimatch: 3.1.2
+      picocolors: 1.1.1
 
   jiti@1.21.7: {}
 
