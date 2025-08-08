@@ -1,13 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type Region =
-  | "us-east"
-  | "us-west"
-  | "south"
-  | "asia"
-  | "europe"
-  | "unknown";
+export type Region = "east" | "west" | "south" | "asia" | "europe" | "unknown";
 
 interface RegionStore {
   region: Region | null;
@@ -39,8 +33,8 @@ export const useRegionStore = create<RegionStore>()(
 
 // Coordinates for each proxy server region
 const regionCoordinates = [
-  { region: "us-east" as Region, lat: 40.4173, lon: -82.9071 }, // Ohio, US
-  { region: "us-west" as Region, lat: 37.7749, lon: -122.4194 }, // California, US
+  { region: "east" as Region, lat: 40.4173, lon: -82.9071 }, // Ohio, US
+  { region: "west" as Region, lat: 37.7749, lon: -122.4194 }, // California, US
   { region: "south" as Region, lat: -23.5505, lon: -46.6333 }, // São Paulo, BR
   { region: "asia" as Region, lat: -33.8688, lon: 151.2093 }, // Sydney, Australia
   { region: "europe" as Region, lat: 51.5074, lon: -0.1278 }, // London, UK

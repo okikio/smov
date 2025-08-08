@@ -7,8 +7,8 @@ export function RegionSelectorPart() {
   const { region, setRegion } = useRegionStore();
 
   const regionOptions = [
-    { id: "us-east", name: "US East (Ohio)" },
-    { id: "us-west", name: "US West (California)" },
+    { id: "east", name: "US East (Ohio)" },
+    { id: "west", name: "US West (California)" },
     { id: "south", name: "South America (São Paulo)" },
     { id: "asia", name: "Asia Pacific (Sydney)" },
     { id: "europe", name: "Europe Central (London)" },
@@ -28,7 +28,7 @@ export function RegionSelectorPart() {
           <Dropdown
             options={regionOptions}
             selectedItem={{
-              id: region || "us-east",
+              id: region || "east",
               name:
                 regionOptions.find((r) => r.id === region)?.name ||
                 "Unknown (US East)",
