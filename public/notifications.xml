@@ -9,6 +9,27 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-033</guid>
+      <title>Clarifying current source issues</title>
+      <description>I wanted to appologize for some recent issues with FED API and Vidify. 
+Firstly, I wanted to note that P-Stream does not host or control any of the content. Everything is streamed from third party sources.
+
+Vidify:
+You may have noticed (hopefully not) that Vidify has been showing some NSFW content. This is due to protections they have to prevent us from using them as a source.
+This should now be resolved, and hopefully prevented in the future.
+
+
+FED API:
+We’re aware of the issues with FED API and are looking into it. However, the problem is with febbox, not the FED API scraper.
+Once FED API gets the link from febbox it’s entirely out of our control. There’s not much we can do, but maybe there’s something we can find to answer why this is happening and hopefully prevent it.
+Please be patient. I suggest using another source, or use the “open in” download option to stream the febbox mp4 within the player of your choice! 
+      </description>
+      <pubDate>Sat, 09 Aug 2025 8:10:00 MST</pubDate>
+      <category>announcement</category>
+    </item>
+
+
+    <item>
       <guid>notification-032</guid>
       <title>Bug fixes and source updates!</title>
       <description>
