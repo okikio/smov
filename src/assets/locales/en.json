@@ -773,7 +773,9 @@
         "homeButton": "Go home",
         "discoverButton": "Discover more",
         "text": "We have searched through our providers and cannot find the media you are looking for! We do not host the media and have no control over what is available. Please click 'Show details' below for more details.",
-        "title": "We couldn't find that"
+        "title": "We couldn't find that",
+        "onboarding": "More sources might be avalible using the extension or febbox token!",
+        "onboardingButton": "Do setup again"
       },
       "extensionFailure": {
         "badge": "Extension disabled",
