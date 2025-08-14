@@ -151,6 +151,11 @@ export function SettingsPage() {
   const sourceOrder = usePreferencesStore((s) => s.sourceOrder);
   const setSourceOrder = usePreferencesStore((s) => s.setSourceOrder);
 
+  const enableSourceOrder = usePreferencesStore((s) => s.enableSourceOrder);
+  const setEnableSourceOrder = usePreferencesStore(
+    (s) => s.setEnableSourceOrder,
+  );
+
   const enableDiscover = usePreferencesStore((s) => s.enableDiscover);
   const setEnableDiscover = usePreferencesStore((s) => s.setEnableDiscover);
 
@@ -164,11 +169,6 @@ export function SettingsPage() {
 
   const enableImageLogos = usePreferencesStore((s) => s.enableImageLogos);
   const setEnableImageLogos = usePreferencesStore((s) => s.setEnableImageLogos);
-
-  const enableSourceOrder = usePreferencesStore((s) => s.enableSourceOrder);
-  const setEnableSourceOrder = usePreferencesStore(
-    (s) => s.setEnableSourceOrder,
-  );
 
   const proxyTmdb = usePreferencesStore((s) => s.proxyTmdb);
   const setProxyTmdb = usePreferencesStore((s) => s.setProxyTmdb);
@@ -348,6 +348,7 @@ export function SettingsPage() {
     setEnableDetailsModal(state.enableDetailsModal.state);
     setEnableImageLogos(state.enableImageLogos.state);
     setSourceOrder(state.sourceOrder.state);
+    setEnableSourceOrder(state.enableSourceOrder.state);
     setAppLanguage(state.appLanguage.state);
     setTheme(state.theme.state);
     setSubStyling(state.subtitleStyling.state);
@@ -389,6 +390,7 @@ export function SettingsPage() {
     setEnableDetailsModal,
     setEnableImageLogos,
     setSourceOrder,
+    setEnableSourceOrder,
     setAppLanguage,
     setTheme,
     setSubStyling,
@@ -397,7 +399,6 @@ export function SettingsPage() {
     updateProfile,
     logout,
     setBackendUrl,
-    setEnableSourceOrder,
     setProxyTmdb,
     setEnableCarouselView,
     setForceCompactEpisodeView,

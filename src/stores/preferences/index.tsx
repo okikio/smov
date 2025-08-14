@@ -14,6 +14,8 @@ export interface PreferencesStore {
   forceCompactEpisodeView: boolean;
   sourceOrder: string[];
   enableSourceOrder: boolean;
+  embedOrder: string[];
+  enableEmbedOrder: boolean;
   proxyTmdb: boolean;
   febboxKey: string | null;
   realDebridKey: string | null;
@@ -31,6 +33,8 @@ export interface PreferencesStore {
   setForceCompactEpisodeView(v: boolean): void;
   setSourceOrder(v: string[]): void;
   setEnableSourceOrder(v: boolean): void;
+  setEmbedOrder(v: string[]): void;
+  setEnableEmbedOrder(v: boolean): void;
   setProxyTmdb(v: boolean): void;
   setFebboxKey(v: string | null): void;
   setRealDebridKey(v: string | null): void;
@@ -52,6 +56,8 @@ export const usePreferencesStore = create(
       forceCompactEpisodeView: false,
       sourceOrder: [],
       enableSourceOrder: false,
+      embedOrder: [],
+      enableEmbedOrder: false,
       proxyTmdb: false,
       febboxKey: null,
       realDebridKey: null,
@@ -110,6 +116,16 @@ export const usePreferencesStore = create(
       setEnableSourceOrder(v) {
         set((s) => {
           s.enableSourceOrder = v;
+        });
+      },
+      setEmbedOrder(v) {
+        set((s) => {
+          s.embedOrder = v;
+        });
+      },
+      setEnableEmbedOrder(v) {
+        set((s) => {
+          s.enableEmbedOrder = v;
         });
       },
       setProxyTmdb(v) {

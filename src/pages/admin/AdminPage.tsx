@@ -8,6 +8,7 @@ import { TMDBTestPart } from "@/pages/parts/admin/TMDBTestPart";
 import { WorkerTestPart } from "@/pages/parts/admin/WorkerTestPart";
 
 import { BackendTestPart } from "../parts/admin/BackendTestPart";
+import { EmbedOrderPart } from "../parts/admin/EmbedOrderPart";
 
 export function AdminPage() {
   return (
@@ -22,6 +23,7 @@ export function AdminPage() {
         <TMDBTestPart />
         <M3U8TestPart />
         <RegionSelectorPart />
+        <EmbedOrderPart />
       </ThinContainer>
     </SubPageLayout>
   );
