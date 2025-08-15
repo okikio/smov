@@ -578,7 +578,22 @@
                 "3": "Tryck och håll ned eller håll SHIFT för att visa widescreen-knappen istället för fullscreen!",
                 "4": "Vissa källor fungerar bättre än andra!",
                 "5": "Skaffa tillägget för fler källor!",
-                "6": "Håll ned bokmärken för att redigera eller ta bort dem!"
+                "6": "Håll ned bokmärken för att redigera eller ta bort dem!",
+                "7": "Håll ned SHIFT och tryck på titeln för att kopiera länken med tid!",
+                "8": "Ställ in en anpassad undertextfärg!",
+                "9": "Migrera ditt konto till en ny backend i inställningarna!",
+                "10": "Joina Discord servern!",
+                "11": "Använd [ och ] för att justera undertextens timing!",
+                "12": "Tryck på MELLANSLAG eller K för att spela/pausa!",
+                "13": "Använd vänster och höger piltangent för att hoppa 5 sekunder!",
+                "14": "Använd tangenterna J och L för att hoppa 10 sekunder!",
+                "15": "Tryck på F för att växla fullskärmsläge!",
+                "16": "Tryck på M för att slå av eller på ljudet!",
+                "17": "Använd upp- och nedpilarna för att ändra volym!",
+                "18": "Tryck på < och > för att ändra uppspelningshastighet!",
+                "19": "Tryck på . och , för att flytta bildruta för bildruta när videon är pausad!",
+                "20": "Tryck på C för att slå på eller av undertexter!",
+                "21": "Tryck på R för att göra en barrel roll!"
             }
         },
         "time": {
@@ -592,6 +607,9 @@
             "description": "Detta avsnitt är {{percentage}}% tittat",
             "resume": "Återuppta",
             "restart": "Starta om"
+        },
+        "turnstile": {
+            "description": "Vänligen bevisa att din mänsklighet genom att genomföra den snabba utmaningen; detta görs för att hålla P-Stream säkert."
         }
     },
     "screens": {
