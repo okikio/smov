@@ -9,6 +9,20 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-036</guid>
+      <title>Some sources are currently down</title>
+      <description>Some sources are currently down. We are aware of the issue and are working to resolve it. 
+Unfortunatly, many sources needed to be disabled due to them showing NSFW content and xprime is experiencing a temporary outage.
+
+I recommend you set up the febbox token to get access to FED API and CIA API, the best sources at the moment. You can find the febbox token setting at the botton of the settings page!
+
+If you are interested in adding a new source to P-Stream, I recently created a new guide for it! Check the link below.</description>
+      <link>https://providers.pstream.mov/in-depth/development</link>
+      <pubDate>Sat, 16 Aug 2025 11:12:00 MST</pubDate>
+      <category>announcement</category>
+    </item>
+
+    <item>
       <guid>notification-033</guid>
       <title>Clarifying current source issues</title>
       <description>I wanted to appologize for some recent issues with FED API and Vidify. 
