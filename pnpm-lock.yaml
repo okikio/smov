@@ -158,7 +158,7 @@ importers:
         version: 2.1.2
       wyzie-lib:
         specifier: github:FifthWit/wyzie-lib
-        version: https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/a6d155a7ada4a414263b8d33dea307b1f5c7bb97
+        version: https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/107cea3056f25fbcbd02df8d9707a5188628d97f
       zustand:
         specifier: ^4.5.7
         version: 4.5.7(@types/react@18.3.23)(immer@10.1.1)(react@18.3.1)
@@ -4538,9 +4538,9 @@ packages:
       utf-8-validate:
         optional: true
 
-  wyzie-lib@https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/a6d155a7ada4a414263b8d33dea307b1f5c7bb97:
-    resolution: {tarball: https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/a6d155a7ada4a414263b8d33dea307b1f5c7bb97}
-    version: 2.2.5
+  wyzie-lib@https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/107cea3056f25fbcbd02df8d9707a5188628d97f:
+    resolution: {tarball: https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/107cea3056f25fbcbd02df8d9707a5188628d97f}
+    version: 2.2.6
 
   xml-name-validator@5.0.0:
     resolution: {integrity: sha512-EvGK8EJ3DhaHfbRlETOWAS5pO9MZITeauHKJyb8wyajUfQUenkIg2MvLDTZ4T/TgIcm3HU0TFBgWWboAZ30UHg==}
@@ -9761,7 +9761,7 @@ snapshots:
 
   ws@8.18.3: {}
 
-  wyzie-lib@https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/a6d155a7ada4a414263b8d33dea307b1f5c7bb97: {}
+  wyzie-lib@https://codeload.github.com/FifthWit/wyzie-lib/tar.gz/107cea3056f25fbcbd02df8d9707a5188628d97f: {}
 
   xml-name-validator@5.0.0: {}
 
