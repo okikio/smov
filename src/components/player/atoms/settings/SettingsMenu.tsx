@@ -22,6 +22,9 @@ export function SettingsMenu({ id }: { id: string }) {
   );
   const subtitlesEnabled = useSubtitleStore((s) => s.enabled);
   const currentSourceId = usePlayerStore((s) => s.sourceId);
+  const currentEmbedId = usePlayerStore(
+    (s) => (s as any).embedId as string | null,
+  );
   const sourceName = useMemo(() => {
     if (!currentSourceId) return "...";
     const source = getCachedMetadata().find(
@@ -29,6 +32,11 @@ export function SettingsMenu({ id }: { id: string }) {
     );
     return source?.name ?? "...";
   }, [currentSourceId]);
+  const embedName = useMemo(() => {
+    if (!currentEmbedId) return undefined;
+    const meta = getCachedMetadata().find((s) => s.id === currentEmbedId);
+    return meta?.name;
+  }, [currentEmbedId]);
   const { toggleLastUsed } = useCaptions();
 
   const selectedLanguagePretty = selectedCaptionLanguage
@@ -67,7 +75,9 @@ export function SettingsMenu({ id }: { id: string }) {
           rightText={sourceName}
         >
           {t("player.menus.settings.sourceItem")}
-          <span className="text-type-secondary text-sm">{sourceName}</span>
+          <span className="text-type-secondary text-sm">
+            {sourceName} | {embedName}
+          </span>
         </Menu.ChevronLink>
         <Menu.ChevronLink
           box
