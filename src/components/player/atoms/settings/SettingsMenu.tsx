@@ -75,9 +75,10 @@ export function SettingsMenu({ id }: { id: string }) {
           rightText={sourceName}
         >
           {t("player.menus.settings.sourceItem")}
-          <span className="text-type-secondary text-sm">
-            {sourceName} {embedName && `| ${embedName}`}
-          </span>
+          <span className="text-type-secondary text-sm">{sourceName}</span>
+          {embedName && (
+            <span className="text-type-secondary text-xs">{embedName}</span>
+          )}
         </Menu.ChevronLink>
         <Menu.ChevronLink
           box
