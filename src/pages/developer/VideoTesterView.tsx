@@ -18,7 +18,7 @@ const testMeta: PlayerMeta = {
 };
 
 const testStreams: Record<StreamType, string> = {
-  hls: "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+  hls: "https://alpha-charlott.github.io/video-openh264/Sintel_master.m3u8",
   mp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
 };
 
