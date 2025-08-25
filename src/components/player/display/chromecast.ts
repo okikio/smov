@@ -141,13 +141,6 @@ export function makeChromecastDisplayInterface(
     request.currentTime = startAt;
     if (caption?.url) request.activeTrackIds = [1];
 
-    if (source.type === "hls") {
-      const staticMedia = chrome.cast.media as any;
-      (mediaInfo as any).hlsSegmentFormat = staticMedia.HlsSegmentFormat.FMP4;
-      (mediaInfo as any).hlsVideoSegmentFormat =
-        staticMedia.HlsVideoSegmentFormat.FMP4;
-    }
-
     const session = ops.instance.getCurrentSession();
     session
       ?.loadMedia(request)
