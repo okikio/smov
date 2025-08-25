@@ -9,6 +9,7 @@ import {
   DisplayInterfaceEvents,
   DisplayMeta,
 } from "@/components/player/display/displayInterface";
+import { conf } from "@/setup/config";
 import { LoadableSource } from "@/stores/player/utils/qualities";
 import { processCdnLink } from "@/utils/cdn";
 import { canFullscreen, canFullscreenAnyElement } from "@/utils/detectFeatures";
@@ -110,7 +111,35 @@ export function makeChromecastDisplayInterface(
     const metaData = new chrome.cast.media.GenericMediaMetadata();
     metaData.title = meta.title;
 
-    const contentUrl = processCdnLink(source.url);
+    let contentUrl = processCdnLink(source.url);
+
+    // When casting HLS, use an enabled M3U8 proxy so the Chromecast device can fetch the manifest
+    if (source.type === "hls") {
+      try {
+        const all = conf().M3U8_PROXY_URLS;
+        let enabledMap: Record<string, boolean> = {};
+        const enabledRaw = localStorage.getItem("m3u8-proxy-enabled");
+        if (enabledRaw) {
+          try {
+            enabledMap = JSON.parse(enabledRaw) as Record<string, boolean>;
+          } catch {
+            enabledMap = {};
+          }
+        }
+        const enabled = all.filter(
+          (_url, idx) => enabledMap[idx.toString()] !== false,
+        );
+        const list = enabled.length > 0 ? enabled : all;
+        if (list.length > 0) {
+          const base = list[Math.floor(Math.random() * list.length)];
+          const trimmed = base.endsWith("/") ? base.slice(0, -1) : base;
+          contentUrl = `${trimmed}/?destination=${encodeURIComponent(contentUrl)}`;
+        }
+      } catch {
+        // If anything goes wrong, fall back to direct URL
+      }
+    }
+
     const mediaInfo = new chrome.cast.media.MediaInfo(contentUrl, type);
     mediaInfo.streamType = chrome.cast.media.StreamType.BUFFERED;
     mediaInfo.metadata = metaData;
