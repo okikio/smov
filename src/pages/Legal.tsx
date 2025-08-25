@@ -149,7 +149,7 @@ export function LegalPage() {
                 <br />
                 <br />
                 We strongly recommend using VPN services for enhanced privacy
-                and security while browsing.
+                and security while browsing. Downloading is not advised.
                 <br />
                 <br />
                 Please respect intellectual property rights and be mindful of
