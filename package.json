@@ -1,7 +1,7 @@
 {
   "packageManager": "pnpm@9.14.4",
   "name": "P-Stream",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "private": true,
   "homepage": "https://github.com/p-stream/p-stream",
   "scripts": {

@@ -9,6 +9,28 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-037</guid>
+      <title>P-Stream v5.1.1 released!</title>
+      <description>Minor updates to fix bugs and add some QoL features.
+
+- Now anyone can watch trailers on the details modal! A custom proxy or the extension no longer required. (Other IMDb info still requires the extension or proxy)
+- Added a resume watching page.
+- Added checks and label to see what embed a source is currently on. (e.x. fox for xprime)
+- Updated curated movie lists and editor picks!
+- Added an onboarding reminder for content that is not found but there are other sources that may have it.
+- Using a custom subtitle source with no baked in ads.
+- Fixed a broken URL issue caused by the Dood source.
+- Fixed 2x boost overlay sizing.
+- Fixed speed boost not working on mobile.
+- Other bug fixes!
+
+P.S. I wanted to highlight TrinityHades, a community member, who is working on adding Safari support to the P-Stream extension! It's not quire ready yet but soon mac users will be able to use the extension to watch P-Stream on Safari!
+      </description>
+      <pubDate>Sun, 24 Aug 2025 22:37:00 MST</pubDate>
+      <category>update</category>
+    </item>
+
+    <item>
       <guid>notification-036</guid>
       <title>Some sources are currently down</title>
       <description>Some sources are currently down. We are aware of the issue and are working to resolve it. 
