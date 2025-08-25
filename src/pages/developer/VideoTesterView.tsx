@@ -13,8 +13,9 @@ import { SourceSliceSource, StreamType } from "@/stores/player/utils/qualities";
 const testMeta: PlayerMeta = {
   releaseYear: 2010,
   title: "Sintel",
-  tmdbId: "",
+  tmdbId: "45745",
   type: "movie",
+  poster: "https://image.tmdb.org/t/p/w342//4BMG9hk9NvSBeQvC82sVmVRK140.jpg",
 };
 
 const testStreams: Record<StreamType, string> = {
