@@ -9,6 +9,17 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-038</guid>
+      <title>New subtile source badges!</title>
+      <description>There's now a quick way to see the source of a subtitle on the external subtitle selection menu!
+
+In addition to the new badges, there's now a new subtitle source: Febbox! Thanks to Nemo for helping P-Stream fetch subtitles from Febbox without needing to set up the Febbox token! It also allows for the subtitles to be used on any source!
+      </description>
+      <pubDate>Tue, 26 Aug 2025 21:50:00 MST</pubDate>
+      <category>feature</category>
+    </item>
+
+    <item>
       <guid>notification-037</guid>
       <title>P-Stream v5.1.1 released!</title>
       <description>Minor updates to fix bugs and add some QoL features.
