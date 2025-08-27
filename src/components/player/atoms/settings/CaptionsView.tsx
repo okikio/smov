@@ -118,7 +118,7 @@ export function CaptionOption(props: {
               className={classNames(
                 "ml-2 px-2 py-0.5 rounded text-white text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap",
                 {
-                  "bg-blue-500": props.subtitleSource === "wyzie",
+                  "bg-blue-500": props.subtitleSource.includes("wyzie"),
                   "bg-orange-500": props.subtitleSource === "opensubs",
                   "bg-purple-500": props.subtitleSource === "febbox",
                 },
