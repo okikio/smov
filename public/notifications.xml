@@ -10,7 +10,7 @@
 
     <item>
       <guid>notification-038</guid>
-      <title>New subtile source badges!</title>
+      <title>New subtitle source badges!</title>
       <description>There's now a quick way to see the source of a subtitle on the external subtitle selection menu!
 
 In addition to the new badges, there's now a new subtitle source: Febbox! Thanks to Nemo for helping P-Stream fetch subtitles from Febbox without needing to set up the Febbox token! It also allows for the subtitles to be used on any source!
