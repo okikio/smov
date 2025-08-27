@@ -194,6 +194,7 @@ export async function scrapeOpenSubtitlesCaptions(
         type: caption.SubFormat || "srt",
         needsProxy: false,
         opensubtitles: true,
+        source: "opensubs", // shortened becuase used on CaptionView for badge
       });
     }
 
