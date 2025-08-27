@@ -101,14 +101,6 @@ function labelToLanguageCode(languageName: string): string {
   return languageMap[languageName] || languageName.toLowerCase();
 }
 
-const timeout = (ms: number, source: string) =>
-  new Promise<null>((resolve) => {
-    setTimeout(() => {
-      console.error(`${source} captions request timed out after ${ms}ms`);
-      resolve(null);
-    }, ms);
-  });
-
 export async function scrapeWyzieCaptions(
   tmdbId: string | number,
   imdbId: string,
@@ -309,32 +301,28 @@ export async function scrapeExternalSubtitles(
     const episode = meta.episode?.number;
     const tmdbId = meta.tmdbId;
 
-    // Fetch Wyzie, OpenSubtitles, and Febbox captions with timeouts
-    const [wyzieCaptions, openSubsCaptions, febboxCaptions] = await Promise.all(
-      [
-        Promise.race([
-          scrapeWyzieCaptions(tmdbId, imdbId, season, episode),
-          timeout(2000, "Wyzie"),
-        ]),
-        Promise.race([
-          scrapeOpenSubtitlesCaptions(imdbId, season, episode),
-          timeout(5000, "OpenSubtitles"),
-        ]),
-        Promise.race([
-          scrapeFebboxCaptions(imdbId, season, episode),
-          timeout(3000, "Febbox"),
-        ]),
-      ],
-    );
+    // Fetch Wyzie, OpenSubtitles, and Febbox captions (no timeouts to allow all to complete)
+    const [wyzieCaptions, openSubsCaptions, febboxCaptions] =
+      await Promise.allSettled([
+        scrapeWyzieCaptions(tmdbId, imdbId, season, episode),
+        scrapeOpenSubtitlesCaptions(imdbId, season, episode),
+        scrapeFebboxCaptions(imdbId, season, episode),
+      ]);
 
     const allCaptions: CaptionListItem[] = [];
 
-    if (wyzieCaptions) allCaptions.push(...wyzieCaptions);
-    if (openSubsCaptions) allCaptions.push(...openSubsCaptions);
-    if (febboxCaptions) allCaptions.push(...febboxCaptions);
+    // Handle Promise.allSettled results
+    const wyzieResult =
+      wyzieCaptions.status === "fulfilled" ? wyzieCaptions.value : [];
+    const openSubsResult =
+      openSubsCaptions.status === "fulfilled" ? openSubsCaptions.value : [];
+    const febboxResult =
+      febboxCaptions.status === "fulfilled" ? febboxCaptions.value : [];
+
+    allCaptions.push(...wyzieResult, ...openSubsResult, ...febboxResult);
 
     console.log(
-      `Found ${allCaptions.length} external captions (Wyzie: ${wyzieCaptions?.length || 0}, OpenSubtitles: ${openSubsCaptions?.length || 0}, Febbox: ${febboxCaptions?.length || 0})`,
+      `Found ${allCaptions.length} external captions (Wyzie: ${wyzieResult.length}, OpenSubtitles: ${openSubsResult.length}, Febbox: ${febboxResult.length})`,
     );
 
     return allCaptions;
