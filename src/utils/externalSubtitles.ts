@@ -210,7 +210,7 @@ export async function scrapeFebboxCaptions(
   try {
     let url: string;
     if (season && episode) {
-      url = `https://fed-subs.pstream.mov/tv/${imdbId}/s${season}/e${episode}`;
+      url = `https://fed-subs.pstream.mov/tv/${imdbId}/${season}/${episode}`;
     } else {
       url = `https://fed-subs.pstream.mov/movie/${imdbId}`;
     }
@@ -299,28 +299,61 @@ export async function scrapeExternalSubtitles(
     const episode = meta.episode?.number;
     const tmdbId = meta.tmdbId;
 
-    // Fetch Wyzie, OpenSubtitles, and Febbox captions (no timeouts to allow all to complete)
-    const [wyzieCaptions, openSubsCaptions, febboxCaptions] =
-      await Promise.allSettled([
-        scrapeWyzieCaptions(tmdbId, imdbId, season, episode),
-        scrapeOpenSubtitlesCaptions(imdbId, season, episode),
-        scrapeFebboxCaptions(imdbId, season, episode),
-      ]);
+    // Set a reasonable timeout for each source (10 seconds)
+    const timeout = 10000;
 
+    // Create promises for each source with individual timeouts
+    const wyziePromise = scrapeWyzieCaptions(tmdbId, imdbId, season, episode);
+    const openSubsPromise = scrapeOpenSubtitlesCaptions(
+      imdbId,
+      season,
+      episode,
+    );
+    const febboxPromise = scrapeFebboxCaptions(imdbId, season, episode);
+
+    // Create timeout promises
+    const timeoutPromise = new Promise<CaptionListItem[]>((resolve) => {
+      setTimeout(() => resolve([]), timeout);
+    });
+
+    // Start all promises and collect results as they complete
     const allCaptions: CaptionListItem[] = [];
+    let completedSources = 0;
+    const totalSources = 3;
 
-    // Handle Promise.allSettled results
-    const wyzieResult =
-      wyzieCaptions.status === "fulfilled" ? wyzieCaptions.value : [];
-    const openSubsResult =
-      openSubsCaptions.status === "fulfilled" ? openSubsCaptions.value : [];
-    const febboxResult =
-      febboxCaptions.status === "fulfilled" ? febboxCaptions.value : [];
+    // Helper function to handle individual source completion
+    const handleSourceCompletion = (
+      sourceName: string,
+      captions: CaptionListItem[],
+    ) => {
+      allCaptions.push(...captions);
+      completedSources += 1;
+      console.log(
+        `${sourceName} completed with ${captions.length} captions (${completedSources}/${totalSources} sources done)`,
+      );
+    };
 
-    allCaptions.push(...wyzieResult, ...openSubsResult, ...febboxResult);
+    // Start all sources concurrently and handle them as they complete
+    const promises = [
+      Promise.race([wyziePromise, timeoutPromise]).then((captions) => {
+        handleSourceCompletion("Wyzie", captions);
+        return captions;
+      }),
+      Promise.race([openSubsPromise, timeoutPromise]).then((captions) => {
+        handleSourceCompletion("OpenSubtitles", captions);
+        return captions;
+      }),
+      Promise.race([febboxPromise, timeoutPromise]).then((captions) => {
+        handleSourceCompletion("Febbox", captions);
+        return captions;
+      }),
+    ];
+
+    // Wait for all sources to complete (with timeouts)
+    await Promise.allSettled(promises);
 
     console.log(
-      `Found ${allCaptions.length} external captions (Wyzie: ${wyzieResult.length}, OpenSubtitles: ${openSubsResult.length}, Febbox: ${febboxResult.length})`,
+      `Found ${allCaptions.length} total external captions from all sources`,
     );
 
     return allCaptions;
