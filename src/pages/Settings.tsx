@@ -192,6 +192,11 @@ export function SettingsPage() {
     (s) => s.setEnableLowPerformanceMode,
   );
 
+  const enableHoldToBoost = usePreferencesStore((s) => s.enableHoldToBoost);
+  const setEnableHoldToBoost = usePreferencesStore(
+    (s) => s.setEnableHoldToBoost,
+  );
+
   const account = useAuthStore((s) => s.account);
   const updateProfile = useAuthStore((s) => s.setAccountProfile);
   const updateDeviceName = useAuthStore((s) => s.updateDeviceName);
@@ -243,6 +248,7 @@ export function SettingsPage() {
     enableCarouselView,
     forceCompactEpisodeView,
     enableLowPerformanceMode,
+    enableHoldToBoost,
   );
 
   const availableSources = useMemo(() => {
@@ -300,7 +306,8 @@ export function SettingsPage() {
         state.proxyTmdb.changed ||
         state.enableCarouselView.changed ||
         state.forceCompactEpisodeView.changed ||
-        state.enableLowPerformanceMode.changed
+        state.enableLowPerformanceMode.changed ||
+        state.enableHoldToBoost.changed
       ) {
         await updateSettings(backendUrl, account, {
           applicationLanguage: state.appLanguage.state,
@@ -321,6 +328,7 @@ export function SettingsPage() {
           enableCarouselView: state.enableCarouselView.state,
           forceCompactEpisodeView: state.forceCompactEpisodeView.state,
           enableLowPerformanceMode: state.enableLowPerformanceMode.state,
+          enableHoldToBoost: state.enableHoldToBoost.state,
         });
       }
       if (state.deviceName.changed) {
@@ -360,6 +368,7 @@ export function SettingsPage() {
     setEnableCarouselView(state.enableCarouselView.state);
     setForceCompactEpisodeView(state.forceCompactEpisodeView.state);
     setEnableLowPerformanceMode(state.enableLowPerformanceMode.state);
+    setEnableHoldToBoost(state.enableHoldToBoost.state);
 
     if (state.profile.state) {
       updateProfile(state.profile.state);
@@ -403,6 +412,7 @@ export function SettingsPage() {
     setEnableCarouselView,
     setForceCompactEpisodeView,
     setEnableLowPerformanceMode,
+    setEnableHoldToBoost,
   ]);
   return (
     <SubPageLayout>
@@ -453,6 +463,8 @@ export function SettingsPage() {
             setenableSourceOrder={state.enableSourceOrder.set}
             enableLowPerformanceMode={state.enableLowPerformanceMode.state}
             setEnableLowPerformanceMode={state.enableLowPerformanceMode.set}
+            enableHoldToBoost={state.enableHoldToBoost.state}
+            setEnableHoldToBoost={state.enableHoldToBoost.set}
           />
         </div>
         <div id="settings-appearance" className="mt-28">

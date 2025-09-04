@@ -21,6 +21,7 @@ export interface PreferencesStore {
   realDebridKey: string | null;
   enableLowPerformanceMode: boolean;
   enableNativeSubtitles: boolean;
+  enableHoldToBoost: boolean;
 
   setEnableThumbnails(v: boolean): void;
   setEnableAutoplay(v: boolean): void;
@@ -40,6 +41,7 @@ export interface PreferencesStore {
   setRealDebridKey(v: string | null): void;
   setEnableLowPerformanceMode(v: boolean): void;
   setEnableNativeSubtitles(v: boolean): void;
+  setEnableHoldToBoost(v: boolean): void;
 }
 
 export const usePreferencesStore = create(
@@ -63,6 +65,7 @@ export const usePreferencesStore = create(
       realDebridKey: null,
       enableLowPerformanceMode: false,
       enableNativeSubtitles: false,
+      enableHoldToBoost: true,
       setEnableThumbnails(v) {
         set((s) => {
           s.enableThumbnails = v;
@@ -151,6 +154,11 @@ export const usePreferencesStore = create(
       setEnableNativeSubtitles(v) {
         set((s) => {
           s.enableNativeSubtitles = v;
+        });
+      },
+      setEnableHoldToBoost(v) {
+        set((s) => {
+          s.enableHoldToBoost = v;
         });
       },
     })),

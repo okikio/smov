@@ -26,6 +26,7 @@ export interface SettingsInput {
   proxyTmdb?: boolean;
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
+  enableHoldToBoost?: boolean;
 }
 
 export interface SettingsResponse {
@@ -50,6 +51,7 @@ export interface SettingsResponse {
   proxyTmdb?: boolean;
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
+  enableHoldToBoost?: boolean;
 }
 
 export function updateSettings(

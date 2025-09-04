@@ -65,6 +65,7 @@ export function useSettingsState(
   enableCarouselView: boolean,
   forceCompactEpisodeView: boolean,
   enableLowPerformanceMode: boolean,
+  enableHoldToBoost: boolean,
 ) {
   const [proxyUrlsState, setProxyUrls, resetProxyUrls, proxyUrlsChanged] =
     useDerived(proxyUrls);
@@ -174,6 +175,12 @@ export function useSettingsState(
     resetEnableLowPerformanceMode,
     enableLowPerformanceModeChanged,
   ] = useDerived(enableLowPerformanceMode);
+  const [
+    enableHoldToBoostState,
+    setEnableHoldToBoostState,
+    resetEnableHoldToBoost,
+    enableHoldToBoostChanged,
+  ] = useDerived(enableHoldToBoost);
 
   function reset() {
     resetTheme();
@@ -199,6 +206,7 @@ export function useSettingsState(
     resetEnableCarouselView();
     resetForceCompactEpisodeView();
     resetEnableLowPerformanceMode();
+    resetEnableHoldToBoost();
   }
 
   const changed =
@@ -223,7 +231,8 @@ export function useSettingsState(
     proxyTmdbChanged ||
     enableCarouselViewChanged ||
     forceCompactEpisodeViewChanged ||
-    enableLowPerformanceModeChanged;
+    enableLowPerformanceModeChanged ||
+    enableHoldToBoostChanged;
 
   return {
     reset,
@@ -337,6 +346,11 @@ export function useSettingsState(
       state: enableLowPerformanceModeState,
       set: setEnableLowPerformanceModeState,
       changed: enableLowPerformanceModeChanged,
+    },
+    enableHoldToBoost: {
+      state: enableHoldToBoostState,
+      set: setEnableHoldToBoostState,
+      changed: enableHoldToBoostChanged,
     },
   };
 }
