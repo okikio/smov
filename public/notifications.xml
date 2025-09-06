@@ -9,6 +9,22 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-039</guid>
+      <title>Help support P-Stream!</title>
+      <description>If you enjoy P-Stream, please consider donating to help maintain it!
+
+We're looking at a new server, but we need your help! If a couple people could chip in and cover the $20 (per month) that would be much appreciated. There is only one ad on the site, and we want to keep it that way!
+
+It will improve uptime for FED API and faster EU streams, another proxy which we desperately need.
+
+If you are interested in donating, please check the link below!
+      </description>
+      <link>https://rentry.co/h5mypdfs</link>
+      <pubDate>Sat, 06 Sep 2025 14:42:00 MST</pubDate>
+      <category>announcement</category>
+    </item>
+
+    <item>
       <guid>notification-038</guid>
       <title>New subtitle source badges!</title>
       <description>There's now a quick way to see the source of a subtitle on the external subtitle selection menu!
