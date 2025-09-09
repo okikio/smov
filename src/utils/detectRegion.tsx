@@ -36,7 +36,7 @@ export const useRegionStore = create<RegionStore>()(
     }),
     {
       name: "__MW::region",
-      version: 6,
+      version: 7,
     },
   ),
 );
