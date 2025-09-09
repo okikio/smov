@@ -9,6 +9,25 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-040</guid>
+      <title>Extension issue for Firefox!</title>
+      <description>If you're using Firefox with the P-Stream extension, you may have noticed that it says updates are unavailable and that the extension is violating policies. Yikes!
+
+Heres what happened: I accidently deleted my Firefox account that had the P-Stream extension. 
+The extension did NOT violate any policies, it was just deleted. For some it says that when it gets removed.
+
+I just created a new account and re-submitted it, so it should be back in the store soon. I'll post here when it is.
+Just to clarify, the extension is still working perfectly fine, it's just the updates that are not working. When the extension is back in the store, you can update it to the latest version.
+
+The whole story behind me accidentally deleting my Firefox account is on our Discord server, feel free to ask there! (link below)
+
+I apologize for the inconvenience!</description>
+      <link>https://discord.gg/7z6znYgrTG</link>
+      <pubDate>Mon, 08 Sep 2025 16:00:00 MST</pubDate>
+      <category>announcement</category>
+    </item>
+
+    <item>
       <guid>notification-039</guid>
       <title>Help support P-Stream!</title>
       <description>If you enjoy P-Stream, please consider donating to help maintain it!
