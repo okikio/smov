@@ -9,6 +9,21 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-041</guid>
+      <title>Firefox Extension is back in the store!</title>
+      <description>The Firefox extension is back in the store! You can now update it to the latest version.
+
+You’ll need to REPLACE the old one with this one to get future updates. But the old one will also work fine, it’ll just have a warning. HAVING BOTH BREAKS THE SITE, so pick one!
+
+Sorry again!
+(link below)
+      </description>
+      <link>https://addons.mozilla.org/addon/pstream-extension/</link>
+      <pubDate>Wed, 10 Sep 2025 13:00:00 MST</pubDate>
+      <category>announcement</category>
+    </item>
+
+    <item>
       <guid>notification-040</guid>
       <title>Extension issue for Firefox!</title>
       <description>If you're using Firefox with the P-Stream extension, you may have noticed that it says updates are unavailable and that the extension is violating policies. Yikes!
