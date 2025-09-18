@@ -20,30 +20,6 @@ import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
 
-const getRegion = async (): Promise<string | null> => {
-  if (typeof window === "undefined") return null;
-  try {
-    const regionData = window.localStorage.getItem("__MW::region");
-    if (!regionData) return null;
-    const parsed = JSON.parse(regionData);
-    return parsed?.state?.region || null;
-  } catch {
-    return null;
-  }
-};
-
-function getRegionHeader(region: string | null): string {
-  if (region === "dallas") return "east";
-  if (region === "portland") return "west";
-  if (region === "new-york") return "east";
-  if (region === "paris") return "europe";
-  if (region === "hong-kong") return "asia";
-  if (region === "kansas") return "south";
-  if (region === "sydney") return "asia";
-  if (region === "mumbai") return "asia";
-  return "east";
-}
-
 const testUrl = "https://postman-echo.com/get";
 
 const sleep = (ms: number): Promise<void> => {
@@ -88,8 +64,6 @@ export async function testFebboxKey(febboxKey: string | null): Promise<Status> {
     return "unset";
   }
 
-  const region = await getRegion();
-
   let attempts = 0;
   const maxAttempts = 2;
 
@@ -101,7 +75,6 @@ export async function testFebboxKey(febboxKey: string | null): Promise<Status> {
       const response = await fetch(febboxApiTestUrl, {
         headers: {
           "ui-token": febboxKey,
-          region: getRegionHeader(region),
         },
       });
 
