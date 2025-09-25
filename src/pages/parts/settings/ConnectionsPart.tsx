@@ -30,6 +30,8 @@ import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
 
+import { RegionSelectorPart } from "./RegionSelectorPart";
+
 interface ProxyEditProps {
   proxyUrls: string[] | null;
   setProxyUrls: Dispatch<SetStateAction<string[] | null>>;
@@ -349,8 +351,8 @@ function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
               <p className="text-white font-bold">
                 {t("settings.connections.febbox.tokenLabel", "Token")}
               </p>
-              <div className="flex items-center w-full">
-                <StatusCircle type={statusMap[status]} className="mx-2 mr-4" />
+              <div className="flex items-center w-full gap-4">
+                <StatusCircle type={statusMap[status]} className="mx-2" />
                 <AuthInputBox
                   onChange={(newToken) => {
                     setFebboxKey(newToken);
@@ -360,6 +362,7 @@ function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
                   passwordToggleable
                   className="flex-grow"
                 />
+                <RegionSelectorPart />
               </div>
               {status === "error" && (
                 <p className="text-type-danger mt-4">

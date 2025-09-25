@@ -44,6 +44,7 @@ import { conf } from "@/setup/config";
 import { usePreferencesStore } from "@/stores/preferences";
 import { getProxyUrls } from "@/utils/proxyUrls";
 
+import { RegionSelectorPart } from "../parts/settings/RegionSelectorPart";
 import {
   Status,
   testFebboxKey,
@@ -189,11 +190,8 @@ export function FEDAPISetup() {
                 <p className="text-white font-bold mb-3">
                   {t("fedapi.setup.tokenLabel")}
                 </p>
-                <div className="flex items-center w-full">
-                  <StatusCircle
-                    type={statusMap[status]}
-                    className="mx-2 mr-4"
-                  />
+                <div className="flex items-center w-full gap-4">
+                  <StatusCircle type={statusMap[status]} className="mx-2" />
                   <AuthInputBox
                     onChange={(newToken) => {
                       setFebboxKey(newToken);
@@ -203,6 +201,7 @@ export function FEDAPISetup() {
                     passwordToggleable
                     className="flex-grow"
                   />
+                  <RegionSelectorPart />
                 </div>
                 {status === "error" && (
                   <p className="text-type-danger mt-4">
