@@ -639,7 +639,10 @@
         "showMore": "Show more",
         "showLess": "Show less",
         "markAsWatched": "Mark as watched",
-        "markAsUnwatched": "Mark as unwatched"
+        "markAsUnwatched": "Mark as unwatched",
+        "markAsFavorite": "Mark as favorite",
+        "favorites": "Favorites",
+        "noFavorites": "No favorite episodes yet. Star episodes to add them to your favorites!"
       },
       "playback": {
         "speedLabel": "Playback speed",
