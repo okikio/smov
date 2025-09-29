@@ -197,6 +197,9 @@ export function SettingsPage() {
     (s) => s.setEnableHoldToBoost,
   );
 
+  const homeSectionOrder = usePreferencesStore((s) => s.homeSectionOrder);
+  const setHomeSectionOrder = usePreferencesStore((s) => s.setHomeSectionOrder);
+
   const account = useAuthStore((s) => s.account);
   const updateProfile = useAuthStore((s) => s.setAccountProfile);
   const updateDeviceName = useAuthStore((s) => s.updateDeviceName);
@@ -249,6 +252,7 @@ export function SettingsPage() {
     forceCompactEpisodeView,
     enableLowPerformanceMode,
     enableHoldToBoost,
+    homeSectionOrder,
   );
 
   const availableSources = useMemo(() => {
@@ -369,6 +373,7 @@ export function SettingsPage() {
     setForceCompactEpisodeView(state.forceCompactEpisodeView.state);
     setEnableLowPerformanceMode(state.enableLowPerformanceMode.state);
     setEnableHoldToBoost(state.enableHoldToBoost.state);
+    setHomeSectionOrder(state.homeSectionOrder.state);
 
     if (state.profile.state) {
       updateProfile(state.profile.state);
@@ -413,6 +418,7 @@ export function SettingsPage() {
     setForceCompactEpisodeView,
     setEnableLowPerformanceMode,
     setEnableHoldToBoost,
+    setHomeSectionOrder,
   ]);
   return (
     <SubPageLayout>
@@ -484,6 +490,8 @@ export function SettingsPage() {
             setEnableCarouselView={state.enableCarouselView.set}
             forceCompactEpisodeView={state.forceCompactEpisodeView.state}
             setForceCompactEpisodeView={state.forceCompactEpisodeView.set}
+            homeSectionOrder={state.homeSectionOrder.state}
+            setHomeSectionOrder={state.homeSectionOrder.set}
             enableLowPerformanceMode={state.enableLowPerformanceMode.state}
           />
         </div>

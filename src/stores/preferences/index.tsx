@@ -22,6 +22,7 @@ export interface PreferencesStore {
   enableLowPerformanceMode: boolean;
   enableNativeSubtitles: boolean;
   enableHoldToBoost: boolean;
+  homeSectionOrder: string[];
 
   setEnableThumbnails(v: boolean): void;
   setEnableAutoplay(v: boolean): void;
@@ -42,6 +43,7 @@ export interface PreferencesStore {
   setEnableLowPerformanceMode(v: boolean): void;
   setEnableNativeSubtitles(v: boolean): void;
   setEnableHoldToBoost(v: boolean): void;
+  setHomeSectionOrder(v: string[]): void;
 }
 
 export const usePreferencesStore = create(
@@ -66,6 +68,7 @@ export const usePreferencesStore = create(
       enableLowPerformanceMode: false,
       enableNativeSubtitles: false,
       enableHoldToBoost: true,
+      homeSectionOrder: ["watching", "bookmarks"],
       setEnableThumbnails(v) {
         set((s) => {
           s.enableThumbnails = v;
@@ -159,6 +162,11 @@ export const usePreferencesStore = create(
       setEnableHoldToBoost(v) {
         set((s) => {
           s.enableHoldToBoost = v;
+        });
+      },
+      setHomeSectionOrder(v) {
+        set((s) => {
+          s.homeSectionOrder = v;
         });
       },
     })),
