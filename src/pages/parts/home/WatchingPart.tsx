@@ -61,7 +61,6 @@ export function WatchingPart({
         {sortedProgressItems.map((v) => (
           <div
             key={v.id}
-            style={{ userSelect: "none" }}
             onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
               e.preventDefault()
             }

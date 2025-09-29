@@ -20,7 +20,7 @@ interface WatchingCarouselProps {
 
 function MediaCardSkeleton() {
   return (
-    <div className="relative mt-4 group cursor-default user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto">
+    <div className="relative mt-4 group cursor-default rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto">
       <div className="animate-pulse">
         <div className="w-full aspect-[2/3] bg-mediaCard-hoverBackground rounded-lg" />
         <div className="mt-2 h-4 bg-mediaCard-hoverBackground rounded w-3/4" />
@@ -116,11 +116,10 @@ export function WatchingCarousel({
             ? items.map((media) => (
                 <div
                   key={media.id}
-                  style={{ userSelect: "none" }}
                   onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
                     e.preventDefault()
                   }
-                  className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
+                  className="relative mt-4 group cursor-pointer rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
                 >
                   <WatchedMediaCard
                     key={media.id}

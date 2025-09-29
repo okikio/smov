@@ -287,7 +287,6 @@ export function BookmarksPart({
                 {section.items.map((v) => (
                   <div
                     key={v.id}
-                    style={{ userSelect: "none" }}
                     onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
                       e.preventDefault()
                     }
@@ -331,7 +330,6 @@ export function BookmarksPart({
               {section.items.map((v) => (
                 <div
                   key={v.id}
-                  style={{ userSelect: "none" }}
                   onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
                     e.preventDefault()
                   }
