@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -39,7 +39,6 @@ interface BookmarksCarouselProps {
   onShowDetails?: (media: MediaItem) => void;
 }
 
-const LONG_PRESS_DURATION = 500; // 0.5 seconds
 const MAX_ITEMS_PER_SECTION = 20; // Limit items per section
 
 function MediaCardSkeleton() {
@@ -92,7 +91,6 @@ export function BookmarksCarousel({
   let isScrolling = false;
   const [editing, setEditing] = useState(false);
   const removeBookmark = useBookmarkStore((s) => s.removeBookmark);
-  const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const backendUrl = useBackendUrl();
   const account = useAuthStore((s) => s.account);
 
@@ -297,41 +295,6 @@ export function BookmarksCarousel({
     }
   };
 
-  const handleLongPress = () => {
-    // Find the button by ID and simulate a click
-    const editButton = document.getElementById("edit-button-bookmark");
-    if (editButton) {
-      (editButton as HTMLButtonElement).click();
-    }
-  };
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Prevent default touch action
-    pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
-  };
-
-  const handleTouchEnd = () => {
-    if (pressTimerRef.current) {
-      clearTimeout(pressTimerRef.current);
-      pressTimerRef.current = null;
-    }
-  };
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only trigger long press for left mouse button (button 0)
-    if (e.button === 0) {
-      e.preventDefault(); // Prevent default mouse action
-      pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (pressTimerRef.current) {
-      clearTimeout(pressTimerRef.current);
-      pressTimerRef.current = null;
-    }
-  };
-
   const handleEditGroupOrder = () => {
     // Initialize with current order or default order
     if (groupOrder.length === 0) {
@@ -424,10 +387,6 @@ export function BookmarksCarousel({
                         onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
                           e.preventDefault()
                         }
-                        onTouchStart={handleTouchStart}
-                        onTouchEnd={handleTouchEnd}
-                        onMouseDown={handleMouseDown}
-                        onMouseUp={handleMouseUp}
                         className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
                       >
                         <WatchedMediaCard
@@ -502,10 +461,6 @@ export function BookmarksCarousel({
                           onContextMenu={(
                             e: React.MouseEvent<HTMLDivElement>,
                           ) => e.preventDefault()}
-                          onTouchStart={handleTouchStart}
-                          onTouchEnd={handleTouchEnd}
-                          onMouseDown={handleMouseDown}
-                          onMouseUp={handleMouseUp}
                           className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
                         >
                           <WatchedMediaCard

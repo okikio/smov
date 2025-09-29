@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EditButton } from "@/components/buttons/EditButton";
@@ -17,8 +17,6 @@ interface WatchingCarouselProps {
   }>;
   onShowDetails?: (media: MediaItem) => void;
 }
-
-const LONG_PRESS_DURATION = 500; // 0.5 seconds
 
 function MediaCardSkeleton() {
   return (
@@ -40,7 +38,6 @@ export function WatchingCarousel({
   let isScrolling = false;
   const [editing, setEditing] = useState(false);
   const removeItem = useProgressStore((s) => s.removeItem);
-  const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { isMobile } = useIsMobile();
 
@@ -87,41 +84,6 @@ export function WatchingCarousel({
   const categorySlug = "continue-watching";
   const SKELETON_COUNT = 10;
 
-  const handleLongPress = () => {
-    // Find the button by ID and simulate a click
-    const editButton = document.getElementById("edit-button-watching");
-    if (editButton) {
-      (editButton as HTMLButtonElement).click();
-    }
-  };
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Prevent default touch action
-    pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
-  };
-
-  const handleTouchEnd = () => {
-    if (pressTimerRef.current) {
-      clearTimeout(pressTimerRef.current);
-      pressTimerRef.current = null;
-    }
-  };
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only trigger long press for left mouse button (button 0)
-    if (e.button === 0) {
-      e.preventDefault(); // Prevent default mouse action
-      pressTimerRef.current = setTimeout(handleLongPress, LONG_PRESS_DURATION);
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (pressTimerRef.current) {
-      clearTimeout(pressTimerRef.current);
-      pressTimerRef.current = null;
-    }
-  };
-
   if (itemsLength === 0) return null;
 
   return (
@@ -158,10 +120,6 @@ export function WatchingCarousel({
                   onContextMenu={(e: React.MouseEvent<HTMLDivElement>) =>
                     e.preventDefault()
                   }
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={handleTouchEnd}
-                  onMouseDown={handleMouseDown}
-                  onMouseUp={handleMouseUp}
                   className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
                 >
                   <WatchedMediaCard
