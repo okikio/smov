@@ -48,6 +48,11 @@ const availableThemes = [
     key: "settings.appearance.themes.forest",
   },
   {
+    id: "autumn",
+    selector: "theme-autumn",
+    key: "settings.appearance.themes.autumn",
+  },
+  {
     id: "mocha",
     selector: "theme-mocha",
     key: "settings.appearance.themes.mocha",

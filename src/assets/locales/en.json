@@ -324,6 +324,15 @@
       "69": {
         "default": "Up for something spicy?",
         "extra": ["Happy 69 day 😘!"]
+      },
+      "halloween": {
+        "default": "What spooky movie would you like to watch this Halloween?",
+        "extra": [
+          "Happy Halloween! 🎃👻",
+          "Boo! 👻",
+          "Trick or treat! 🍬",
+          "It's the Great Pumpkin, Charlie Brown!"
+        ]
       }
     }
   },
@@ -938,7 +947,8 @@
         "forest": "Forest",
         "wolverine": "Wolverine",
         "popsicle": "Popsicle",
-        "hulk": "Hulk"
+        "hulk": "Hulk",
+        "autumn": "Autumn"
       },
       "title": "Appearance",
       "options": {
