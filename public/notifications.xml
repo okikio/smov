@@ -5,8 +5,30 @@
     <link>https://pstream.mov</link>
     <description>Site updates and important notifications for P-Stream users</description>
     <language>en</language>
-    <lastBuildDate>Mon, 28 Jul 2025 21:53:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 29 Sep 2025 18:00:00 MST</lastBuildDate>
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <guid>notification-042</guid>
+      <title>P-Stream v5.1.3 released!</title>
+      <description>New features and improvements in this update:
+
+- Added favorite episodes! Every episode now has a bookmark icon that can be toggled to sort your episodes into a new Favorites section! It's like a special season of just your picks!
+- Watching and bookmark sections can be reordered - You can drag and drop sort the watching section to be under your bookmarks. (Groups can be reordered from the home page)
+- Removed the hold to edit bookmarks/watching feature
+- Added small skip episode button to player - Quickly skip to the next episode without opening the episode menu
+- Close any modal with ESC key
+- Added "Autumn" theme
+- New easter egg -not exactly easter...
+- Various bug fixes and improvements
+
+Enjoy the new features!
+
+Also, P-Stream now has a SimpleX community! Feel free to join if you want to stay away from the prying eyes of Discord. Press the link below.</description>
+      <link>https://smp10.simplex.im/g#C1oMmXt1lMPqDZAs9Rne4SQ-LhvpwNv2UDLR8RA1zos</link>
+      <pubDate>Mon, 29 Sep 2025 18:00:00 MST</pubDate>
+      <category>update</category>
+    </item>
 
     <item>
       <guid>notification-041</guid>
