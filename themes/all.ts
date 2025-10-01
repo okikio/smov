@@ -17,6 +17,7 @@ import wolverine from "./list/wolverine";
 import popsicle from "./list/popsicle";
 import hulk from "./list/hulk";
 import autumn from "./list/autumn";
+import skyRealm from "./list/skyrealm";
 
 export const allThemes = [
   teal,
@@ -38,4 +39,5 @@ export const allThemes = [
   hulk,
   wolverine,
   popsicle,
-]
+  skyRealm,
+];

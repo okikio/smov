@@ -108,6 +108,11 @@ const availableThemes = [
     selector: "theme-popsicle",
     key: "settings.appearance.themes.popsicle",
   },
+  {
+    id: "skyRealm",
+    selector: "theme-skyrealm",
+    key: "settings.appearance.themes.skyrealm",
+  },
 ];
 
 function ThemePreview(props: {
