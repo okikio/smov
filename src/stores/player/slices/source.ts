@@ -162,6 +162,8 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
   setMeta(meta, newStatus) {
     set((s) => {
       s.meta = meta;
+      s.embedId = null;
+      s.sourceId = null;
       s.interface.hideNextEpisodeBtn = false;
       if (newStatus) s.status = newStatus;
     });
