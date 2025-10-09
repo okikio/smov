@@ -9,6 +9,20 @@
     <atom:link href="https://pstream.mov/notifications.xml" rel="self" type="application/rss+xml" />
 
     <item>
+      <guid>notification-043</guid>
+      <title>Manual Source Selection!</title>
+      <description>I know many sources have been inconsistent recently, so to help with the trouble, we're introducing a new manual source selection setting! 
+      
+      This setting disables the automatic scraping process and requires manual selection before scraping. 
+      
+      You can find it settings, preferences. Hope it helps!
+
+      Also some bug fixes so it counts as a new version: v5.1.4!</description>
+      <pubDate>Wed, 8 Oct 2025 19:00:00 MST</pubDate>
+      <category>feature</category>
+    </item>
+
+    <item>
       <guid>notification-042</guid>
       <title>P-Stream v5.1.3 released!</title>
       <description>New features and improvements in this update:
