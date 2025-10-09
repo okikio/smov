@@ -138,7 +138,7 @@ export function SourceSelectPart(props: { media: ScrapeMedia }) {
   if (selectedSourceId) {
     return (
       <div className="h-full w-full flex items-center justify-center">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md h-[50vh] flex flex-col">
           <Menu.CardWithScrollable>
             <EmbedSelectionView
               sourceId={selectedSourceId}
@@ -153,7 +153,7 @@ export function SourceSelectPart(props: { media: ScrapeMedia }) {
 
   return (
     <div className="h-full w-full flex items-center justify-center">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md h-[50vh] flex flex-col">
         <Menu.CardWithScrollable>
           <Menu.Title>{t("player.menus.sources.title")}</Menu.Title>
           <Menu.Section className="pb-4">

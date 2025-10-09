@@ -12,6 +12,7 @@ import { useSkipTime } from "@/components/player/hooks/useSkipTime";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { PlayerMeta, playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
+import { usePreferencesStore } from "@/stores/preferences";
 import { useWatchPartyStore } from "@/stores/watchParty";
 
 import { ScrapingPartInterruptButton, Tips } from "./ScrapingPart";
@@ -27,6 +28,9 @@ export function PlayerPart(props: PlayerPartProps) {
   const { showTargets, showTouchTargets } = useShouldShowControls();
   const status = usePlayerStore((s) => s.status);
   const { isMobile } = useIsMobile();
+  const manualSourceSelection = usePreferencesStore(
+    (s) => s.manualSourceSelection,
+  );
   const isLoading = usePlayerStore((s) => s.mediaPlaying.isLoading);
   const { isHost, enabled } = useWatchPartyStore();
 
@@ -143,7 +147,7 @@ export function PlayerPart(props: PlayerPartProps) {
       </Player.TopControls>
 
       <Player.BottomControls show={showTargets}>
-        {status === playerStatus.PLAYING ? null : <Tips />}
+        {status !== playerStatus.PLAYING && !manualSourceSelection && <Tips />}
         <div className="flex items-center justify-center space-x-3 h-full">
           {status === playerStatus.SCRAPING ? (
             <ScrapingPartInterruptButton />
