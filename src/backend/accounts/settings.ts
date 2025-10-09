@@ -27,6 +27,7 @@ export interface SettingsInput {
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
   enableHoldToBoost?: boolean;
+  manualSourceSelection?: boolean;
 }
 
 export interface SettingsResponse {
@@ -52,6 +53,7 @@ export interface SettingsResponse {
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
   enableHoldToBoost?: boolean;
+  manualSourceSelection?: boolean;
 }
 
 export function updateSettings(

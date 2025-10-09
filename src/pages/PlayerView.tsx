@@ -22,8 +22,10 @@ import { PlayerPart } from "@/pages/parts/player/PlayerPart";
 import { ResumePart } from "@/pages/parts/player/ResumePart";
 import { ScrapeErrorPart } from "@/pages/parts/player/ScrapeErrorPart";
 import { ScrapingPart } from "@/pages/parts/player/ScrapingPart";
+import { SourceSelectPart } from "@/pages/parts/player/SourceSelectPart";
 import { useLastNonPlayerLink } from "@/stores/history";
 import { PlayerMeta, playerStatus } from "@/stores/player/slices/source";
+import { usePreferencesStore } from "@/stores/preferences";
 import { useProgressStore } from "@/stores/progress";
 import { needsOnboarding } from "@/utils/onboarding";
 import { parseTimestamp } from "@/utils/timestamp";
@@ -51,6 +53,9 @@ export function RealPlayerView() {
   } = usePlayer();
   const { setPlayerMeta, scrapeMedia } = usePlayerMeta();
   const backUrl = useLastNonPlayerLink();
+  const manualSourceSelection = usePreferencesStore(
+    (s) => s.manualSourceSelection,
+  );
   const router = useOverlayRouter("settings");
   const openedWatchPartyRef = useRef<boolean>(false);
   const progressItems = useProgressStore((s) => s.items);
@@ -175,17 +180,21 @@ export function RealPlayerView() {
         />
       ) : null}
       {status === playerStatus.SCRAPING && scrapeMedia ? (
-        <ScrapingPart
-          media={scrapeMedia}
-          onResult={(sources, sourceOrder) => {
-            setErrorData({
-              sourceOrder,
-              sources,
-            });
-            setScrapeNotFound();
-          }}
-          onGetStream={playAfterScrape}
-        />
+        manualSourceSelection ? (
+          <SourceSelectPart media={scrapeMedia} />
+        ) : (
+          <ScrapingPart
+            media={scrapeMedia}
+            onResult={(sources, sourceOrder) => {
+              setErrorData({
+                sourceOrder,
+                sources,
+              });
+              setScrapeNotFound();
+            }}
+            onGetStream={playAfterScrape}
+          />
+        )
       ) : null}
       {status === playerStatus.SCRAPE_NOT_FOUND && errorData ? (
         <ScrapeErrorPart data={errorData} />

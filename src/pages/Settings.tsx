@@ -200,6 +200,13 @@ export function SettingsPage() {
   const homeSectionOrder = usePreferencesStore((s) => s.homeSectionOrder);
   const setHomeSectionOrder = usePreferencesStore((s) => s.setHomeSectionOrder);
 
+  const manualSourceSelection = usePreferencesStore(
+    (s) => s.manualSourceSelection,
+  );
+  const setManualSourceSelection = usePreferencesStore(
+    (s) => s.setManualSourceSelection,
+  );
+
   const account = useAuthStore((s) => s.account);
   const updateProfile = useAuthStore((s) => s.setAccountProfile);
   const updateDeviceName = useAuthStore((s) => s.updateDeviceName);
@@ -253,6 +260,7 @@ export function SettingsPage() {
     enableLowPerformanceMode,
     enableHoldToBoost,
     homeSectionOrder,
+    manualSourceSelection,
   );
 
   const availableSources = useMemo(() => {
@@ -311,7 +319,8 @@ export function SettingsPage() {
         state.enableCarouselView.changed ||
         state.forceCompactEpisodeView.changed ||
         state.enableLowPerformanceMode.changed ||
-        state.enableHoldToBoost.changed
+        state.enableHoldToBoost.changed ||
+        state.manualSourceSelection.changed
       ) {
         await updateSettings(backendUrl, account, {
           applicationLanguage: state.appLanguage.state,
@@ -333,6 +342,7 @@ export function SettingsPage() {
           forceCompactEpisodeView: state.forceCompactEpisodeView.state,
           enableLowPerformanceMode: state.enableLowPerformanceMode.state,
           enableHoldToBoost: state.enableHoldToBoost.state,
+          manualSourceSelection: state.manualSourceSelection.state,
         });
       }
       if (state.deviceName.changed) {
@@ -374,6 +384,7 @@ export function SettingsPage() {
     setEnableLowPerformanceMode(state.enableLowPerformanceMode.state);
     setEnableHoldToBoost(state.enableHoldToBoost.state);
     setHomeSectionOrder(state.homeSectionOrder.state);
+    setManualSourceSelection(state.manualSourceSelection.state);
 
     if (state.profile.state) {
       updateProfile(state.profile.state);
@@ -419,6 +430,7 @@ export function SettingsPage() {
     setEnableLowPerformanceMode,
     setEnableHoldToBoost,
     setHomeSectionOrder,
+    setManualSourceSelection,
   ]);
   return (
     <SubPageLayout>
@@ -471,6 +483,8 @@ export function SettingsPage() {
             setEnableLowPerformanceMode={state.enableLowPerformanceMode.set}
             enableHoldToBoost={state.enableHoldToBoost.state}
             setEnableHoldToBoost={state.enableHoldToBoost.set}
+            manualSourceSelection={state.manualSourceSelection.state}
+            setManualSourceSelection={state.manualSourceSelection.set}
           />
         </div>
         <div id="settings-appearance" className="mt-28">

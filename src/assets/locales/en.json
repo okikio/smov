@@ -1055,7 +1055,10 @@
       "sourceOrderEnableLabel": "Custom source order",
       "embedOrder": "Reordering embeds",
       "embedOrderDescription": "Drag and drop to reorder embeds. This will determine the order in which embeds are checked for the media you are trying to watch. <br><br> <strong>(The default order is best for most users)</strong>",
-      "embedOrderEnableLabel": "Custom embed order"
+      "embedOrderEnableLabel": "Custom embed order",
+      "manualSource": "Manual source selection",
+      "manualSourceDescription": "Require picking a source before scraping. Disables automatic source selection and opens the source picker when starting playback.",
+      "manualSourceLabel": "Manual source selection"
     },
     "reset": "Reset",
     "save": "Save",
