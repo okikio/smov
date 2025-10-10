@@ -64,7 +64,7 @@ export function bookmarkResponsesToEntries(responses: BookmarkResponse[]) {
   const entries = responses.map((bookmark) => {
     const item: BookmarkMediaItem = {
       ...bookmark.meta,
-      group: bookmark.group.length > 0 ? bookmark.group : undefined,
+      group: bookmark.group?.length > 0 ? bookmark.group : undefined,
       favoriteEpisodes: bookmark.favoriteEpisodes,
       updatedAt: new Date(bookmark.updatedAt).getTime(),
     };
