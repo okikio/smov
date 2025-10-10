@@ -65,6 +65,9 @@ export function useAuthData() {
   const setEnableHoldToBoost = usePreferencesStore(
     (s) => s.setEnableHoldToBoost,
   );
+  const setEnableDoubleClickToSeek = usePreferencesStore(
+    (s) => s.setEnableDoubleClickToSeek,
+  );
 
   const login = useCallback(
     async (
@@ -192,6 +195,10 @@ export function useAuthData() {
       if (settings.enableHoldToBoost !== undefined) {
         setEnableHoldToBoost(settings.enableHoldToBoost);
       }
+
+      if (settings.enableDoubleClickToSeek !== undefined) {
+        setEnableDoubleClickToSeek(settings.enableDoubleClickToSeek);
+      }
     },
     [
       replaceBookmarks,
@@ -215,6 +222,7 @@ export function useAuthData() {
       setEnableLowPerformanceMode,
       setEnableNativeSubtitles,
       setEnableHoldToBoost,
+      setEnableDoubleClickToSeek,
     ],
   );
 

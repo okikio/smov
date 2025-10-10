@@ -197,13 +197,6 @@ export function SettingsPage() {
     (s) => s.setEnableHoldToBoost,
   );
 
-  const enableDoubleClickToSeek = usePreferencesStore(
-    (s) => s.enableDoubleClickToSeek,
-  );
-  const setEnableDoubleClickToSeek = usePreferencesStore(
-    (s) => s.setEnableDoubleClickToSeek,
-  );
-
   const homeSectionOrder = usePreferencesStore((s) => s.homeSectionOrder);
   const setHomeSectionOrder = usePreferencesStore((s) => s.setHomeSectionOrder);
 
@@ -212,6 +205,13 @@ export function SettingsPage() {
   );
   const setManualSourceSelection = usePreferencesStore(
     (s) => s.setManualSourceSelection,
+  );
+
+  const enableDoubleClickToSeek = usePreferencesStore(
+    (s) => s.enableDoubleClickToSeek,
+  );
+  const setEnableDoubleClickToSeek = usePreferencesStore(
+    (s) => s.setEnableDoubleClickToSeek,
   );
 
   const account = useAuthStore((s) => s.account);
@@ -266,9 +266,9 @@ export function SettingsPage() {
     forceCompactEpisodeView,
     enableLowPerformanceMode,
     enableHoldToBoost,
-    enableDoubleClickToSeek,
     homeSectionOrder,
     manualSourceSelection,
+    enableDoubleClickToSeek,
   );
 
   const availableSources = useMemo(() => {
@@ -328,8 +328,8 @@ export function SettingsPage() {
         state.forceCompactEpisodeView.changed ||
         state.enableLowPerformanceMode.changed ||
         state.enableHoldToBoost.changed ||
-        state.enableDoubleClickToSeek.changed ||
-        state.manualSourceSelection.changed
+        state.manualSourceSelection.changed ||
+        state.enableDoubleClickToSeek
       ) {
         await updateSettings(backendUrl, account, {
           applicationLanguage: state.appLanguage.state,
@@ -351,8 +351,8 @@ export function SettingsPage() {
           forceCompactEpisodeView: state.forceCompactEpisodeView.state,
           enableLowPerformanceMode: state.enableLowPerformanceMode.state,
           enableHoldToBoost: state.enableHoldToBoost.state,
-          enableDoubleClickToSeek: state.enableDoubleClickToSeek.state,
           manualSourceSelection: state.manualSourceSelection.state,
+          enableDoubleClickToSeek: state.enableDoubleClickToSeek.state,
         });
       }
       if (state.deviceName.changed) {
@@ -393,9 +393,9 @@ export function SettingsPage() {
     setForceCompactEpisodeView(state.forceCompactEpisodeView.state);
     setEnableLowPerformanceMode(state.enableLowPerformanceMode.state);
     setEnableHoldToBoost(state.enableHoldToBoost.state);
-    setEnableDoubleClickToSeek(state.enableDoubleClickToSeek.state);
     setHomeSectionOrder(state.homeSectionOrder.state);
     setManualSourceSelection(state.manualSourceSelection.state);
+    setEnableDoubleClickToSeek(state.enableDoubleClickToSeek.state);
 
     if (state.profile.state) {
       updateProfile(state.profile.state);
@@ -442,6 +442,7 @@ export function SettingsPage() {
     setEnableHoldToBoost,
     setHomeSectionOrder,
     setManualSourceSelection,
+    setEnableDoubleClickToSeek,
   ]);
   return (
     <SubPageLayout>
@@ -494,10 +495,10 @@ export function SettingsPage() {
             setEnableLowPerformanceMode={state.enableLowPerformanceMode.set}
             enableHoldToBoost={state.enableHoldToBoost.state}
             setEnableHoldToBoost={state.enableHoldToBoost.set}
-            enableDoubleClickToSeek={state.enableDoubleClickToSeek.state}
-            setEnableDoubleClickToSeek={state.enableDoubleClickToSeek.set}
             manualSourceSelection={state.manualSourceSelection.state}
             setManualSourceSelection={state.manualSourceSelection.set}
+            enableDoubleClickToSeek={state.enableDoubleClickToSeek.state}
+            setEnableDoubleClickToSeek={state.enableDoubleClickToSeek.set}
           />
         </div>
         <div id="settings-appearance" className="mt-28">

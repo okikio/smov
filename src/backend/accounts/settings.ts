@@ -27,8 +27,8 @@ export interface SettingsInput {
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
   enableHoldToBoost?: boolean;
-  enableDoubleClickToSeek?: boolean;
   manualSourceSelection?: boolean;
+  enableDoubleClickToSeek?: boolean;
 }
 
 export interface SettingsResponse {
@@ -54,8 +54,8 @@ export interface SettingsResponse {
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
   enableHoldToBoost?: boolean;
-  enableDoubleClickToSeek?: boolean;
   manualSourceSelection?: boolean;
+  enableDoubleClickToSeek?: boolean;
 }
 
 export function updateSettings(

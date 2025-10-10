@@ -31,10 +31,10 @@ export function PreferencesPart(props: {
   setEnableLowPerformanceMode: (v: boolean) => void;
   enableHoldToBoost: boolean;
   setEnableHoldToBoost: (v: boolean) => void;
-  enableDoubleClickToSeek: boolean;
-  setEnableDoubleClickToSeek: (v: boolean) => void;
   manualSourceSelection: boolean;
   setManualSourceSelection: (v: boolean) => void;
+  enableDoubleClickToSeek: boolean;
+  setEnableDoubleClickToSeek: (v: boolean) => void;
 }) {
   const { t } = useTranslation();
   const sorted = sortLangCodes(appLanguageOptions.map((item) => item.code));

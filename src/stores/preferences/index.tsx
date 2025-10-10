@@ -22,9 +22,9 @@ export interface PreferencesStore {
   enableLowPerformanceMode: boolean;
   enableNativeSubtitles: boolean;
   enableHoldToBoost: boolean;
-  enableDoubleClickToSeek: boolean;
   homeSectionOrder: string[];
   manualSourceSelection: boolean;
+  enableDoubleClickToSeek: boolean;
 
   setEnableThumbnails(v: boolean): void;
   setEnableAutoplay(v: boolean): void;
@@ -45,9 +45,9 @@ export interface PreferencesStore {
   setEnableLowPerformanceMode(v: boolean): void;
   setEnableNativeSubtitles(v: boolean): void;
   setEnableHoldToBoost(v: boolean): void;
-  setEnableDoubleClickToSeek(v: boolean): void;
   setHomeSectionOrder(v: string[]): void;
   setManualSourceSelection(v: boolean): void;
+  setEnableDoubleClickToSeek(v: boolean): void;
 }
 
 export const usePreferencesStore = create(
@@ -72,9 +72,9 @@ export const usePreferencesStore = create(
       enableLowPerformanceMode: false,
       enableNativeSubtitles: false,
       enableHoldToBoost: true,
-      enableDoubleClickToSeek: false,
       homeSectionOrder: ["watching", "bookmarks"],
       manualSourceSelection: false,
+      enableDoubleClickToSeek: false,
       setEnableThumbnails(v) {
         set((s) => {
           s.enableThumbnails = v;
@@ -170,11 +170,6 @@ export const usePreferencesStore = create(
           s.enableHoldToBoost = v;
         });
       },
-      setEnableDoubleClickToSeek(v) {
-        set((s) => {
-          s.enableDoubleClickToSeek = v;
-        });
-      },
       setHomeSectionOrder(v) {
         set((s) => {
           s.homeSectionOrder = v;
@@ -183,6 +178,11 @@ export const usePreferencesStore = create(
       setManualSourceSelection(v) {
         set((s) => {
           s.manualSourceSelection = v;
+        });
+      },
+      setEnableDoubleClickToSeek(v) {
+        set((s) => {
+          s.enableDoubleClickToSeek = v;
         });
       },
     })),
