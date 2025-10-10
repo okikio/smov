@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { useTranslation } from "react-i18next";
 
 import { Icons } from "@/components/Icon";
 import { usePlayerMeta } from "@/components/player/hooks/usePlayerMeta";
@@ -14,7 +13,6 @@ interface SkipEpisodeButtonProps {
 }
 
 export function SkipEpisodeButton(props: SkipEpisodeButtonProps) {
-  const { t } = useTranslation();
   const meta = usePlayerStore((s) => s.meta);
   const { setDirectMeta } = usePlayerMeta();
   const setShouldStartFromBeginning = usePlayerStore(
