@@ -197,6 +197,13 @@ export function SettingsPage() {
     (s) => s.setEnableHoldToBoost,
   );
 
+  const enableDoubleClickToSeek = usePreferencesStore(
+    (s) => s.enableDoubleClickToSeek,
+  );
+  const setEnableDoubleClickToSeek = usePreferencesStore(
+    (s) => s.setEnableDoubleClickToSeek,
+  );
+
   const homeSectionOrder = usePreferencesStore((s) => s.homeSectionOrder);
   const setHomeSectionOrder = usePreferencesStore((s) => s.setHomeSectionOrder);
 
@@ -259,6 +266,7 @@ export function SettingsPage() {
     forceCompactEpisodeView,
     enableLowPerformanceMode,
     enableHoldToBoost,
+    enableDoubleClickToSeek,
     homeSectionOrder,
     manualSourceSelection,
   );
@@ -320,6 +328,7 @@ export function SettingsPage() {
         state.forceCompactEpisodeView.changed ||
         state.enableLowPerformanceMode.changed ||
         state.enableHoldToBoost.changed ||
+        state.enableDoubleClickToSeek.changed ||
         state.manualSourceSelection.changed
       ) {
         await updateSettings(backendUrl, account, {
@@ -342,6 +351,7 @@ export function SettingsPage() {
           forceCompactEpisodeView: state.forceCompactEpisodeView.state,
           enableLowPerformanceMode: state.enableLowPerformanceMode.state,
           enableHoldToBoost: state.enableHoldToBoost.state,
+          enableDoubleClickToSeek: state.enableDoubleClickToSeek.state,
           manualSourceSelection: state.manualSourceSelection.state,
         });
       }
@@ -383,6 +393,7 @@ export function SettingsPage() {
     setForceCompactEpisodeView(state.forceCompactEpisodeView.state);
     setEnableLowPerformanceMode(state.enableLowPerformanceMode.state);
     setEnableHoldToBoost(state.enableHoldToBoost.state);
+    setEnableDoubleClickToSeek(state.enableDoubleClickToSeek.state);
     setHomeSectionOrder(state.homeSectionOrder.state);
     setManualSourceSelection(state.manualSourceSelection.state);
 
@@ -483,6 +494,8 @@ export function SettingsPage() {
             setEnableLowPerformanceMode={state.enableLowPerformanceMode.set}
             enableHoldToBoost={state.enableHoldToBoost.state}
             setEnableHoldToBoost={state.enableHoldToBoost.set}
+            enableDoubleClickToSeek={state.enableDoubleClickToSeek.state}
+            setEnableDoubleClickToSeek={state.enableDoubleClickToSeek.set}
             manualSourceSelection={state.manualSourceSelection.state}
             setManualSourceSelection={state.manualSourceSelection.set}
           />

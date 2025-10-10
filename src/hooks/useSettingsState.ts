@@ -66,6 +66,7 @@ export function useSettingsState(
   forceCompactEpisodeView: boolean,
   enableLowPerformanceMode: boolean,
   enableHoldToBoost: boolean,
+  enableDoubleClickToSeek: boolean,
   homeSectionOrder: string[],
   manualSourceSelection: boolean,
 ) {
@@ -184,6 +185,12 @@ export function useSettingsState(
     enableHoldToBoostChanged,
   ] = useDerived(enableHoldToBoost);
   const [
+    enableDoubleClickToSeekState,
+    setEnableDoubleClickToSeekState,
+    resetEnableDoubleClickToSeek,
+    enableDoubleClickToSeekChanged,
+  ] = useDerived(enableDoubleClickToSeek);
+  const [
     homeSectionOrderState,
     setHomeSectionOrderState,
     resetHomeSectionOrder,
@@ -221,6 +228,7 @@ export function useSettingsState(
     resetForceCompactEpisodeView();
     resetEnableLowPerformanceMode();
     resetEnableHoldToBoost();
+    resetEnableDoubleClickToSeek();
     resetHomeSectionOrder();
     resetManualSourceSelection();
   }
@@ -249,6 +257,7 @@ export function useSettingsState(
     forceCompactEpisodeViewChanged ||
     enableLowPerformanceModeChanged ||
     enableHoldToBoostChanged ||
+    enableDoubleClickToSeekChanged ||
     homeSectionOrderChanged ||
     manualSourceSelectionChanged;
 
@@ -369,6 +378,11 @@ export function useSettingsState(
       state: enableHoldToBoostState,
       set: setEnableHoldToBoostState,
       changed: enableHoldToBoostChanged,
+    },
+    enableDoubleClickToSeek: {
+      state: enableDoubleClickToSeekState,
+      set: setEnableDoubleClickToSeekState,
+      changed: enableDoubleClickToSeekChanged,
     },
     homeSectionOrder: {
       state: homeSectionOrderState,

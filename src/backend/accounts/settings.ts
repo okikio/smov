@@ -27,6 +27,7 @@ export interface SettingsInput {
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
   enableHoldToBoost?: boolean;
+  enableDoubleClickToSeek?: boolean;
   manualSourceSelection?: boolean;
 }
 
@@ -53,6 +54,7 @@ export interface SettingsResponse {
   enableLowPerformanceMode?: boolean;
   enableNativeSubtitles?: boolean;
   enableHoldToBoost?: boolean;
+  enableDoubleClickToSeek?: boolean;
   manualSourceSelection?: boolean;
 }
 
