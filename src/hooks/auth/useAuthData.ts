@@ -68,6 +68,9 @@ export function useAuthData() {
   const setEnableDoubleClickToSeek = usePreferencesStore(
     (s) => s.setEnableDoubleClickToSeek,
   );
+  const setManualSourceSelection = usePreferencesStore(
+    (s) => s.setManualSourceSelection,
+  );
 
   const login = useCallback(
     async (
@@ -196,6 +199,10 @@ export function useAuthData() {
         setEnableHoldToBoost(settings.enableHoldToBoost);
       }
 
+      if (settings.manualSourceSelection !== undefined) {
+        setManualSourceSelection(settings.manualSourceSelection);
+      }
+
       if (settings.enableDoubleClickToSeek !== undefined) {
         setEnableDoubleClickToSeek(settings.enableDoubleClickToSeek);
       }
@@ -222,6 +229,7 @@ export function useAuthData() {
       setEnableLowPerformanceMode,
       setEnableNativeSubtitles,
       setEnableHoldToBoost,
+      setManualSourceSelection,
       setEnableDoubleClickToSeek,
     ],
   );
