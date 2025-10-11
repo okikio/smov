@@ -1,6 +1,5 @@
 import { ReactNode, useRef, useState } from "react";
 
-import IosPwaLimitations from "@/components/buttons/IosPwaLimitations";
 import { BrandPill } from "@/components/layout/BrandPill";
 import { Player } from "@/components/player";
 import { SkipIntroButton } from "@/components/player/atoms/SkipIntroButton";
@@ -37,8 +36,7 @@ export function PlayerPart(props: PlayerPartProps) {
   const inControl = !enabled || isHost;
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isIOSPWA =
-    isIOS && window.matchMedia("(display-mode: standalone)").matches;
+  const isPWA = window.matchMedia("(display-mode: standalone)").matches;
 
   const [isShifting, setIsShifting] = useState(false);
   const [isHoldingFullscreen, setIsHoldingFullscreen] = useState(false);
@@ -204,7 +202,9 @@ export function PlayerPart(props: PlayerPartProps) {
           <div />
           <div className="flex justify-center space-x-3">
             {/* Disable PiP for iOS PWA */}
-            {!isIOSPWA && status === playerStatus.PLAYING && <Player.Pip />}
+            {!isPWA && !isIOS && status === playerStatus.PLAYING && (
+              <Player.Pip />
+            )}
             <Player.Episodes inControl={inControl} />
             {status === playerStatus.PLAYING ? (
               <div className="hidden ssm:block">
@@ -212,11 +212,11 @@ export function PlayerPart(props: PlayerPartProps) {
               </div>
             ) : null}
             <Player.Settings />
-            {isIOSPWA && <IosPwaLimitations />}
           </div>
           <div>
-            {/* iOS PWA */}
-            {!isIOSPWA && (
+            {isPWA && status === playerStatus.PLAYING ? (
+              <Widescreen />
+            ) : (
               <div
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
@@ -226,7 +226,6 @@ export function PlayerPart(props: PlayerPartProps) {
                 {isHoldingFullscreen ? <Widescreen /> : <Player.Fullscreen />}
               </div>
             )}
-            {isIOSPWA && status === playerStatus.PLAYING && <Widescreen />}
           </div>
         </div>
       </Player.BottomControls>
