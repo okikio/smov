@@ -309,7 +309,7 @@ export async function scrapeExternalSubtitles(
       season,
       episode,
     );
-    const febboxPromise = scrapeFebboxCaptions(imdbId, season, episode);
+    // const febboxPromise = scrapeFebboxCaptions(imdbId, season, episode);
 
     // Create timeout promises
     const timeoutPromise = new Promise<CaptionListItem[]>((resolve) => {
@@ -343,10 +343,10 @@ export async function scrapeExternalSubtitles(
         handleSourceCompletion("OpenSubtitles", captions);
         return captions;
       }),
-      Promise.race([febboxPromise, timeoutPromise]).then((captions) => {
-        handleSourceCompletion("Febbox", captions);
-        return captions;
-      }),
+      // Promise.race([febboxPromise, timeoutPromise]).then((captions) => {
+      //   handleSourceCompletion("Febbox", captions);
+      //   return captions;
+      // }),
     ];
 
     // Wait for all sources to complete (with timeouts)
