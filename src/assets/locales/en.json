@@ -594,6 +594,8 @@
       "short": "Back"
     },
     "casting": {
+      "to": "Casting to {{device}} 📺",
+      "device": "device",
       "enabled": "Casting to device 🎬"
     },
     "menus": {
