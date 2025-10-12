@@ -39,6 +39,173 @@ export function ColorOption(props: {
   );
 }
 
+export function CaptionDelay(props: {
+  textTransformer?: (s: string) => string;
+  value: number;
+  onChange?: (val: number) => void;
+  max: number;
+  label: string;
+  min: number;
+  decimalsAllowed?: number;
+}) {
+  const { t } = useTranslation();
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const currentPercentage = (props.value - props.min) / (props.max - props.min);
+  const commit = useCallback(
+    (percentage: number) => {
+      const range = props.max - props.min;
+      const newPercentage = Math.min(Math.max(percentage, 0), 1);
+      props.onChange?.(props.min + range * newPercentage);
+    },
+    [props],
+  );
+
+  const { dragging, dragPercentage, dragMouseDown } = useProgressBar(
+    ref,
+    commit,
+    true,
+  );
+
+  const [isFocused, setIsFocused] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    function listener(e: KeyboardEvent) {
+      if (e.key === "Enter" && isFocused) {
+        inputRef.current?.blur();
+      }
+    }
+    window.addEventListener("keydown", listener);
+    return () => {
+      window.removeEventListener("keydown", listener);
+    };
+  }, [isFocused]);
+
+  const inputClasses =
+    "tabbable py-1 bg-video-context-inputBg rounded text-white cursor-text text-center px-4 w-24 h-12";
+  const textTransformer = props.textTransformer ?? ((s) => s);
+
+  return (
+    <div>
+      <Menu.FieldTitle>{props.label}</Menu.FieldTitle>
+      <div className="space-y-3">
+        {/* Slider */}
+        <div ref={ref}>
+          <div
+            className="group/progress w-full h-8 flex items-center cursor-pointer"
+            onMouseDown={dragMouseDown}
+            onTouchStart={dragMouseDown}
+          >
+            <div
+              dir="ltr"
+              className={[
+                "relative w-full h-1 bg-video-context-slider bg-opacity-25 rounded-full transition-[height] duration-100 group-hover/progress:h-1.5",
+                dragging ? "!h-1.5" : "",
+              ].join(" ")}
+            >
+              {/* Actual progress bar */}
+              <div
+                className="absolute top-0 left-0 h-full rounded-full bg-video-context-sliderFilled flex justify-end items-center"
+                style={{
+                  width: `${
+                    Math.max(
+                      0,
+                      Math.min(
+                        1,
+                        dragging ? dragPercentage / 100 : currentPercentage,
+                      ),
+                    ) * 100
+                  }%`,
+                }}
+              >
+                <div
+                  className={[
+                    "w-[1rem] min-w-[1rem] h-[1rem] border-[4px] border-video-context-sliderFilled rounded-full transform translate-x-1/2 bg-white transition-[transform] duration-100",
+                  ].join(" ")}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Control buttons and value display */}
+        <div className="flex items-center gap-2">
+          {/* Left arrow button - full width */}
+          <button
+            type="button"
+            onClick={() =>
+              props.onChange?.(
+                props.value - 1 / 10 ** (props.decimalsAllowed ?? 0),
+              )
+            }
+            className="flex-1 flex-col tabbable py-2 h-12 hover:text-white transition-colors duration-100 flex justify-center items-center hover:bg-video-context-buttonOverInputHover rounded bg-video-context-inputBg"
+          >
+            <Icon icon={Icons.CHEVRON_LEFT} />
+            <span className="text-xs">
+              {t("player.menus.subtitles.delayLate")}
+            </span>
+          </button>
+
+          {/* Value display/input */}
+          {isFocused ? (
+            <input
+              className={inputClasses}
+              value={inputValue}
+              autoFocus
+              onFocus={(e) => {
+                (e.target as HTMLInputElement).select();
+              }}
+              onBlur={(e) => {
+                setIsFocused(false);
+                const num = Number((e.target as HTMLInputElement).value);
+                if (!Number.isNaN(num))
+                  props.onChange?.(
+                    (props.decimalsAllowed ?? 0) === 0 ? Math.round(num) : num,
+                  );
+              }}
+              ref={inputRef}
+              onChange={(e) =>
+                setInputValue((e.target as HTMLInputElement).value)
+              }
+            />
+          ) : (
+            <button
+              className={inputClasses}
+              type="button"
+              tabIndex={0}
+              onClick={() => {
+                setInputValue(props.value.toFixed(props.decimalsAllowed ?? 0));
+                setIsFocused(true);
+              }}
+            >
+              {textTransformer(props.value.toFixed(props.decimalsAllowed ?? 0))}
+            </button>
+          )}
+
+          {/* Right arrow button - full width */}
+          <button
+            type="button"
+            onClick={() =>
+              props.onChange?.(
+                props.value + 1 / 10 ** (props.decimalsAllowed ?? 0),
+              )
+            }
+            className="flex-1 flex-col tabbable py-2 h-12 hover:text-white transition-colors duration-100 flex justify-center items-center hover:bg-video-context-buttonOverInputHover rounded bg-video-context-inputBg"
+          >
+            <Icon icon={Icons.CHEVRON_RIGHT} />
+            <span className="text-xs">
+              {t("player.menus.subtitles.delayEarly")}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CaptionSetting(props: {
   textTransformer?: (s: string) => string;
   value: number;
@@ -294,7 +461,7 @@ export function CaptionSettingsView({
             <span className="text-xs text-type-secondary">
               {t("player.menus.subtitles.useNativeSubtitlesDescription")}
             </span>
-            <CaptionSetting
+            <CaptionDelay
               label={t("player.menus.subtitles.settings.delay")}
               max={20}
               min={-20}
@@ -302,7 +469,6 @@ export function CaptionSettingsView({
               value={delay}
               textTransformer={(s) => `${s}s`}
               decimalsAllowed={1}
-              controlButtons
             />
             <div className="flex justify-between items-center">
               <Menu.FieldTitle>

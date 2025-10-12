@@ -711,7 +711,9 @@
         "empty": "There are no provided subtitles for this.",
         "notFound": "None of the available options match your query",
         "useNativeSubtitles": "Use native video subtitles",
-        "useNativeSubtitlesDescription": "May fix subtitles when casting and in PiP"
+        "useNativeSubtitlesDescription": "May fix subtitles when casting and in PiP",
+        "delayLate": "Heard audio",
+        "delayEarly": "Saw caption"
       },
       "watchparty": {
         "watchpartyItem": "Watch Party",
