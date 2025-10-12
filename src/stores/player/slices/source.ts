@@ -83,6 +83,7 @@ export interface SourceSlice {
   currentQuality: SourceQuality | null;
   currentAudioTrack: AudioTrack | null;
   captionList: CaptionListItem[];
+  isLoadingExternalSubtitles: boolean;
   caption: {
     selected: Caption | null;
     asTrack: boolean;
@@ -135,6 +136,7 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
   qualities: [],
   audioTracks: [],
   captionList: [],
+  isLoadingExternalSubtitles: false,
   currentQuality: null,
   currentAudioTrack: null,
   status: playerStatus.IDLE,
@@ -258,6 +260,10 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
     const store = get();
     if (!store.meta) return;
 
+    set((s) => {
+      s.isLoadingExternalSubtitles = true;
+    });
+
     try {
       const { scrapeExternalSubtitles } = await import(
         "@/utils/externalSubtitles"
@@ -277,6 +283,10 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
       }
     } catch (error) {
       console.error("Failed to scrape external subtitles:", error);
+    } finally {
+      set((s) => {
+        s.isLoadingExternalSubtitles = false;
+      });
     }
   },
 });
