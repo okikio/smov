@@ -1,9 +1,13 @@
-name: Deploying
+name: Build and Deploy
 
 on:
   push:
     branches:
       - main
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   build_pwa:
@@ -12,25 +16,26 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
                   
-    - uses: pnpm/action-setup@v2
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
       with:
-        version: 8
+        version: 10
         
-    - name: Install Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
       with:
-        node-version: 20
+        node-version: 24
         cache: 'pnpm'
     
-    - name: Install pnpm packages
+    - name: Install dependencies
       run: pnpm install
     
-    - name: Build project
+    - name: Build PWA
       run: pnpm run build:pwa
 
-    - name: Upload production-ready build files
+    - name: Upload PWA artifact
       uses: actions/upload-artifact@v4
       with:
         name: pwa
@@ -42,25 +47,26 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
                   
-    - uses: pnpm/action-setup@v2
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
       with:
-        version: 8
+        version: 10
     
-    - name: Install Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
       with:
-        node-version: 20
+        node-version: 24
         cache: 'pnpm'
 
-    - name: Install pnpm packages
+    - name: Install dependencies
       run: pnpm install
     
-    - name: Build project
+    - name: Build
       run: pnpm run build
 
-    - name: Upload production-ready build files
+    - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
         name: normal
@@ -70,10 +76,12 @@ jobs:
     name: Release
     needs: [build, build_pwa]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Download PWA artifact
       uses: actions/download-artifact@v4
@@ -81,7 +89,7 @@ jobs:
         name: pwa
         path: ./dist_pwa
 
-    - name: Zip PWA files
+    - name: Create PWA archive
       run: cd dist_pwa && zip -r ../movie-web.pwa.zip .
 
     - name: Download normal artifact
@@ -90,46 +98,26 @@ jobs:
         name: normal
         path: ./dist_normal
 
-    - name: Zip normal files
+    - name: Create normal archive
       run: cd dist_normal && zip -r ../movie-web.zip .
 
-    - name: Get version
+    - name: Get version from package.json
       id: package-version
       uses: martinbeentjes/npm-get-version-action@main
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
+    - name: Create GitHub Release
       env:
-        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-      with:
-        tag_name: ${{ steps.package-version.outputs.current-version }}
-        release_name: Movie web v${{ steps.package-version.outputs.current-version }}
-        draft: false
-        prerelease: false
-
-    - name: Upload release (PWA)
-      uses: actions/upload-release-asset@v1
-      env:
-        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./movie-web.pwa.zip
-        asset_name: movie-web.pwa.zip
-        asset_content_type: application/zip
-
-    - name: Upload Release (Normal)
-      uses: actions/upload-release-asset@v1
-      env:
-        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./movie-web.zip
-        asset_name: movie-web.zip
-        asset_content_type: application/zip
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ steps.package-version.outputs.current-version }}
+      run: |
+        gh release create "v${VERSION}" \
+          --title "Movie web v${VERSION}" \
+          --generate-notes \
+          movie-web.pwa.zip \
+          movie-web.zip
 
   registry:
-    name: Push to registry
+    name: Push to GitHub Container Registry
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -142,21 +130,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup Docker buildx
+      - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Get version
+      - name: Get version from package.json
         id: package-version
         uses: martinbeentjes/npm-get-version-action@main
 
-      - name: Log into registry ${{ env.REGISTRY }}
+      - name: Log into GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.PAT_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract Docker metadata
         id: meta
@@ -170,7 +158,7 @@ jobs:
 
       - name: Build and push Docker image
         id: build-and-push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           platforms: linux/amd64,linux/arm64
