@@ -1,4 +1,4 @@
-import { MetaOutput, NotFoundError, ScrapeMedia } from "@movie-web/providers";
+import { MetaOutput, NotFoundError, ScrapeMedia } from "@p-stream/providers";
 import { jwtDecode } from "jwt-decode";
 
 import { mwFetch } from "@/backend/helpers/fetch";
@@ -73,9 +73,19 @@ export function makeProviderUrl(base: string) {
       addQueryDataToUrl(url, { id: sourceId });
       return url.toString();
     },
-    scrapeAll(media: ScrapeMedia) {
+    scrapeAll(
+      media: ScrapeMedia,
+      sourceOrder?: string[],
+      embedOrder?: string[],
+    ) {
       const url = makeUrl("/scrape");
       addQueryDataToUrl(url, scrapeMediaToQueryMedia(media));
+      if (sourceOrder && sourceOrder.length > 0) {
+        url.searchParams.set("sourceOrder", sourceOrder.join(","));
+      }
+      if (embedOrder && embedOrder.length > 0) {
+        url.searchParams.set("embedOrder", embedOrder.join(","));
+      }
       return url.toString();
     },
     scrapeEmbed(embedId: string, embedUrl: string) {

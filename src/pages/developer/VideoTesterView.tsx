@@ -13,12 +13,13 @@ import { SourceSliceSource, StreamType } from "@/stores/player/utils/qualities";
 const testMeta: PlayerMeta = {
   releaseYear: 2010,
   title: "Sintel",
-  tmdbId: "",
+  tmdbId: "45745",
   type: "movie",
+  poster: "https://image.tmdb.org/t/p/w342//4BMG9hk9NvSBeQvC82sVmVRK140.jpg",
 };
 
 const testStreams: Record<StreamType, string> = {
-  hls: "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+  hls: "https://alpha-charlott.github.io/video-openh264/Sintel_master.m3u8",
   mp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
 };
 
@@ -58,7 +59,7 @@ export default function VideoTesterView() {
   );
 
   return (
-    <PlayerPart backUrl="/">
+    <PlayerPart backUrl="/dev">
       {status === playerStatus.IDLE ? (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-full max-w-4xl rounded-xl bg-video-scraping-card p-10 m-4">

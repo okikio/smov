@@ -34,6 +34,8 @@ async function syncBookmarks(
             year: item.year ?? NaN,
           },
           tmdbId: item.tmdbId,
+          group: item.group,
+          favoriteEpisodes: item.favoriteEpisodes,
         });
         continue;
       }

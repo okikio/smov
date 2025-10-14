@@ -23,6 +23,7 @@ const defaultLanguageCodes: string[] = [
   "ca-AD",
   "da-DK",
   "de-DE",
+  "de-CH",
   "el-GR",
   "en-US",
   "es-ES",
@@ -84,6 +85,11 @@ const extraLanguages: Record<string, LocaleInfo> = {
     code: "tok",
     name: "Toki pona",
     nativeName: "Toki pona",
+  },
+  futhark: {
+    code: "futhark",
+    name: "Elder Futhark (EN)",
+    nativeName: "ᛖᛚᛞᛖᚱ ᚠᚢᚦᚨᚱᚲ",
   },
 };
 
@@ -186,8 +192,16 @@ export function getCountryCodeForLocale(locale: string): string | null {
  */
 export function getLocaleInfo(locale: string): LocaleInfo | null {
   const realLocale = populateLanguageCode(locale);
+
+  document.body.style.wordSpacing = "normal";
+
   const extraLang = extraLanguages[realLocale];
-  if (extraLang) return extraLang;
+  if (extraLang) {
+    if (extraLang.code === "futhark") {
+      document.body.style.wordSpacing = "5px";
+    }
+    return extraLang;
+  }
 
   const tag = getTag(realLocale, true);
   if (!tag?.language?.Subtag) return null;
@@ -210,4 +224,36 @@ export function getLocaleInfo(locale: string): LocaleInfo | null {
     name: output.name[0] + (extraStringified ? ` ${extraStringified}` : ""),
     nativeName: output.nativeName[0] ?? undefined,
   };
+}
+
+/**
+ * Converts a language code to a TMDB-compatible format (ISO 639-1 with region)
+ * @param language The language code to convert
+ * @returns A TMDB-compatible language code (e.g., "en-US", "el-GR")
+ */
+export function getTmdbLanguageCode(language: string): string {
+  // Handle empty or undefined
+  if (!language) return "en-US";
+
+  // If it already has a region code (e.g., "en-US"), use it directly
+  if (language.includes("-")) return language;
+
+  // Handle special/custom languages by defaulting to English
+  if (language.length > 2 || Object.keys(extraLanguages).includes(language))
+    return "en-US";
+
+  // For standard language codes, find the appropriate region from the existing defaultLanguageCodes array
+  const defaultCode = defaultLanguageCodes.find((code) =>
+    code.startsWith(`${language}-`),
+  );
+
+  if (defaultCode) return defaultCode;
+
+  // If we can't find a good match, create a standard format like "fr-FR" from "fr"
+  if (language.length === 2) {
+    return `${language}-${language.toUpperCase()}`;
+  }
+
+  // Last resort fallback
+  return "en-US";
 }

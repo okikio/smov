@@ -42,3 +42,16 @@ export function CenterContainer(props: ThinContainerProps) {
     </div>
   );
 }
+
+export function BiggerCenterContainer(props: ThinContainerProps) {
+  return (
+    <div
+      className={classNames(
+        "min-h-screen w-full flex justify-center p-8 py-24 items-center",
+        props.classNames,
+      )}
+    >
+      <div className="w-[1100px] max-w-full">{props.children}</div>
+    </div>
+  );
+}

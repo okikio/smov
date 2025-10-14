@@ -1,4 +1,4 @@
-import { Qualities, Stream } from "@movie-web/providers";
+import { Qualities, Stream } from "@p-stream/providers";
 
 import { QualityStore } from "@/stores/quality";
 
@@ -52,8 +52,11 @@ export function getPreferredQuality(
     qualityPreferences.automaticQuality ||
     qualityPreferences.lastChosenQuality === null ||
     qualityPreferences.lastChosenQuality === "unknown"
-  )
+  ) {
+    // For automatic quality, select the best available quality
+    // Sort by our quality preference order and pick the first (best) available
     return sortedQualities.find((v) => availableQualites.includes(v));
+  }
 
   // get preferred quality - not automatic or unknown
   const chosenQualityIndex = sortedQualities.indexOf(

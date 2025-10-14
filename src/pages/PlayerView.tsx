@@ -1,5 +1,5 @@
-import { RunOutput } from "@movie-web/providers";
-import { useCallback, useEffect, useState } from "react";
+import { RunOutput } from "@p-stream/providers";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Navigate,
   useLocation,
@@ -8,19 +8,25 @@ import {
 } from "react-router-dom";
 import { useAsync } from "react-use";
 
+import { DetailedMeta } from "@/backend/metadata/getmeta";
 import { usePlayer } from "@/components/player/hooks/usePlayer";
 import { usePlayerMeta } from "@/components/player/hooks/usePlayerMeta";
 import { convertProviderCaption } from "@/components/player/utils/captions";
 import { convertRunoutputToSource } from "@/components/player/utils/convertRunoutputToSource";
+import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { ScrapingItems, ScrapingSegment } from "@/hooks/useProviderScrape";
 import { useQueryParam } from "@/hooks/useQueryParams";
 import { MetaPart } from "@/pages/parts/player/MetaPart";
 import { PlaybackErrorPart } from "@/pages/parts/player/PlaybackErrorPart";
 import { PlayerPart } from "@/pages/parts/player/PlayerPart";
+import { ResumePart } from "@/pages/parts/player/ResumePart";
 import { ScrapeErrorPart } from "@/pages/parts/player/ScrapeErrorPart";
 import { ScrapingPart } from "@/pages/parts/player/ScrapingPart";
+import { SourceSelectPart } from "@/pages/parts/player/SourceSelectPart";
 import { useLastNonPlayerLink } from "@/stores/history";
 import { PlayerMeta, playerStatus } from "@/stores/player/slices/source";
+import { usePreferencesStore } from "@/stores/preferences";
+import { useProgressStore } from "@/stores/progress";
 import { needsOnboarding } from "@/utils/onboarding";
 import { parseTimestamp } from "@/utils/timestamp";
 
@@ -43,9 +49,16 @@ export function RealPlayerView() {
     setScrapeNotFound,
     shouldStartFromBeginning,
     setShouldStartFromBeginning,
+    setStatus,
   } = usePlayer();
   const { setPlayerMeta, scrapeMedia } = usePlayerMeta();
   const backUrl = useLastNonPlayerLink();
+  const manualSourceSelection = usePreferencesStore(
+    (s) => s.manualSourceSelection,
+  );
+  const router = useOverlayRouter("settings");
+  const openedWatchPartyRef = useRef<boolean>(false);
+  const progressItems = useProgressStore((s) => s.items);
 
   const paramsData = JSON.stringify({
     media: params.media,
@@ -54,7 +67,24 @@ export function RealPlayerView() {
   });
   useEffect(() => {
     reset();
+    // Reset watch party state when media changes
+    openedWatchPartyRef.current = false;
   }, [paramsData, reset]);
+
+  // Auto-open watch party menu if URL contains watchparty parameter
+  useEffect(() => {
+    if (openedWatchPartyRef.current) return;
+
+    if (status === playerStatus.PLAYING) {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("watchparty")) {
+        setTimeout(() => {
+          router.navigate("/watchparty");
+          openedWatchPartyRef.current = true;
+        }, 1000);
+      }
+    }
+  }, [status, router]);
 
   const metaChange = useCallback(
     (meta: PlayerMeta) => {
@@ -66,6 +96,53 @@ export function RealPlayerView() {
     },
     [navigate, params],
   );
+
+  // Check if episode is more than 80% watched
+  const shouldShowResumeScreen = useCallback(
+    (meta: PlayerMeta) => {
+      if (!meta?.tmdbId) return false;
+
+      const item = progressItems[meta.tmdbId];
+      if (!item) return false;
+
+      if (meta.type === "movie") {
+        if (!item.progress) return false;
+        const percentage =
+          (item.progress.watched / item.progress.duration) * 100;
+        return percentage > 80;
+      }
+
+      if (meta.type === "show" && meta.episode?.tmdbId) {
+        const episode = item.episodes?.[meta.episode.tmdbId];
+        if (!episode) return false;
+        const percentage =
+          (episode.progress.watched / episode.progress.duration) * 100;
+        return percentage > 80;
+      }
+
+      return false;
+    },
+    [progressItems],
+  );
+
+  const handleMetaReceived = useCallback(
+    (detailedMeta: DetailedMeta, episodeId?: string) => {
+      const playerMeta = setPlayerMeta(detailedMeta, episodeId);
+      if (playerMeta && shouldShowResumeScreen(playerMeta)) {
+        setStatus(playerStatus.RESUME);
+      }
+    },
+    [shouldShowResumeScreen, setStatus, setPlayerMeta],
+  );
+
+  const handleResume = useCallback(() => {
+    setStatus(playerStatus.SCRAPING);
+  }, [setStatus]);
+
+  const handleRestart = useCallback(() => {
+    setShouldStartFromBeginning(true);
+    setStatus(playerStatus.SCRAPING);
+  }, [setShouldStartFromBeginning, setStatus]);
 
   const playAfterScrape = useCallback(
     (out: RunOutput | null) => {
@@ -93,20 +170,31 @@ export function RealPlayerView() {
   return (
     <PlayerPart backUrl={backUrl} onMetaChange={metaChange}>
       {status === playerStatus.IDLE ? (
-        <MetaPart onGetMeta={setPlayerMeta} />
+        <MetaPart onGetMeta={handleMetaReceived} />
+      ) : null}
+      {status === playerStatus.RESUME ? (
+        <ResumePart
+          onResume={handleResume}
+          onRestart={handleRestart}
+          onMetaChange={metaChange}
+        />
       ) : null}
       {status === playerStatus.SCRAPING && scrapeMedia ? (
-        <ScrapingPart
-          media={scrapeMedia}
-          onResult={(sources, sourceOrder) => {
-            setErrorData({
-              sourceOrder,
-              sources,
-            });
-            setScrapeNotFound();
-          }}
-          onGetStream={playAfterScrape}
-        />
+        manualSourceSelection ? (
+          <SourceSelectPart media={scrapeMedia} />
+        ) : (
+          <ScrapingPart
+            media={scrapeMedia}
+            onResult={(sources, sourceOrder) => {
+              setErrorData({
+                sourceOrder,
+                sources,
+              });
+              setScrapeNotFound();
+            }}
+            onGetStream={playAfterScrape}
+          />
+        )
       ) : null}
       {status === playerStatus.SCRAPE_NOT_FOUND && errorData ? (
         <ScrapeErrorPart data={errorData} />

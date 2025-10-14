@@ -15,11 +15,11 @@ import { useOnlineListener } from "@/hooks/usePing";
 import { AboutPage } from "@/pages/About";
 import { AdminPage } from "@/pages/admin/AdminPage";
 import VideoTesterView from "@/pages/developer/VideoTesterView";
-import { Discover } from "@/pages/Discover";
-import { DmcaPage, shouldHaveDmcaPage } from "@/pages/Dmca";
+import { Discover } from "@/pages/discover/Discover";
 import MaintenancePage from "@/pages/errors/MaintenancePage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
+import { LegalPage, shouldHaveLegalPage } from "@/pages/Legal";
 import { LoginPage } from "@/pages/Login";
 import { OnboardingPage } from "@/pages/onboarding/Onboarding";
 import { OnboardingExtensionPage } from "@/pages/onboarding/OnboardingExtension";
@@ -145,8 +145,11 @@ function App() {
             element={<OnboardingExtensionPage />}
           />
           <Route path="/onboarding/proxy" element={<OnboardingProxyPage />} />
-          {shouldHaveDmcaPage() ? (
-            <Route path="/dmca" element={<DmcaPage />} />
+          {shouldHaveLegalPage() ? (
+            <>
+              <Route path="/legal" element={<LegalPage />} />
+              <Route path="/dmca" element={<LegalPage />} />
+            </>
           ) : null}
           {/* Support page */}
           <Route path="/support" element={<SupportPage />} />

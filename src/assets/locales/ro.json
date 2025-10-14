@@ -1,20 +1,28 @@
 {
   "about": {
-    "description": "sudo-flix este o aplicație web care caută fluxuri pe internet. Echipa urmărește o abordare mai ales minimalistă a consumului de conținut.",
+    "description": "P-Stream este o aplicație web care caută fluxuri pe internet. Echipa urmărește o abordare mai ales minimalistă a consumului de conținut.",
     "faqTitle": "Întrebări obișnuite",
     "q1": {
-      "body": "sudo-flix nu găzduiește niciun conținut. Când faceți clic pe ceva pentru a viziona, pe Internet este căutat media selectată (Pe ecranul de încărcare și în fila „Surse video”, puteți vedea ce sursă utilizați). Media nu este niciodată încărcată de sudo-flix, totul se face prin acest mecanism de căutare.",
+      "body": "P-Stream nu găzduiește niciun conținut. Când faceți clic pe ceva pentru a viziona, pe Internet este căutat media selectată (Pe ecranul de încărcare și în fila „Surse video”, puteți vedea ce sursă utilizați). Media nu este niciodată încărcată de P-Stream, totul se face prin acest mecanism de căutare.",
       "title": "De unde vine conținutul?"
     },
     "q2": {
-      "body": "Nu este posibil să solicitați o emisiune sau un film, sudo-flix nu gestionează niciun conținut. Tot conținutul este vizualizat prin surse de internet.",
+      "body": "Nu este posibil să solicitați o emisiune sau un film, P-Stream nu gestionează niciun conținut. Tot conținutul este vizualizat prin surse de internet.",
       "title": "Unde pot solicita o emisiune sau un film?"
     },
     "q3": {
       "body": "Rezultatele căutării noastre sunt furnizate de The Movie Database (TMDB) și afișați indiferent dacă sursele noastre au de fapt conținutul.",
       "title": "Rezultatele căutării afișează emisiunea sau filmul, de ce nu îl pot reda?"
     },
-    "title": "Despre sudo-flix"
+    "title": "Despre P-Stream",
+    "q4": {
+      "body": "Toate datele sunt sincronizate cu serverul comunitar, oricine e liber să-l folosească.",
+      "title": "Ce se întâmplă cu datele mele?"
+    },
+    "q5": {
+      "body": "P-Stream are un server de Discord care poate fi găsit în antetul acestei pagini!",
+      "title": "Cum pot afla mai multe?"
+    }
   },
   "actions": {
     "copied": "Copiat",
@@ -82,25 +90,30 @@
   "footer": {
     "legal": {
       "disclaimer": "Declinare a răspunderii",
-      "disclaimerText": "sudo-flix nu găzduiește niciun fișier, ci doar trimite la servicii terțe. Problemele juridice ar trebui abordate cu gazdele și furnizorii de fișiere. sudo-flix nu este responsabil pentru niciun fișier media afișat de furnizorii de video."
+      "disclaimerText": "P-Stream nu găzduiește niciun fișier, ci doar trimite la servicii terțe. Problemele juridice ar trebui abordate cu gazdele și furnizorii de fișiere. P-Stream nu este responsabil pentru niciun fișier media afișat de furnizorii de video."
     },
     "links": {
       "discord": "Discord",
-      "dmca": "DMCA",
-      "github": "GitHub"
+      "legal": "Legal / DMCA",
+      "github": "GitHub",
+      "funding": "Ajută-ne",
+      "twitter": "Twitter"
     },
     "tagline": "Urmăriți emisiunile și filmele preferate cu această aplicație de streaming open source."
   },
   "global": {
-    "name": "sudo-flix",
+    "name": "P-Stream",
     "pages": {
       "about": "Despre",
-      "dmca": "DMCA",
+      "legal": "Legal / DMCA",
       "login": "Log in",
       "onboarding": "Configurație",
-      "pagetitle": "{{title}} - sudo-flix",
+      "pagetitle": "{{title}} - P-Stream",
       "register": "Inregistreaza-te",
-      "settings": "Setări"
+      "settings": "Setări",
+      "discover": "Descoperă",
+      "support": "Ajutor",
+      "migration": "Migrare cont"
     }
   },
   "home": {
@@ -124,10 +137,26 @@
           "Ce vrei să explorezi?",
           "Ce e pe lista dvs. de urmărire?",
           "Care e filmul tău preferat?",
-          "Care e serialul tău preferat?"
+          "Care e serialul tău preferat?",
+          "Ce ai vrea să vizionezi azi?",
+          "Cum a fost ziua de azi?",
+          "Vina mea că site-ul nu funcționează niciodată...",
+          "Nu-i așa că P-Stream e cel mai tare?",
+          ">ᴗ<"
         ]
       },
-      "sectionTitle": "Rezultate de căutare"
+      "sectionTitle": "Rezultate de căutare",
+      "empty": {
+        "extra": [
+          "Nu-i nimic aici :(",
+          "E așa de gol...",
+          "Atât de gol...",
+          "Salut noule utilizator :3"
+        ],
+        "default": "Bine ai venit, găsește conținut de vizionat aici!"
+      },
+      "discoverMore": "Descoperă mai multe",
+      "discover": "Descoperă"
     },
     "titles": {
       "day": {
@@ -143,7 +172,19 @@
       "night": {
         "default": "La ce dorești să te uiți în astă seară?",
         "extra": ["Obosit? Aud că The Exorcist is good."]
+      },
+      "420": {
+        "extra": ["Un 20/4 fericit 🥳!"],
+        "default": "Ce ai vrea să vizionezi pe data asta de 20/4?"
+      },
+      "69": {
+        "default": "Gata de ceva picant?"
       }
+    },
+    "mediaCard": {
+      "moreInfo": "Mai multe informații",
+      "copyLink": "Copiază link",
+      "close": "Închide"
     }
   },
   "media": {
@@ -151,7 +192,8 @@
     "types": {
       "movie": "Film",
       "show": "Spectacol"
-    }
+    },
+    "unreleased": "Nelansate"
   },
   "navigation": {
     "banner": {
@@ -160,7 +202,7 @@
     "menu": {
       "about": "Despre noi",
       "logout": "Deconectați-vă",
-      "register": "Sincronizare în sudo-cloud",
+      "register": "Sincronizare în Cloud",
       "settings": "Setări",
       "support": "Ajutor"
     }
@@ -231,7 +273,7 @@
           "title": "Proxy personalizat"
         }
       },
-      "title": "Hai să configurăm sudo-flix"
+      "title": "Hai să configurăm P-Stream"
     }
   },
   "overlays": {
@@ -248,10 +290,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Copiere link către lista de redare HLS",
-        "disclaimer": "Descărcările sunt luate direct de la furnizor. sudo-flix nu are control cum descărcările sunt furnizate.",
+        "disclaimer": "Descărcările sunt luate direct de la furnizor. P-Stream nu are control cum descărcările sunt furnizate.",
         "downloadSubtitle": "Descărcați subtitlul curente",
         "downloadVideo": "Descarcă video",
-        "hlsDisclaimer": "Descărcările sunt preluate direct de la furnizor. sudo-flix nu are control asupra modului în care sunt furnizate descărcările.<br /><br />Vă rugăm să rețineți că descărcați o listă de redare HLS, <bold>nu este recomandat să o descărcați dacă nu sunteți familiari cu formate avasate de streaming</bold>. Încercați surse diferite pentru formate diferte.",
+        "hlsDisclaimer": "Descărcările sunt preluate direct de la furnizor. P-Stream nu are control asupra modului în care sunt furnizate descărcările.<br /><br />Vă rugăm să rețineți că descărcați o listă de redare HLS, <bold>nu este recomandat să o descărcați dacă nu sunteți familiari cu formate avasate de streaming</bold>. Încercați surse diferite pentru formate diferte.",
         "onAndroid": {
           "1": "Pentru a descărca pe android, apăsați butonul de descărcare apoi în pagina nouă,<bold>apăsați și țineți</bold> pe video, apoi selectați <bold>salvează</bold>.",
           "shortTitle": "Descărcare / Android",
@@ -332,7 +374,7 @@
         "text": "Metadatele API nu au putut fi încărcate, vă rugăm să vă verificați conexiunea la internet.",
         "title": "Nu s-a putut incărca API metadata"
       },
-      "dmca": {
+      "legal": {
         "badge": "Șters",
         "text": "Această medie nu mai este valabilă din vina copyright-ului.",
         "title": "Media a fost ștearsă"
@@ -357,7 +399,6 @@
       }
     },
     "nextEpisode": {
-      "cancel": "Anulare",
       "next": "Episodul următor"
     },
     "playbackError": {
@@ -394,16 +435,15 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Vă rog să vă verificați umanitatea completând acest captcha in partea dreapta. Asta este pentru a pastra sudo-flix sigur!",
+      "description": "Vă rog să vă verificați umanitatea completând acest captcha in partea dreapta. Asta este pentru a pastra P-Stream sigur!",
       "error": "Verificarea umanității tale a eșuat. Încercați din nou.",
       "title": "Noi trebuie să verificăm dacă sunteți un om.",
       "verifyingHumanity": "Verificați-vă umanitatea voastră..."
     }
   },
   "screens": {
-    "dmca": {
-      "text": "Bun venit pe pagina de contact DMCA a sudo-flix! Respectăm drepturile de proprietate intelectuală și dorim să abordăm rapid orice problemă privind drepturile de autor. Dacă credeți că lucrarea dumneavoastră protejată prin drepturi de autor a fost utilizată necorespunzător pe platforma noastră, vă rugăm să trimiteți o notificare detaliată DMCA la e-mailul de mai jos. Vă rugăm să includeți o descriere a materialului protejat prin drepturi de autor, detaliile dvs. de contact și o declarație de bună credință. Ne angajăm să rezolvăm aceste probleme cu promptitudine și apreciem cooperarea dumneavoastră pentru a menține sudo-flix un loc care respectă creativitatea și drepturile de autor.",
-      "title": "DMCA"
+    "legal": {
+      "title": "Legal / DMCA"
     },
     "loadingApp": "Se încarcă aplicația",
     "loadingUser": "Se încarcă profilul tău",
@@ -435,7 +475,12 @@
           "text": "Acțiunea asta este ireversibilă. Toate datele tale vor dispărea și nimic nu va putea fi recuperat.",
           "title": "Șterge contul"
         },
-        "title": "Acțiuni"
+        "title": "Acțiuni",
+        "logoutAllDevices": {
+          "title": "Încheie toate sesiunele",
+          "text": "Aceasta te va deconecta de pe toate dispozitivele asociate contului tău.",
+          "button": "Ieși din toate dispozitivele"
+        }
       },
       "devices": {
         "deviceNameLabel": "Numele dispozitivului",
@@ -453,7 +498,7 @@
       "register": {
         "cta": "Începeți",
         "text": "Partajați progresul vizionării între dispozitive și păstrați-le sincronizate.",
-        "title": "Sincronizare în sudo-cloud"
+        "title": "Sincronizare în Cloud"
       },
       "title": "Cont"
     },
@@ -539,5 +584,9 @@
       "title": "Subtitluri"
     },
     "unsaved": "Aveți modificări nesalvate"
+  },
+  "details": {
+    "resume": "Reia",
+    "play": "Redă"
   }
 }

@@ -1,9 +1,9 @@
 {
   "about": {
-    "description": "sudo-flix ir tīmekļa lietojumprogramma, kas internetā meklē straumes. Komandas mērķis ir galvenokārt minimālistiska pieeja satura patērēšanai.",
+    "description": "P-Stream ir tīmekļa lietojumprogramma, kas internetā meklē straumes. Komandas mērķis ir galvenokārt minimālistiska pieeja satura patērēšanai.",
     "faqTitle": "Bieži jautājumi",
     "q1": {
-      "body": "sudo-flix neveic nekādu saturu. Noklikšķinot uz kāda skatāma satura, internetā tiek meklēts atlasītais multivides saturs (ielādes ekrānā un cilnē “video avoti” varat redzēt, kuru avotu izmantojat). Multivide nekad netiek augšupielādēta, izmantojot filmu tīmekli, viss notiek caur šo meklēšanas mehānismu.",
+      "body": "P-Stream neveic nekādu saturu. Noklikšķinot uz kāda skatāma satura, internetā tiek meklēts atlasītais multivides saturs (ielādes ekrānā un cilnē “video avoti” varat redzēt, kuru avotu izmantojat). Multivide nekad netiek augšupielādēta, izmantojot filmu tīmekli, viss notiek caur šo meklēšanas mehānismu.",
       "title": "No kurienes nāk saturs?"
     },
     "q2": {
@@ -79,11 +79,11 @@
   "footer": {
     "legal": {
       "disclaimer": "Atruna",
-      "disclaimerText": "sudo-flix nemitina nekādus failus, tas tikai veido saites uz trešās puses pakalpojumiem. Juridiskie jautājumi ir jārisina ar failu resursdatoriem un nodrošinātājiem. sudo-flix nav atbildīgs par video pakalpojumu sniedzēju parādītajiem multivides failiem."
+      "disclaimerText": "P-Stream nemitina nekādus failus, tas tikai veido saites uz trešās puses pakalpojumiem. Juridiskie jautājumi ir jārisina ar failu resursdatoriem un nodrošinātājiem. P-Stream nav atbildīgs par video pakalpojumu sniedzēju parādītajiem multivides failiem."
     },
     "links": {
       "discord": "Discord",
-      "dmca": "Autortiesību likums",
+      "legal": "Autortiesību likums",
       "github": "GitHub"
     },
     "tagline": "Skatieties savas iecienītākās pārraides un filmas, izmantojot šo atvērtā koda straumēšanas lietotni."
@@ -92,7 +92,7 @@
     "name": "Filmas-web",
     "pages": {
       "about": "Par",
-      "dmca": "Autortiesību likums",
+      "legal": "Autortiesību likums",
       "login": "Ieiet",
       "pagetitle": "{{title}} - filmas-web",
       "register": "Reģistrēties",
@@ -115,8 +115,7 @@
       "loading": "Lādejas...",
       "noResults": "Mēs nevarējām neko atrast!",
       "placeholder": {
-        "default": "Ko tu gribi skatīties?",
-        "extra": []
+        "default": "Ko tu gribi skatīties?"
       },
       "sectionTitle": "Meklējuma rezultāti"
     },
@@ -172,7 +171,7 @@
     },
     "menus": {
       "downloads": {
-        "disclaimer": "Lejupielādes tiek ņemtas tieši no pakalpojumu sniedzēja. sudo-flix nevar kontrolēt, kā tiek nodrošinātas lejupielādes.",
+        "disclaimer": "Lejupielādes tiek ņemtas tieši no pakalpojumu sniedzēja. P-Stream nevar kontrolēt, kā tiek nodrošinātas lejupielādes.",
         "downloadVideo": "Lejupielādēt video",
         "onAndroid": {
           "1": "Lai lejupielādētu operētājsistēmā Android, noklikšķiniet uz lejupielādes pogas, pēc tam jaunajā lapā <bold>pieskarieties videoklipam un turiet to</bold>, pēc tam atlasiet <bold>saglabāt</bold>.",
@@ -249,7 +248,6 @@
       }
     },
     "nextEpisode": {
-      "cancel": "Atcelt",
       "next": "Nakamā epizode"
     },
     "playbackError": {
@@ -287,8 +285,7 @@
     }
   },
   "screens": {
-    "dmca": {
-      "text": "Laipni lūdzam filmu-web Autortiesību kontaktu lapā! Mēs cienām intelektuālā īpašuma tiesības un vēlamies ātri atrisināt visas autortiesību problēmas. Ja uzskatāt, ka jūsu ar autortiesībām aizsargātais darbs ir nepareizi izmantots mūsu platformā, lūdzu, nosūtiet uz tālāk norādīto e-pasta ziņojumu detalizētu Digitālās tūkstošgades autortiesību likuma paziņojumu. Lūdzu, iekļaujiet ar autortiesībām aizsargātā materiāla aprakstu, savu kontaktinformāciju un labas ticības apliecinājumu. Mēs esam apņēmušies ātri atrisināt šīs problēmas un novērtējam jūsu sadarbību, lai saglabātu filmu tīmekli par vietu, kurā tiek ievērotas radošums un autortiesības.",
+    "legal": {
       "title": "Autortiesību likums"
     },
     "loadingApp": "Notiek aplikācijas ielāde",
@@ -321,7 +318,12 @@
           "text": "Šī darbība ir neatgriezeniska. Visi dati tiks dzēsti, un neko nevarēs atgūt.",
           "title": "Dzēst kontu"
         },
-        "title": "Darbības"
+        "title": "Darbības",
+        "logoutAllDevices": {
+          "title": "Beigt visas sesijas",
+          "text": "Šī darbība izrakstīs jūs no visiem ierīcēm, kas saistītas ar jūsu kontu.",
+          "button": "Izrakstīties no visām ierīcēm"
+        }
       },
       "devices": {
         "deviceNameLabel": "Ierīces vārds",

@@ -2,7 +2,7 @@ import {
   EmbedOutput,
   NotFoundError,
   SourcererOutput,
-} from "@movie-web/providers";
+} from "@p-stream/providers";
 import { useAsyncFn } from "react-use";
 
 import { isExtensionActiveCached } from "@/backend/extension/messaging";
@@ -32,6 +32,7 @@ export function useEmbedScraping(
   const setSource = usePlayerStore((s) => s.setSource);
   const setCaption = usePlayerStore((s) => s.setCaption);
   const setSourceId = usePlayerStore((s) => s.setSourceId);
+  const setEmbedId = usePlayerStore((s) => (s as any).setEmbedId);
   const progress = usePlayerStore((s) => s.progress.time);
   const meta = usePlayerStore((s) => s.meta);
   const router = useOverlayRouter(routerId);
@@ -75,6 +76,7 @@ export function useEmbedScraping(
     ]);
     if (isExtensionActiveCached()) await prepareStream(result.stream[0]);
     setSourceId(sourceId);
+    setEmbedId(embedId);
     setCaption(null);
     setSource(
       convertRunoutputToSource({ stream: result.stream[0] }),
@@ -96,12 +98,14 @@ export function useSourceScraping(sourceId: string | null, routerId: string) {
   const setSource = usePlayerStore((s) => s.setSource);
   const setCaption = usePlayerStore((s) => s.setCaption);
   const setSourceId = usePlayerStore((s) => s.setSourceId);
+  const setEmbedId = usePlayerStore((s) => (s as any).setEmbedId);
   const progress = usePlayerStore((s) => s.progress.time);
   const router = useOverlayRouter(routerId);
   const { report } = useReportProviders();
 
   const [request, run] = useAsyncFn(async () => {
     if (!sourceId || !meta) return null;
+    setEmbedId(null);
     const scrapeMedia = metaToScrapeMedia(meta);
     const providerApiUrl = getLoadbalancedProviderApiUrl();
 
@@ -135,6 +139,7 @@ export function useSourceScraping(sourceId: string | null, routerId: string) {
 
     if (result.stream) {
       if (isExtensionActiveCached()) await prepareStream(result.stream[0]);
+      setEmbedId(null);
       setCaption(null);
       setSource(
         convertRunoutputToSource({ stream: result.stream[0] }),
@@ -190,6 +195,7 @@ export function useSourceScraping(sourceId: string | null, routerId: string) {
         ),
       ]);
       setSourceId(sourceId);
+      setEmbedId(result.embeds[0].embedId);
       setCaption(null);
       if (isExtensionActiveCached()) await prepareStream(embedResult.stream[0]);
       setSource(

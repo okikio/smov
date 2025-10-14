@@ -1,20 +1,28 @@
 {
     "about": {
-        "description": "sudo-flix es una aplicación web que busca transmisiones en internet. El equipo tiene como objetivo un enfoque principalmente minimalista para consumir contenido.",
+        "description": "P-Stream es una aplicación web que busca transmisiones en internet. El equipo tiene como objetivo un enfoque principalmente minimalista para consumir contenido.",
         "faqTitle": "Preguntas frecuentes",
         "q1": {
-            "body": "sudo-flix no aloja ningún contenido. Cuando haces clic en algo para ver, se busca en internet el medio seleccionado (En la pantalla de carga y en la pestaña 'fuentes de vídeo' puedes ver qué fuente estás utilizando). El contenido nunca se carga en sudo-flix, todo se realiza a través de este mecanismo de búsqueda.",
+            "body": "P-Stream no aloja ningún contenido. Cuando haces clic en algo para ver, se busca en internet el medio seleccionado (En la pantalla de carga y en la pestaña 'fuentes de vídeo' puedes ver qué fuente estás utilizando). El contenido nunca se carga en P-Stream, todo se realiza a través de este mecanismo de búsqueda.",
             "title": "¿De dónde proviene el contenido?"
         },
         "q2": {
-            "body": "No es posible solicitar una serie o película, sudo-flix no gestiona ningún contenido. Todo el contenido se ve a través de fuentes en internet.",
+            "body": "No es posible solicitar una serie o película, P-Stream no gestiona ningún contenido. Todo el contenido se ve a través de fuentes en internet.",
             "title": "¿Dónde puedo solicitar una serie o película?"
         },
         "q3": {
             "body": "Nuestros resultados de búsqueda están alimentados por The Movie Database (TMDB) y se muestran independientemente de si nuestras fuentes realmente tienen el contenido.",
             "title": "Los resultados de búsqueda muestran la serie o película, ¿Por qué no puedo reproducirla?"
         },
-        "title": "Acerca de sudo-flix"
+        "title": "Acerca de P-Stream",
+        "q5": {
+            "body": "¡P-Stream tiene un servidor de Discord que se puede encontrar en el encabezado de esta página!",
+            "title": "¿Cómo puedo obtener más información?"
+        },
+        "q4": {
+            "body": "Todos los datos se sincronizan en el servidor de la comunidad, cualquiera es libre de usarlo.",
+            "title": "¿Qué pasa con mis datos y cosas?"
+        }
     },
     "actions": {
         "copied": "Copiado",
@@ -82,25 +90,30 @@
     "footer": {
         "legal": {
             "disclaimer": "Descargo de responsabilidad",
-            "disclaimerText": "sudo-flix no aloja ningún archivo, simplemente enlaza a servicios de terceros. Los problemas legales deben ser tratados con los proveedores de archivos y servicios. sudo-flix no se hace responsable de los archivos multimedia mostrados por los proveedores de vídeo."
+            "disclaimerText": "P-Stream no aloja ningún archivo, simplemente enlaza a servicios de terceros. Los problemas legales deben ser tratados con los proveedores de archivos y servicios. P-Stream no se hace responsable de los archivos multimedia mostrados por los proveedores de vídeo."
         },
         "links": {
             "discord": "Discord",
-            "dmca": "DMCA",
-            "github": "GitHub"
+            "legal": "Legal / DMCA",
+            "github": "GitHub",
+            "twitter": "Twitter",
+            "funding": "Apóyanos"
         },
         "tagline": "Ve tus series y películas favoritas con esta aplicación de transmisión de código abierto."
     },
     "global": {
-        "name": "sudo-flix",
+        "name": "P-Stream",
         "pages": {
             "about": "Acerca de",
-            "dmca": "DMCA",
+            "legal": "Legal / DMCA",
             "login": "Iniciar sesión",
             "onboarding": "Configurar",
-            "pagetitle": "{{title}} - sudo-flix",
+            "pagetitle": "{{title}} - P-Stream",
             "register": "Registrarse",
-            "settings": "Configuración"
+            "settings": "Configuración",
+            "discover": "Descubrir",
+            "support": "Soporte",
+            "migration": "Migrar Cuenta"
         }
     },
     "home": {
@@ -124,10 +137,26 @@
                     "¿Qué quieres explorar?",
                     "¿Qué hay en tu lista de reproducción?",
                     "¿Cuál es tu película favorita?",
-                    "¿Cuál es tu serie favorita?"
+                    "¿Cuál es tu serie favorita?",
+                    "¿Qué hay en tu lista de seguimiento hoy?",
+                    "¿Cómo estuvo su día?",
+                    "Mala mia este sitio nunca funciona...",
+                    "¿No es P-Stream lo mejor?",
+                    ">ᴗ<"
                 ]
             },
-            "sectionTitle": "Resultados de búsqueda"
+            "sectionTitle": "Resultados de búsqueda",
+            "empty": {
+                "default": "¡Bienvenido! ¡Encuentra contenido para ver aquí!",
+                "extra": [
+                    "No hay nada aquí :(",
+                    "Tan vacío...",
+                    "Qué vacío.",
+                    "Hola nuevo usuario :3"
+                ]
+            },
+            "discoverMore": "Descubre más",
+            "discover": "Descubre"
         },
         "titles": {
             "day": {
@@ -147,7 +176,24 @@
                 "extra": [
                     "¿Cansado? Escuché que “El Exorcista” es buena."
                 ]
+            },
+            "420": {
+                "default": "¿Qué te gustaría ver este 4/20?",
+                "extra": [
+                    "¡Feliz 4/20 🥳!"
+                ]
+            },
+            "69": {
+                "default": "¿Te apetece algo picante?",
+                "extra": [
+                    "¡Feliz día 69 😘!"
+                ]
             }
+        },
+        "mediaCard": {
+            "moreInfo": "Más información",
+            "copyLink": "Copiar enlace",
+            "close": "Cerrar"
         }
     },
     "media": {
@@ -155,7 +201,10 @@
         "types": {
             "movie": "Película",
             "show": "Serie"
-        }
+        },
+        "unreleased": "No Estrenado",
+        "episodeShort": "E",
+        "seasonShort": "S"
     },
     "navigation": {
         "banner": {
@@ -166,14 +215,17 @@
             "logout": "Cerrar sesión",
             "register": "Sincronizar con la nube",
             "settings": "Configuración",
-            "support": "Soporte"
+            "support": "Soporte",
+            "discover": "Descubrir",
+            "development": "Desarrollo"
         }
     },
     "notFound": {
         "badge": "No encontrado",
         "goHome": "Volver a inicio",
         "message": "Buscamos en todas partes: debajo de los contenedores, en el armario, detrás del proxy, pero al final no pudimos encontrar la página que estás buscando.",
-        "title": "No se puede encontrar esa página"
+        "title": "No se puede encontrar esa página",
+        "reloadButton": "Intentar de nuevo"
     },
     "onboarding": {
         "defaultConfirm": {
@@ -233,9 +285,43 @@
                     "description": "Configura un proxy en tan solo 5 minutos y obtén acceso a buenas fuentes.",
                     "quality": "Buena calidad",
                     "title": "Proxy personalizado"
-                }
+                },
+                "or": "o"
             },
-            "title": "Vamos a configurar sudo-flix"
+            "title": "Vamos a configurar P-Stream",
+            "moreInfo": {
+                "explainer": {
+                    "default": "3. Configuración predeterminada",
+                    "intro": "P-Stream no aloja los videos. Depende de sitios de páginas web de terceros para el contenido, asi que tienes que elegir como te conectas a esos sitios.",
+                    "fedapi": {
+                        "fedapi": "Adicional: FED API (Privado) token",
+                        "fedapiDescription": "¡Trae tu propia cuenta GRATIS de Febbox para tener acceso a FED API (Privada), la mejor fuente con calidad 4K,Dolby Atmos, saltar intros y los tiempos de carga mas rapidos! ¡Opción altamente recomendada!"
+                    },
+                    "defaultDescription": "Usa el proxy incorporado de P-Stream. Es la opción mas facil pero puede ser mas lenta debido a ancho de banda compartida.",
+                    "extension": "1. Extensión",
+                    "options": "Tus Opciones:",
+                    "extensionDescription": "La extensión te brinda acceso a la mayoría de las fuentes. Actúa como un proxy local y puede manejar sitios que necesitan cookies especiales o encabezados para cargar.",
+                    "proxy": "2. Proxy",
+                    "outro": "¡Si tienes más preguntas en cómo esto funciona, siéntete libre de preguntar en el <0>P-Stream Discord</0> servidor!"
+                },
+                "title": "Comprender una configuración",
+                "recommended": {
+                    "title": "¿No estás seguro de qué elegir?",
+                    "subtitle": "Configuraciones recomendadas:",
+                    "desktop": {
+                        "description": "Extensión + FED API (Privada)"
+                    },
+                    "iOS": {
+                        "title": "iOS:",
+                        "description": "Proxy personalizado + FED API (Privada)"
+                    },
+                    "android": {
+                        "title": "Android:",
+                        "description": "Extensión + FED API (Privada)"
+                    }
+                },
+                "button": "Más información"
+            }
         }
     },
     "overlays": {
@@ -252,10 +338,10 @@
         "menus": {
             "downloads": {
                 "copyHlsPlaylist": "Copiar enlace de reproducción HLS",
-                "disclaimer": "Las descargas se realizan directamente desde el proveedor. sudo-flix no tiene control sobre cómo se proporcionan las descargas.",
+                "disclaimer": "Las descargas se realizan directamente desde el proveedor. P-Stream no tiene control sobre cómo se proporcionan las descargas.",
                 "downloadSubtitle": "Descargar subtítulo actual",
                 "downloadVideo": "Descargar vídeo",
-                "hlsDisclaimer": "Las descargas se realizan directamente del proveedor. sudo-flix no tiene control sobre cómo se proporcionan las descargas. <br /><br />Tenga en cuenta que está descargando una lista de reproducción HLS, <bold>dirigida a usuarios familiarizados con la transmisión multimedia avanzada.</bold> Prueba con diferentes fuentes para diferentes formatos.",
+                "hlsDisclaimer": "Las descargas se realizan directamente del proveedor. P-Stream no tiene control sobre cómo se proporcionan las descargas. <br /><br />Tenga en cuenta que está descargando una lista de reproducción HLS, <bold>dirigida a usuarios familiarizados con la transmisión multimedia avanzada.</bold> Prueba con diferentes fuentes para diferentes formatos.",
                 "onAndroid": {
                     "1": "Para descargar en Android, haz clic en el botón de descarga y luego, en la nueva página, <bold>mantén presionado</bold> el vídeo y selecciona <bold>guardar</bold>.",
                     "shortTitle": "Descargar / Android",
@@ -271,7 +357,9 @@
                     "shortTitle": "Descargar / PC",
                     "title": "Descargando en PC"
                 },
-                "title": "Descargar"
+                "title": "Descargar",
+                "button": "Intentar descarga",
+                "hlsDownloader": "O, ve a la <0>hls downloader website</0> y pega el URL de la playlist de abajo."
             },
             "episodes": {
                 "button": "Episodios",
@@ -280,17 +368,22 @@
                 "loadingError": "Error al cargar la temporada",
                 "loadingList": "Cargando...",
                 "loadingTitle": "Cargando...",
-                "unairedEpisodes": "Uno o más episodios de esta temporada se han desactivado porque aún no se han emitido."
+                "unairedEpisodes": "Uno o más episodios de esta temporada se han desactivado porque aún no se han emitido.",
+                "seasons": "Temporadas",
+                "showMore": "Mostrar más",
+                "showLess": "Mostrar menos"
             },
             "playback": {
                 "speedLabel": "Velocidad de reproducción",
-                "title": "Configuración de reproducción"
+                "title": "Configuración de reproducción",
+                "disabled": "Desabilitado en Watch party"
             },
             "quality": {
                 "automaticLabel": "Calidad automática",
                 "hint": "Puedes intentar <0>cambiar de fuente</0> para obtener diferentes opciones de calidad.",
                 "iosNoQuality": "Debido a limitaciones definidas por Apple, la selección de calidad no está disponible en iOS para esta fuente. Puedes intentar <0>cambiar a otra fuente</0> para obtener diferentes opciones de calidad.",
-                "title": "Calidad"
+                "title": "Calidad",
+                "auto": "Automático"
             },
             "settings": {
                 "audioItem": "Audio",
@@ -317,7 +410,8 @@
                     "title": "Sin transmisión"
                 },
                 "title": "Fuentes",
-                "unknownOption": "Desconocida"
+                "unknownOption": "Desconocida",
+                "editOrder": "Editar orden"
             },
             "subtitles": {
                 "customChoice": "Sube o arrastra un archivo",
@@ -330,7 +424,13 @@
                     "fixCapitals": "Arreglar capitalización"
                 },
                 "title": "Subtítulos",
-                "unknownLanguage": "Desconocido"
+                "unknownLanguage": "Desconocido",
+                "onChoice": "En",
+                "SourceChoice": "Subtitulos de fuente",
+                "OpenSubtitlesChoice": "OpenSubtitles",
+                "empty": "No hay subtítulos provistos para esto.",
+                "notFound": "Ni una de las opciones habiles coinciden con tus preferencias",
+                "useNativeSubtitles": "Usar subtitulos de video nativos"
             }
         },
         "metadata": {
@@ -338,7 +438,7 @@
                 "text": "No ha sido posible cargar la metadata de la API, por favor, comprueba tu conexión a internet.",
                 "title": "No ha sido posible cargar los metadatos de la API"
             },
-            "dmca": {
+            "legal": {
                 "badge": "Eliminado",
                 "text": "Este contenido no va a estar disponible debido a un aviso de eliminación o un reclamo de derechos de autor.",
                 "title": "El contenido ha sido eliminado"
@@ -363,7 +463,6 @@
             }
         },
         "nextEpisode": {
-            "cancel": "Cancelar",
             "next": "Siguiente episodio"
         },
         "playbackError": {
@@ -400,16 +499,15 @@
             "shortRemaining": "-{{timeLeft}}"
         },
         "turnstile": {
-            "description": "Por favor, confirma que eres humano completando el Captcha. ¡Esto es para mantener sudo-flix seguro!",
+            "description": "Por favor, confirma que eres humano completando el Captcha. ¡Esto es para mantener P-Stream seguro!",
             "error": "Ha habido un error al verificar tu humanidad. Por favor, prueba de nuevo.",
             "title": "Necesitamos verificar que eres humano.",
             "verifyingHumanity": "Verificando tu hunanidad…"
         }
     },
     "screens": {
-        "dmca": {
-            "text": "¡Bienvenido a la página de contacto DMCA de sudo-flix! Respetamos los derechos de propiedad intelectual y queremos abordar cualquier problema de derechos de autor de manera rápida. Si cree que su trabajo con derechos de autor se ha utilizado incorrectamente en nuestra plataforma, envíe un aviso DMCA detallado al correo electrónico que se muestra a continuación. Incluya una descripción del material con derechos de autor, sus datos de contacto y una declaración de buena fe. Estamos comprometidos a resolver estos asuntos de manera pronta y agradecemos su cooperación para mantener a sudo-flix como un lugar que respeta la creatividad y los derechos de autor.",
-            "title": "DMCA"
+        "legal": {
+            "title": "Legal / DMCA"
         },
         "loadingApp": "Cargando la aplicación",
         "loadingUser": "Cargando tu perfil",
@@ -441,7 +539,12 @@
                     "text": "Esta acción es irreversible. Todos los datos se eliminarán y no se podrán recuperar.",
                     "title": "Eliminar cuenta"
                 },
-                "title": "Acciones"
+                "title": "Acciones",
+                "logoutAllDevices": {
+                    "title": "Finalizar todas las sesiones",
+                    "text": "Esto te desconectará de todos los dispositivos vinculados a tu cuenta.",
+                    "button": "Cerrar sesión en todos los dispositivos"
+                }
             },
             "devices": {
                 "deviceNameLabel": "Nombre del dispositivo",
@@ -545,5 +648,159 @@
             "title": "Subtítulos"
         },
         "unsaved": "Tienes cambios sin guardar"
+    },
+    "details": {
+        "rating": "Clasificación:",
+        "season": "Temporada",
+        "resume": "Reanudar",
+        "runtime": "Tiempo de ejecución:",
+        "releaseDate": "Fecha de lanzamiento:",
+        "votes": "votos",
+        "tmdb": "Ver en TMDB",
+        "imdb": "Ver en IMDb",
+        "episodes": "Episodios",
+        "play": "Reproducir",
+        "seasons": "Temporada/s",
+        "trailer": "Trailer",
+        "endsAt": "Termina en {{time}}",
+        "episode": "Episodio",
+        "language": "Idioma:"
+    },
+    "migration": {
+        "loginRequired": "¡Debes iniciar sesión para migrar tus datos! Vuelve e inicia sesión para continuar.",
+        "start": {
+            "options": {
+                "download": {
+                    "description": "Esto descargará tus datos a tu dispositivo. Podrás subirlos al nuevo servidor o simplemente guardarlos para mayor seguridad.",
+                    "title": "Descargar datos",
+                    "quality": "Mas tecnico",
+                    "action": "Descargar datos"
+                },
+                "or": "o",
+                "direct": {
+                    "description": "Esto migrará tus datos directamente al nuevo servidor. Es la opción más rápida. <br /><br />¡Esta opción te permite mantener tu contraseña!",
+                    "title": "Migración directa",
+                    "quality": "Más fácil y rápida",
+                    "action": "Transferir datos"
+                },
+                "upload": {
+                    "title": "Subir Datos",
+                    "description": "Sube tu archivo de datos previamente exportado para restaurar tus marcadores y progreso en esta cuenta.",
+                    "quality": "Restaurar desde copia de seguridad",
+                    "action": "Subir Datos"
+                }
+            },
+            "explainer": "Si desea migrar o hacer una copia de seguridad de sus datos, puede hacerlo mediante las opciones a continuación. Esto le permitirá conservar sus datos al cambiar de servidor backend.",
+            "title": "Migra tus datos"
+        },
+        "direct": {
+            "button": {
+                "processing": "Procesando...",
+                "migrate": "MIgrar",
+                "home": "Ir al inicio",
+                "login": "Continua a iniciar sesión"
+            },
+            "description": "Introduce la URL del servidor backend para migrar los datos de tu cuenta actual al nuevo backend. ¡Así conservarás tu contraseña!",
+            "backendLabel": "URL del Servidor Backend",
+            "recaptchaLabel": "Clave ReCaptcha (opcional)",
+            "toggleLable": "¿Necesita ReCaptcha?",
+            "status": {
+                "error": "No se pudo migrar tus datos. 😿",
+                "success": "¡Tus datos se han migrado correctamente! 🎉"
+            },
+            "title": "Migración directa"
+        },
+        "download": {
+            "status": {
+                "error": "No se pudo descargar tus datos. 😿",
+                "success": "¡Tus datos se han descargado correctamente! 🎉"
+            },
+            "description": "Esto descargará tus datos a tu dispositivo. Podrás subirlos al nuevo servidor o simplemente guardarlos para mayor seguridad.",
+            "title": "Descargar datos",
+            "items": {
+                "description": "La descarga incluye:",
+                "bookmarks": "Marcadores de contenido",
+                "progress": "Progreso de Visualización"
+            },
+            "button": {
+                "download": "Descargar datos",
+                "home": "Ir al Inicio",
+                "login": "Continua a Iniciar sesión"
+            }
+        },
+        "upload": {
+            "description": "Sube tu archivo de datos previamente exportado para restaurar tus marcadores y progreso en esta cuenta.",
+            "title": "Subir datos",
+            "status": {
+                "processing": "Procesando datos...",
+                "error": "No se pudieron cargar tus datos. 😿",
+                "success": "¡Tus datos se han cargado correctamente! 🎉"
+            },
+            "file": {
+                "description": "Seleccione el archivo que desea subir",
+                "select": "Seleccionar archivo",
+                "change": "Cambiar archivo",
+                "name": "Nombre del archivo"
+            },
+            "dataPreview": "Vista Previa:",
+            "items": {
+                "bookmarks": "Marcadores de contenido",
+                "progress": "Progreso de Visualización"
+            },
+            "exportedOn": "Exportado en",
+            "button": {
+                "import": "Importar data",
+                "processing": "Procesando...",
+                "success": "Importación completa"
+            }
+        },
+        "back": "Ir de vuelta"
+    },
+    "watchParty": {
+        "join": "Unirse",
+        "status": {
+            "inSync": "En sincronización",
+            "outOfSync": "Fuera de sincronización"
+        },
+        "copyCode": "Toca para copiar",
+        "behindHost": "Atrás del anfitrión por {{seconds}} segundos",
+        "alone": "Solo",
+        "withCount": "Con {{count}} otros",
+        "isGuest": "Mirando como invitado en <0>{{backendName}}</0>",
+        "watching": "Mirando",
+        "syncing": "Sincronizando...",
+        "shareCode": "Compartir este codigo con amigos (Toca para copiar link)",
+        "viewers": "Espectadores ({{count}})",
+        "aheadOfHost": "Adelantado del anfitrión por {{seconds}} segundos",
+        "linkCopied": "Copiado!",
+        "invalidRoom": "No se pudo conectar a la sala",
+        "emptyRoom": "Nadie está aún en la sala",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+    },
+    "fedapi": {
+        "setup": {
+            "step": {
+                "warning": "(¡No compartas este token!)",
+                "1": "1. Anda a <0>febbox.com</0> y inicia sesión con Google (¡Usa una cuenta nueva!)",
+                "5": "5. Cierra la pestaña, pero NO cierres sesión!",
+                "4": "4. Copia la galleta/cookie de \"ui\".",
+                "3": "3. Ve a la pestaña de Application → Cookies",
+                "2": "2. Abre DevTools o inspecciona la página"
+            },
+            "title": "Para conseguir tu UI token:",
+            "showVideo": "Muestra el Video Tutorial",
+            "hideVideo": "Oculta el Video Tutorial"
+        },
+        "status": {
+            "invalid_token": "¡No se pudo recuperar un stream 'VIP'. Tu token es inválido!",
+            "api_down": "¡No se pudo alcanzar FED API!",
+            "success": "éxito"
+        }
+    },
+    "downtimeNotice": {
+        "message": "P-Stream esta experimentando problemas con algunos proveedores de nuevo. Si no puedes encontrar o reproducir un programa, por favor cambie de fuente. Espera que este error persista a lo largo de los siguientes momentos.",
+        "badge": "Problemas",
+        "title": "Problemas de proveedor"
     }
 }

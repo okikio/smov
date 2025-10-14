@@ -29,6 +29,7 @@ export function EmbedOption(props: {
   routerId: string;
 }) {
   const { t } = useTranslation();
+  const currentEmbedId = usePlayerStore((s) => s.embedId);
   const unknownEmbedName = t("player.menus.sources.unknownOption");
 
   const embedName = useMemo(() => {
@@ -45,7 +46,12 @@ export function EmbedOption(props: {
   );
 
   return (
-    <SelectableLink loading={loading} error={errored} onClick={run}>
+    <SelectableLink
+      loading={loading}
+      error={errored}
+      onClick={run}
+      selected={props.embedId === currentEmbedId}
+    >
       <span className="flex flex-col">
         <span>{embedName}</span>
       </span>
@@ -144,7 +150,18 @@ export function SourceSelectionView({
 
   return (
     <>
-      <Menu.BackLink onClick={() => router.navigate("/")}>
+      <Menu.BackLink
+        onClick={() => router.navigate("/")}
+        rightSide={
+          <button
+            type="button"
+            onClick={() => window.open("/settings#source-order")}
+            className="-mr-2 -my-1 px-2 p-[0.4em] rounded tabbable hover:bg-video-context-light hover:bg-opacity-10"
+          >
+            {t("player.menus.sources.editOrder")}
+          </button>
+        }
+      >
         {t("player.menus.sources.title")}
       </Menu.BackLink>
       <Menu.Section className="pb-4">

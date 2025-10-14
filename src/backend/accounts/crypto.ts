@@ -26,12 +26,18 @@ async function seedFromMnemonic(mnemonic: string) {
 }
 
 export function verifyValidMnemonic(mnemonic: string) {
-  return validateMnemonic(mnemonic, wordlist);
+  // First try to validate as BIP39 mnemonic
+  if (validateMnemonic(mnemonic, wordlist)) {
+    return true;
+  }
+
+  // If not a valid BIP39 mnemonic, check if it's a valid custom passphrase
+  const validPassphraseRegex =
+    /^[a-zA-Z0-9\s\-_.,!?@#$%^&*()+=:;"'<>[\]{}|\\/`~]+$/;
+  return mnemonic.length >= 8 && validPassphraseRegex.test(mnemonic);
 }
 
-export async function keysFromMnemonic(mnemonic: string): Promise<Keys> {
-  const seed = await seedFromMnemonic(mnemonic);
-
+export async function keysFromSeed(seed: Uint8Array): Promise<Keys> {
   const { privateKey, publicKey } = forge.pki.ed25519.generateKeyPair({
     seed,
   });
@@ -41,6 +47,12 @@ export async function keysFromMnemonic(mnemonic: string): Promise<Keys> {
     publicKey: new Uint8Array(publicKey),
     seed,
   };
+}
+
+export async function keysFromMnemonic(mnemonic: string): Promise<Keys> {
+  const seed = await seedFromMnemonic(mnemonic);
+
+  return keysFromSeed(seed);
 }
 
 export function genMnemonic(): string {

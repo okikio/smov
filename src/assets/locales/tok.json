@@ -86,7 +86,7 @@
     },
     "links": {
       "discord": "kulupu Siko",
-      "dmca": "DMCA",
+      "legal": "Legal / DMCA",
       "github": "lipu Kita"
     },
     "tagline": "o lukin e sitelen ale pi wile sina kepeken ilo ni"
@@ -95,7 +95,7 @@
     "name": "ilo Muwi-We",
     "pages": {
       "about": "o sona",
-      "dmca": "DMCA",
+      "legal": "Legal / DMCA",
       "login": "o open",
       "onboarding": "o pali",
       "pagetitle": "{{title}} - ilo Muwi-We",
@@ -158,7 +158,7 @@
     "menu": {
       "about": "mi",
       "logout": "o weka sona e sina",
-      "register": "Sync to sudo-cloud",
+      "register": "Sync to Cloud",
       "settings": "o ante",
       "support": "o supa"
     }
@@ -270,7 +270,7 @@
       }
     },
     "metadata": {
-      "dmca": {
+      "legal": {
         "badge": "weka",
         "text": "wile weka li kama tan mama sitelen la sitelen ni li ken ala",
         "title": "sitelen li weka"
@@ -292,7 +292,6 @@
       }
     },
     "nextEpisode": {
-      "cancel": "o ala",
       "next": "o sitelen sin"
     },
     "playbackError": {
@@ -336,8 +335,8 @@
     }
   },
   "screens": {
-    "dmca": {
-      "title": "DMCA"
+    "legal": {
+      "title": "Legal / DMCA"
     },
     "loadingApp": "mi alasa e ilo",
     "loadingUser": "mi alasa e lipu sina",
@@ -369,7 +368,12 @@
           "text": "tenpo kama la sina ken ala ante e weka ni. ale li kama weka",
           "title": "o weka e ale"
         },
-        "title": "pali"
+        "title": "pali",
+        "logoutAllDevices": {
+          "title": "kama ala e sona ale",
+          "text": "tenpo ni la sina ken ala kama lon e sona ale ale.",
+          "button": "kama ala e sona ale"
+        }
       },
       "devices": {
         "deviceNameLabel": "nimi ilo",

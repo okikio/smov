@@ -25,10 +25,12 @@ import App from "@/setup/App";
 import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
 import { BookmarkSyncer } from "@/stores/bookmarks/BookmarkSyncer";
+import { GroupSyncer } from "@/stores/groupOrder/GroupSyncer";
 import { changeAppLanguage, useLanguageStore } from "@/stores/language";
 import { ProgressSyncer } from "@/stores/progress/ProgressSyncer";
 import { SettingsSyncer } from "@/stores/subtitles/SettingsSyncer";
 import { ThemeProvider } from "@/stores/theme";
+import { detectRegion, useRegionStore } from "@/utils/detectRegion";
 
 import {
   extensionInfo,
@@ -136,6 +138,9 @@ function MigrationRunner() {
   const status = useAsync(async () => {
     changeAppLanguage(useLanguageStore.getState().language);
     await initializeOldStores();
+
+    const region = await detectRegion();
+    useRegionStore.getState().setRegion(region);
   }, []);
   const { t } = useTranslation();
 
@@ -181,6 +186,7 @@ root.render(
           <ThemeProvider applyGlobal>
             <ProgressSyncer />
             <BookmarkSyncer />
+            <GroupSyncer />
             <SettingsSyncer />
             <TheRouter>
               <MigrationRunner />

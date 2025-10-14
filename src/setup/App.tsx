@@ -11,17 +11,26 @@ import {
 
 import { convertLegacyUrl, isLegacyUrl } from "@/backend/metadata/getmeta";
 import { generateQuickSearchMediaUrl } from "@/backend/metadata/tmdb";
+import { NotificationModal } from "@/components/overlays/notificationsModal";
+import { useGlobalKeyboardEvents } from "@/hooks/useGlobalKeyboardEvents";
 import { useOnlineListener } from "@/hooks/usePing";
 import { AboutPage } from "@/pages/About";
 import { AdminPage } from "@/pages/admin/AdminPage";
+import { AllBookmarks } from "@/pages/bookmarks/AllBookmarks";
 import VideoTesterView from "@/pages/developer/VideoTesterView";
-import { Discover } from "@/pages/Discover";
-import { DmcaPage, shouldHaveDmcaPage } from "@/pages/Dmca";
+import { DiscoverMore } from "@/pages/discover/AllMovieLists";
+import { Discover } from "@/pages/discover/Discover";
+import { MoreContent } from "@/pages/discover/MoreContent";
 import MaintenancePage from "@/pages/errors/MaintenancePage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
 import { JipPage } from "@/pages/Jip";
+import { LegalPage, shouldHaveLegalPage } from "@/pages/Legal";
 import { LoginPage } from "@/pages/Login";
+import { MigrationPage } from "@/pages/migration/Migration";
+import { MigrationDirectPage } from "@/pages/migration/MigrationDirect";
+import { MigrationDownloadPage } from "@/pages/migration/MigrationDownload";
+import { MigrationUploadPage } from "@/pages/migration/MigrationUpload";
 import { OnboardingPage } from "@/pages/onboarding/Onboarding";
 import { OnboardingExtensionPage } from "@/pages/onboarding/OnboardingExtension";
 import { OnboardingProxyPage } from "@/pages/onboarding/OnboardingProxy";
@@ -87,9 +96,12 @@ function QueryView() {
   return null;
 }
 
+export const maintenanceTime = "March 31th 11:00 PM - 5:00 AM EST";
+
 function App() {
   useHistoryListener();
   useOnlineListener();
+  useGlobalKeyboardEvents();
   const maintenance = false; // Shows maintance page
   const [showDowntime, setShowDowntime] = useState(maintenance);
 
@@ -108,6 +120,7 @@ function App() {
   return (
     <Layout>
       <LanguageProvider />
+      <NotificationModal id="notifications" />
       {!showDowntime && (
         <Routes>
           {/* functional routes */}
@@ -146,14 +159,36 @@ function App() {
             element={<OnboardingExtensionPage />}
           />
           <Route path="/onboarding/proxy" element={<OnboardingProxyPage />} />
-          {shouldHaveDmcaPage() ? (
-            <Route path="/dmca" element={<DmcaPage />} />
+
+          {/* Migration pages - awaiting import and export fixes */}
+          <Route path="/migration" element={<MigrationPage />} />
+          <Route path="/migration/direct" element={<MigrationDirectPage />} />
+          <Route
+            path="/migration/download"
+            element={<MigrationDownloadPage />}
+          />
+          <Route path="/migration/upload" element={<MigrationUploadPage />} />
+
+          {shouldHaveLegalPage() ? (
+            <Route path="/legal" element={<LegalPage />} />
           ) : null}
           {/* Support page */}
           <Route path="/support" element={<SupportPage />} />
           <Route path="/jip" element={<JipPage />} />
-          {/* Discover page */}
+          {/* Discover pages */}
           <Route path="/discover" element={<Discover />} />
+          <Route
+            path="/discover/more/:contentType/:mediaType"
+            element={<MoreContent />}
+          />
+          <Route
+            path="/discover/more/:contentType/:id/:mediaType"
+            element={<MoreContent />}
+          />
+          <Route path="/discover/more/:category" element={<MoreContent />} />
+          <Route path="/discover/all" element={<DiscoverMore />} />
+          {/* Bookmarks page */}
+          <Route path="/bookmarks" element={<AllBookmarks />} />
           {/* Settings page */}
           <Route
             path="/settings"

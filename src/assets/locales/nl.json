@@ -1,20 +1,28 @@
 {
   "about": {
-    "description": "sudo-flix is een webapplicatie die het internet afzoekt naar streams. Het team streeft naar een minimalistische benadering van het consumeren van inhoud.",
+    "description": "P-Stream is een webapplicatie die het internet afzoekt naar streams. Het team streeft naar een minimalistische benadering van het consumeren van inhoud.",
     "faqTitle": "Veelgestelde vragen",
     "q1": {
-      "body": "sudo-flix host geen inhoud. Wanneer je op iets klikt om te bekijken, wordt het internet afgezocht naar de geselecteerde media (op het laadscherm en in het tabblad 'videobronnen' kun je zien welke bron je gebruikt). Media wordt nooit geüpload door sudo-flix, alles gaat via dit zoekmechanisme.",
+      "body": "P-Stream host geen inhoud. Wanneer je op iets klikt om te bekijken, wordt het internet afgezocht naar de geselecteerde media (op het laadscherm en in het tabblad 'videobronnen' kun je zien welke bron je gebruikt). Media wordt nooit geüpload door P-Stream, alles gaat via dit zoekmechanisme.",
       "title": "Waar komt de content vandaan?"
     },
     "q2": {
-      "body": "Het is niet mogelijk om een show of film aan te vragen, sudo-flix beheert geen content. Alle inhoud wordt bekeken via bronnen op het internet.",
+      "body": "Het is niet mogelijk om een show of film aan te vragen, P-Stream beheert geen content. Alle inhoud wordt bekeken via bronnen op het internet.",
       "title": "Waar kan ik een show of film aanvragen?"
     },
     "q3": {
       "body": "Onze zoekresultaten worden aangestuurd door The Movie Database (TMDB) en worden weergegeven ongeacht of onze bronnen de inhoud daadwerkelijk hebben.",
       "title": "De zoekresultaten tonen de show of film, waarom kan ik hem niet afspelen?"
     },
-    "title": "Over sudo-flix"
+    "title": "Over P-Stream",
+    "q4": {
+      "body": "Alle data worden gesynchroniseerd met de community backend. Iedereen kan deze ook vrij gebruiken.",
+      "title": "Hoe zit het met mijn gegevens en dergelijke?"
+    },
+    "q5": {
+      "body": "P-Stream heeft een Discord server die je bovenaan in deze pagina kunt vinden!",
+      "title": "Hoe kan ik meer te weten komen?"
+    }
   },
   "actions": {
     "copied": "Gekopieerd",
@@ -25,7 +33,7 @@
     "deviceNameLabel": "Naam toestel",
     "deviceNamePlaceholder": "Mijn telefoon",
     "generate": {
-      "description": "Je passphrase werkt als je gebruikersnaam en wachtwoord. Sla je passphrase dus goed op, je hebt hem namelijk nodig om in te loggen",
+      "description": "Je passphrase werkt als je gebruikersnaam en wachtwoord. Sla je passphrase dus goed op, je hebt hem namelijk nodig om in te loggen. <bold>Verlies hem dus NIET!</bold>",
       "next": "Ik heb mijn passphrase opgeslagen",
       "passphraseFrameLabel": "Wachtwoord",
       "title": "Uw wachtwoord"
@@ -82,25 +90,30 @@
   "footer": {
     "legal": {
       "disclaimer": "Disclaimer",
-      "disclaimerText": "sudo-flix host geen bestanden, maar linkt alleen naar diensten van derden. Juridische kwesties moeten worden opgenomen met de bestandshosts en providers. sudo-flix is niet verantwoordelijk voor mediabestanden die worden getoond door de videoproviders."
+      "disclaimerText": "P-Stream host geen bestanden, maar linkt alleen naar diensten van derden. Juridische kwesties moeten worden opgenomen met de bestandshosts en providers. P-Stream is niet verantwoordelijk voor mediabestanden die worden getoond door de videoproviders."
     },
     "links": {
       "discord": "Discord",
-      "dmca": "DMCA",
-      "github": "Github"
+      "legal": "Legal / DMCA",
+      "github": "Github",
+      "twitter": "Twitter / X"
     },
     "tagline": "Bekijk je favoriete shows en films met deze open source streaming app."
   },
   "global": {
-    "name": "sudo-flix",
+    "name": "P-Stream",
     "pages": {
       "about": "Over",
-      "dmca": "DMCA",
+      "legal": "Legal / DMCA",
       "login": "Login",
       "onboarding": "Instellen",
-      "pagetitle": "{{title}} - sudo-flix",
+      "pagetitle": "{{title}} - P-Stream",
       "register": "Registreren",
-      "settings": "Instellingen"
+      "settings": "Instellingen",
+      "discover": "Ondek",
+      "support": "Steun",
+      "migration": "Account migreren",
+      "jip": "Jipy"
     }
   },
   "home": {
@@ -124,25 +137,47 @@
           "Wat wil je verkennen?",
           "Wat staat er op jouw kijklijst?",
           "Wat is jouw favoriete film?",
-          "Wat is jouw favoriete serie?"
+          "Wat is jouw favoriete serie?",
+          "Wat staat er vandaag op jouw kijklijst?",
+          "Hoe was je dag?",
+          "Mijn fout, de site werkt nooit...",
+          "Is P-Stream niet gewoon de beste?",
+          ">ᴗ<"
         ]
       },
-      "sectionTitle": "Zoekresultaten"
+      "sectionTitle": "Zoekresultaten",
+      "empty": {
+        "default": "Welkom, hier vindt je de media om te bekijken!",
+        "extra": [
+          "Hier is niks :(",
+          "Zo leeg...",
+          "Wat een leegte.",
+          "Hallo nieuwe gebruiker :3"
+        ]
+      },
+      "discoverMore": "Ondek meer",
+      "discover": "Ondek"
     },
     "titles": {
       "day": {
         "default": "Wat wil je vanmiddag kijken?",
-        "extra": [
-          "Voel je je avontuurlijk? Dan is Jurassic Park misschien wel de perfecte keuze."
-        ]
+        "extra": ["Lang leven P-Stream!"]
       },
       "morning": {
         "default": "Waar wil je deze ochtend naar kijken?",
-        "extra": ["Ik hoor dat Before Sunrise goed is"]
+        "extra": ["Lang leven P-Stream!"]
       },
       "night": {
         "default": "Wat wil je vanavond bekijken?",
         "extra": ["Moe? Ik hoor dat The Exorcist goed is."]
+      },
+      "420": {
+        "default": "Wat wil je deze 4/20 bekijken?",
+        "extra": ["Happy 4/20 🥳"]
+      },
+      "69": {
+        "default": "Zin in iets pittigs?",
+        "extra": ["Gelukkige 69e dag 😘!"]
       }
     }
   },
@@ -161,27 +196,29 @@
     "menu": {
       "about": "Over ons",
       "logout": "Log uit",
-      "register": "Synchroniseren met de sudo-cloud",
+      "register": "Synchroniseren met de Cloud",
       "settings": "Instellingen",
-      "support": "Ondersteuning"
+      "support": "Ondersteuning",
+      "discover": "Ontdek"
     }
   },
   "notFound": {
     "badge": "Pagina niet gevonden",
     "goHome": "Naar de home-pagina",
     "message": "We hebben echt alles geprobeerd, zelfs tijdrijzen; echter hebben we deze pagina helaas niet kunnen vinden.",
-    "title": "Pagina niet gevonden"
+    "title": "Pagina niet gevonden",
+    "reloadButton": "Probeer opnieuw"
   },
   "onboarding": {
     "defaultConfirm": {
       "cancel": "Annuleren",
       "confirm": "Gebruik standaardinstallatie",
-      "description": "De standaardinstallatie heeft niet de beste streams en kan onbruikbaar traag zijn.",
+      "description": "De standaardinstallatie heeft niet de beste streams. Je mist de beste bronnen!",
       "title": "Weet je het zeker?"
     },
     "extension": {
       "back": "Terug",
-      "explainer": "Door gebruik te maken van de browserextensie kun je de beste streams krijgen. Met slechts een eenvoudige installatie.",
+      "explainer": "Door gebruik te maken van de browserextensie kun je de beste streams krijgen. Met slechts een eenvoudige installatie. 👌",
       "explainerIos": "Helaas, de browserextensie is niet ondersteund op iOS. Druk op <bold>Terug</bold> om een andere optie te kiezen.",
       "extensionHelp": "Als je de extensie hebt geïnstalleerd maar niet wordt gedetecteerd, <bold>open dan de extensie via het extensies menu in je browser</bold> en volg de stappen op het scherm.",
       "linkChrome": "Installeer de Chrome-extensie",
@@ -217,7 +254,7 @@
       "explainer": "Om de beste streams mogelijk te krijgen, moet je kiezen welke streammethode je wilt gebruiken.",
       "options": {
         "default": {
-          "text": "Ik wil geen streams van goede kwaliteit, <0 /> <1>Gebruik de standaardinstellingen.</1>"
+          "text": "Ik wil geen streams van goede kwaliteit, gebruik de standaardinstellingen."
         },
         "extension": {
           "action": "Installeer extensie",
@@ -230,9 +267,10 @@
           "description": "Proxy instellen in slechts 5 minuten en krijg toegang tot geweldige bronnen.",
           "quality": "Goede kwaliteit",
           "title": "Eigen proxy"
-        }
+        },
+        "or": "of"
       },
-      "title": "Laten we beginnen met het instellen van sudo-flix"
+      "title": "Laten we beginnen met het instellen van P-Stream"
     }
   },
   "overlays": {
@@ -244,15 +282,15 @@
       "short": "Terug"
     },
     "casting": {
-      "enabled": "Aan het casten..."
+      "enabled": "Aan het casten... 🎬"
     },
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "HLS-afspeellijstlink kopiëren",
-        "disclaimer": "Downloads worden direct bij de bron opgehaald. sudo-flix heeft geen controle over het bestand dat je ontvangt.",
+        "disclaimer": "Downloads worden direct bij de bron opgehaald. P-Stream heeft geen controle over het bestand dat je ontvangt.",
         "downloadSubtitle": "Download huidige ondertiteling",
         "downloadVideo": "Download filmpje",
-        "hlsDisclaimer": "Downloads worden rechtstreeks van de aanbieder gehaald. sudo-flix heeft geen controle over de manier waarop de downloads worden aangeboden.<br /><br />Houd er rekening mee dat u nu een HLS-afspeellijst downloadt, het wordt <bold>afgeraden deze te downloaden als u niet bekend bent met geavanceerde streamingbestandstypen</bold>. Probeer verschillende bronnen voor verschillende streamingbestandstypen.",
+        "hlsDisclaimer": "Downloads worden rechtstreeks van de aanbieder gehaald. P-Stream heeft geen controle over de manier waarop de downloads worden aangeboden.<br /><br />Houd er rekening mee dat u nu een HLS-afspeellijst downloadt, het wordt <bold>afgeraden deze te downloaden als u niet bekend bent met geavanceerde streamingbestandstypen</bold>. Probeer verschillende bronnen voor verschillende streamingbestandstypen.",
         "onAndroid": {
           "1": "Om te downloaden op Android, klik je op de downloadknop en vervolgens, op de nieuwe pagina, <bold>tap and hold</bold> op de video en selecteer <bold>save</bold>.",
           "shortTitle": "Download / Android",
@@ -277,7 +315,8 @@
         "loadingError": "Er ging iets mis bij het laden van dit seizoen",
         "loadingList": "Aan het laden...",
         "loadingTitle": "Aan het zoeken...",
-        "unairedEpisodes": "Een of meer afleveringen van dit seizoen zijn uitgeschakeld omdat ze nog niet zijn uitgezonden."
+        "unairedEpisodes": "Een of meer afleveringen van dit seizoen zijn uitgeschakeld omdat ze nog niet zijn uitgezonden.",
+        "seasons": "Seizoenen"
       },
       "playback": {
         "speedLabel": "Afspeelsnelheid",
@@ -314,7 +353,8 @@
           "title": "Geen bron"
         },
         "title": "Bronnen",
-        "unknownOption": "Onbekend"
+        "unknownOption": "Onbekend",
+        "editOrder": "Bewerk volgorde"
       },
       "subtitles": {
         "customChoice": "Sleep of upload bestand",
@@ -327,7 +367,13 @@
           "fixCapitals": "Hoofdlettergebruik corrigeren"
         },
         "title": "Ondertiteling",
-        "unknownLanguage": "Onbekend"
+        "unknownLanguage": "Onbekend",
+        "onChoice": "Aan",
+        "OpenSubtitlesChoice": "OpenOndertitels",
+        "SourceChoice": "Bronondertitels",
+        "scrapeButton": "Onder titels ophalen",
+        "empty": "Er zijn geen ondertitels beschikbaar voor dit.",
+        "notFound": "Geen van de beschikbare opties komt overeen met je zoekopdracht"
       }
     },
     "metadata": {
@@ -335,7 +381,7 @@
         "text": "Kan API-metagegevens niet laden. Controleer uw internetverbinding.",
         "title": "Kan API-metagegevens niet laden"
       },
-      "dmca": {
+      "legal": {
         "badge": "Weggehaald",
         "text": "Deze media is niet langer beschikbaar vanwege een verwijderingsverzoek of auteursrechtenclaim.",
         "title": "Media is weggehaald"
@@ -360,8 +406,9 @@
       }
     },
     "nextEpisode": {
-      "cancel": "Annuleren",
-      "next": "Volgende aflevering"
+      "next": "Volgende aflevering",
+      "replay": "Opnieuw afspelen",
+      "nextSeason": "Volgend seizoen"
     },
     "playbackError": {
       "badge": "Afspeelfout",
@@ -381,7 +428,7 @@
         "badge": "Extensie uitgeschakeld",
         "enableExtension": "Extensie inschakelen",
         "homeButton": "Naar hoofdpagina",
-        "text": "Je hebt de sudo-flix extensie geïnstalleerd. Om deze te gebruiken, moet je de extensie inschakelen voor deze site.",
+        "text": "Je hebt de P-Stream extensie geïnstalleerd. Om deze te gebruiken, moet je de extensie inschakelen voor deze site.",
         "title": "Activeer alstublieft de extensie"
       },
       "items": {
@@ -394,7 +441,8 @@
         "detailsButton": "Meer informatie",
         "homeButton": "Naar de home-pagina",
         "text": "We hebben al onze providers lief aangekeken maar we hebben niets kunnen vinden. Wij beheersen de media niet, en bepalen dus niet wat er beschikbaar is. Klik op \"meer informatie over foutmelding\" voor meer informatie.",
-        "title": "Dat konden we niet vinden"
+        "title": "Dat konden we niet vinden",
+        "discoverButton": "Ontdek meer"
       }
     },
     "time": {
@@ -404,16 +452,15 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Bevestig dat u een mens bent door de Captcha aan de rechterkant in te vullen. Dit is om sudo-flix veilig te houden!",
+      "description": "Bevestig dat u een mens bent door de Captcha aan de rechterkant in te vullen. Dit is om P-Stream veilig te houden!",
       "error": "Kan uw menselijkheid niet verifiëren. Probeer het opnieuw.",
       "title": "We moeten verifiëren dat u een mens bent.",
       "verifyingHumanity": "Je menselijkheid verifiëren..."
     }
   },
   "screens": {
-    "dmca": {
-      "text": "Welkom op de DMCA-contactpagina van sudo-flix! Wij respecteren intellectuele eigendomsrechten en willen eventuele problemen met auteursrechten snel aanpakken. Als u van mening bent dat uw auteursrechtelijk beschermde werk onjuist is gebruikt op ons platform, stuur dan een gedetailleerde DMCA-kennisgeving naar het onderstaande e-mailadres. Vermeld een beschrijving van het auteursrechtelijk beschermde materiaal, uw contactgegevens en een verklaring dat u te goeder trouw bent. Wij zetten ons in om deze zaken snel op te lossen en waarderen uw medewerking om sudo-flix een plek te houden waar creativiteit en auteursrechten worden gerespecteerd.",
-      "title": "DMCA"
+    "legal": {
+      "title": "Legal / DMCA"
     },
     "loadingApp": "Toepassing laden",
     "loadingUser": "Je profiel laden",
@@ -421,7 +468,8 @@
       "logout": "Uitloggen",
       "reset": "Aangepaste server resetten",
       "text": "Het laden van uw profiel is mislukt",
-      "textWithReset": "Is het laden van je profiel van je aangepaste server mislukt en wil je terug naar de standaardserver?"
+      "textWithReset": "Is het laden van je profiel van je aangepaste server mislukt en wil je terug naar de standaardserver?",
+      "reload": "Opnieuw laden"
     },
     "migration": {
       "failed": "Het migreren van uw gegevens is mislukt.",
@@ -445,7 +493,17 @@
           "text": "Deze actie is onomkeerbaar. Alle gegevens worden verwijderd en er kan niets worden hersteld.",
           "title": "Account verwijderen"
         },
-        "title": "Acties"
+        "title": "Acties",
+        "logoutAllDevices": {
+          "title": "Eindig alle sessies",
+          "text": "Dit zal je afmelden van alle apparaten die gekoppeld zijn aan je account.",
+          "button": "Log uit van alle apparaten"
+        },
+        "migration": {
+          "text": "Zet je account over naar een nieuwe server of download je gegevens.",
+          "title": "Accountmigratie",
+          "button": "Account overzetten"
+        }
       },
       "devices": {
         "deviceNameLabel": "Apparaatnaam",
@@ -463,9 +521,14 @@
       "register": {
         "cta": "Aan de slag",
         "text": "Deel uw kijkvoortgang tussen apparaten en houd ze gesynchroniseerd.",
-        "title": "Synchroniseren met de sudo-cloud"
+        "title": "Synchroniseren met de Cloud"
       },
-      "title": "Account"
+      "title": "Account",
+      "admin": {
+        "title": "Beheerderspaneel",
+        "text": "Gebruik de tools om de status van P‑Stream te testen.",
+        "button": "Bekijk het"
+      }
     },
     "appearance": {
       "activeTheme": "Actief",
@@ -474,15 +537,31 @@
         "default": "Standaard",
         "gray": "Grijs",
         "red": "Rood",
-        "teal": "Groenblauw"
+        "teal": "Groenblauw",
+        "classic": "Klassiek",
+        "green": "Groen",
+        "mocha": "Mokka",
+        "pink": "Roze"
       },
-      "title": "Uiterlijk"
+      "title": "Uiterlijk",
+      "options": {
+        "discoverDescription": "Toon de Ontdek sectie op de startpagina onder je gebookmarkte media. Standaard ingeschakeld.",
+        "discover": "Ontdek sectie",
+        "discoverLabel": "Ontdek sectie",
+        "modal": "Details pop-up",
+        "modalDescription": "Toon de details pop-up wanneer je op een media kaart klikt in plaats van naar de kijkpagina te gaan. Proxy of extensie vereist voor trailer. Standaard uitgeschakeld.",
+        "modalLabel": "Details pop-up"
+      }
     },
     "connections": {
       "server": {
         "description": "Als je verbinding wilt maken met een eigen backend om je gegevens op te slaan, schakel dan deze optie in en geef de URL op. <0>Instructies.</0>",
         "label": "Eigen server",
-        "urlLabel": "Eigen server URL"
+        "urlLabel": "Eigen server URL",
+        "migration": {
+          "link": "Migreer mijn gegevens",
+          "description": "<0>Migreer mijn gegevens</0> naar een nieuwe server."
+        }
       },
       "setup": {
         "doSetup": "Instellen",
@@ -522,7 +601,16 @@
       "thumbnail": "Genereer miniaturen",
       "thumbnailDescription": "Meestal hebben video's geen miniaturen. Je kunt deze instelling inschakelen om ze dynamisch te genereren, maar dit kan je video vertragen.",
       "thumbnailLabel": "Genereer miniaturen",
-      "title": "Voorkeuren"
+      "title": "Voorkeuren",
+      "autoplay": "Automatisch afspelen",
+      "skipCreditsDescription": "Wanneer ingeschakeld, wordt automatisch de volgende aflevering afgespeeld bij 99% voltooiing om de eindcredits over te slaan. Wanneer uitgeschakeld, wacht je totdat de aflevering volledig af is.",
+      "sourceOrderDescription": "Sleep om de volgorde van de bronnen te herordenen. Dit bepaalt de volgorde waarin de bronnen worden gecontroleerd voor de media die je probeert te bekijken. Als een bron grijs is, betekent dit dat de <bold>extensie</bold> vereist is voor die bron. <br><br> <strong>(De standaardvolgorde is het beste voor de meeste gebruikers)</strong>",
+      "autoplayDescription": "Speel automatisch de volgende aflevering in een serie af nadat het einde is bereikt. Kan ingeschakeld worden door gebruikers met de browserextensie, een eigen proxy, of met de standaardinstellingen als dit toegestaan is door de host.",
+      "autoplayLabel": "Automatisch afspelen",
+      "skipCredits": "Sla eindcredits over",
+      "skipCreditsLabel": "Sla eindcredits over",
+      "sourceOrder": "Volgorde van bronnen",
+      "sourceOrderEnableLabel": "Aangepaste bronvolgorde"
     },
     "reset": "Resetten",
     "save": "Wijzigingen opslaan",
@@ -546,8 +634,157 @@
       "colorLabel": "Kleur",
       "previewQuote": "Ik mag niet bang zijn. Angst doodt de geest.",
       "textSizeLabel": "Tekengrootte",
-      "title": "Ondertiteling"
+      "title": "Ondertiteling",
+      "textBoldLabel": "Vetgedrukte tekst"
     },
     "unsaved": "U heeft niet-opgeslagen wijzigingen"
+  },
+  "migration": {
+    "loginRequired": "U moet ingelogd zijn om uw data te migreren! Ga terug en log in om verder te gaan.",
+    "start": {
+      "title": "Migreer uw gegevens",
+      "explainer": "Als je je gegevens wilt migreren of back-uppen, kun je dat doen met de onderstaande opties. Zo kunt u uw gegevens behouden wanneer u van backendserver wisselt.",
+      "options": {
+        "direct": {
+          "description": "Hiermee worden je gegevens direct naar de nieuwe server gemigreerd. Dit is de snelste optie.  <br /><br />Met deze optie kun je je wachtwoordzin hetzelfde houden!",
+          "action": "Gegevens overdragen",
+          "title": "Rechtstreekse migratie",
+          "quality": "Gemakkelijkst en het snelst"
+        },
+        "or": "Of",
+        "download": {
+          "description": "Hierdoor worden je gegevens gedownload naar je apparaat. Je kunt ze dan uploaden naar de nieuwe server of ze gewoon bewaren.",
+          "title": "Download gegevens",
+          "quality": "Meer technisch",
+          "action": "Download data"
+        },
+        "upload": {
+          "title": "Upload data",
+          "description": "Upload uw eerder geëxporteerde gegevensbestand om uw bladwijzers en voortgang op dit account te herstellen.",
+          "quality": "Herstellen vanaf back-up",
+          "action": "Upload Data"
+        }
+      }
+    },
+    "upload": {
+      "exportedOn": "Geëxporteerd op",
+      "button": {
+        "processing": "Bezig met verwerken...",
+        "home": "Ga naar start",
+        "import": "Gegevens importeren",
+        "success": "Importeren voltooid"
+      },
+      "items": {
+        "progress": "Kijkvoortgang",
+        "bookmarks": "Media met bladwijzers"
+      },
+      "file": {
+        "name": "Bestandsnaam",
+        "description": "Selecteer het bestand dat je wilt uploaden",
+        "select": "Selecteer bestand",
+        "change": "Wijzig bestand"
+      },
+      "dataPreview": "Voorbeeld:",
+      "title": "Upload gegevens",
+      "description": "Upload je eerder geëxporteerde gegevensbestand om je bladwijzers en voortgang op dit account te herstellen.",
+      "status": {
+        "processing": "Gegevens worden verwerkt...",
+        "error": "Het is niet gelukt om je gegevens te uploaden. 😿",
+        "success": "Je gegevens zijn succesvol geüpload! 🎉"
+      }
+    },
+    "direct": {
+      "description": "Voer de bestemmingsbackend URL in om je huidige accountgegevens naar een nieuwe backend te migreren. Je wachtwoordzin blijft hetzelfde!",
+      "title": "Rechtstreekse migratie",
+      "backendLabel": "Bestemmingsbackend URL",
+      "recaptchaLabel": "ReCaptcha Sleutel (Optioneel)",
+      "toggleLable": "ReCaptcha nodig?",
+      "status": {
+        "error": "Migratie van je gegevens is mislukt. 😿",
+        "success": "Je gegevens zijn succesvol gemigreerd! 🎉"
+      },
+      "button": {
+        "migrate": "Migreren",
+        "processing": "Bezig met verwerken...",
+        "login": "Ga verder naar inloggen",
+        "home": "Ga naar startpagina"
+      }
+    },
+    "download": {
+      "title": "Gegevens downloaden",
+      "description": "Hiermee download je jouw gegevens naar je apparaat. Je kunt deze daarna uploaden naar de nieuwe server of bewaren voor later gebruik.",
+      "items": {
+        "description": "Download bevat:",
+        "bookmarks": "Media met bladwijzer",
+        "progress": "Voortgang volgen"
+      },
+      "status": {
+        "error": "Het downloaden van je gegevens is mislukt. 😿",
+        "success": "Je gegevens zijn succesvol gedownload! 🎉"
+      },
+      "button": {
+        "download": "Gegevens downloaden",
+        "home": "Ga naar startpagina",
+        "login": "Ga door naar inloggen"
+      }
+    },
+    "back": "Ga terug"
+  },
+  "downtimeNotice": {
+    "badge": "Problemen",
+    "message": "P-Stream ondervindt opnieuw problemen met sommige providers. Als je een show niet kunt vinden of afspelen, probeer dan de bron te wijzigen. Verwacht dat deze fout zich zal blijven voordoen gedurende de onderstaande tijden.",
+    "goHome": "Ga naar startpagina",
+    "title": "Providerproblemen"
+  },
+  "support": {
+    "text": "P-Stream is ontworpen om zo gebruiksvriendelijk mogelijk te zijn. Mensen hebben echter nog steeds vragen en problemen. Deze pagina is hier om deze tekortkomingen op te lossen",
+    "title": "Ondersteuning",
+    "q2": {
+      "body": "We hebben een <0>GitHub</0> waar je een gedetailleerd issue in onze repository kunt aanmaken. Daarnaast kun je, als je dat wilt, een pull request indienen om het probleem zelf op te lossen.",
+      "title": "Hoe kan ik een bug of probleem melden?"
+    },
+    "q1": {
+      "body": "Je kunt lid worden van de officiële <0>P‑Stream Discord</0> en daar vragen stellen, of je kunt een e‑mail sturen naar het adres onderaan deze pagina.",
+      "title": "Waar kan ik hulp krijgen?"
+    }
+  },
+  "discover": {
+    "randomMovie": {
+      "button": "Kijk iets willekeurigs",
+      "cancel": "Annuleer aftelling",
+      "countdown": "{{countdown}}s",
+      "nowPlaying": "Nu aan het afspelen",
+      "in": "in"
+    },
+    "tabs": {
+      "movies": "Films",
+      "tvshows": "Televisieshows",
+      "editorpicks": "Aanbevolen door ons"
+    },
+    "carousel": {
+      "title": {
+        "movies": "{{category}} Films",
+        "tvshows": "{{category}} Shows",
+        "inCinemas": "In de bioscoop",
+        "popularOn": "Populair {{type}} op {{provider}}"
+      }
+    },
+    "page": {
+      "title": "Ontdek Films & TV",
+      "subtitle": "Ontdek de nieuwste hits en tijdloze klassiekers."
+    },
+    "scrollToTop": "Terug naar boven"
+  },
+  "jip": {
+    "q2": {
+      "body": "We hebben een <0>GitHub</0> waar je een gedetailleerd issue in onze repository kunt aanmaken. Daarnaast kun je, als je dat wilt, een pull request indienen om het probleem zelf op te lossen.",
+      "title": "Hoe kan ik een bug of probleem melden?"
+    },
+    "text": "P‑Stream is niet zomaar uit een kokosnootboom gevallen, het is grotendeels door één persoon gemaakt (en niet zomaar één, maar een zeer epische).",
+    "q1": {
+      "body": "Je kunt lid worden van de officiële <0>P‑Stream Discord</0> en daar vragen stellen, of je kunt een e‑mail sturen naar het adres onderaan deze pagina.",
+      "title": "Waar kan ik hulp krijgen?"
+    },
+    "title": "Over de maker"
   }
 }

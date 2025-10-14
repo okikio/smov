@@ -1,4 +1,4 @@
-import { ProviderControls, ScrapeMedia } from "@movie-web/providers";
+import { ProviderControls, ScrapeMedia } from "@p-stream/providers";
 import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -104,8 +104,7 @@ export function ScrapingPart(props: ScrapingProps) {
       ) : null}
       <div
         className={classNames({
-          "absolute transition-[transform,opacity] opacity-0 dir-neutral:left-0":
-            true,
+          "absolute transition-[transform,opacity] opacity-0 dir-neutral:left-0": true,
           "!opacity-100": renderedOnce,
         })}
         ref={listRef}
@@ -177,6 +176,22 @@ export function ScrapingPartInterruptButton() {
       >
         {t("notFound.reloadButton")}
       </Button>
+    </div>
+  );
+}
+
+export function Tips() {
+  const { t } = useTranslation();
+  const [tip] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * 21) + 1;
+    return t(`player.scraping.tips.${randomIndex}`);
+  });
+
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-type-secondary text-center text-sm text-bold">
+        Tip: {tip}
+      </p>
     </div>
   );
 }

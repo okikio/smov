@@ -1,20 +1,95 @@
 {
   "about": {
-    "description": "sudo-flix adalah website yang mengumpulkan sumber media streaming dari internet. Didesain khusus dengan pendekatan minimalis agar mempermudah konsumsi konten.",
+    "description": "P-Stream adalah website yang mengumpulkan sumber media streaming dari internet. Didesain khusus dengan pendekatan minimalis agar mempermudah konsumsi konten.",
     "faqTitle": "Pertanyaan umum",
     "q1": {
-      "body": "sudo-flix tidak menyimpan berkas media apapun. Ketika anda mengklik sesuatu untuk ditonton, aplikasi akan mencari berkas media di internet (saat media dimuat dan pada tab 'sumber media' anda dapat melihat sumber mana yang digunakan). sudo-flix tidak pernah mengunggah media apapun, semua media didapat melalui mekanisme pencarian di internet.",
-      "title": "Dari mana konten berasal?"
+      "body": "P-Stream tidak menyimpan berkas media apapun. Ketika anda mengklik sesuatu untuk ditonton, aplikasi akan mencari berkas media di internet (saat media dimuat dan pada tab 'sumber media' anda dapat melihat sumber mana yang digunakan). P-Stream tidak pernah mengunggah media apapun, semua media didapat melalui mekanisme pencarian di internet.",
+      "title": "Dari mana konten berasal?",
+      "section": "Umum"
     },
     "q2": {
-      "body": "Kami tidak menerima permintaan penambahan serial televisi atau film, sudo-flix tidak mengelola konten apapun. Semua konten ditonton melalui sumber-sumber dari internet.",
-      "title": "Di mana saya dapat meminta serial televisi atau film untuk ditambahkan?"
+      "body": "Kami tidak menerima permintaan penambahan serial televisi atau film, P-Stream tidak mengelola konten apapun. Semua konten ditonton melalui sumber-sumber dari internet.",
+      "title": "Di mana saya dapat meminta serial televisi atau film untuk ditambahkan?",
+      "section": "Pencarian"
     },
     "q3": {
       "body": "Hasil pencarian aplikasi ini menggunakan API milik The Movie Database (TMDB) dan menampilkan semua hasil pencarian terlepas dari apakah sumber media tersebut dapat ditemukan di penyedia pihak ketiga atau tidak.",
-      "title": "Hasil pencarian menampilkan serial televisi atau film yang saya cari, tapi mengapa saya tidak bisa memutarnya?"
+      "title": "Hasil pencarian menampilkan serial televisi atau film yang saya cari, tapi mengapa saya tidak bisa memutarnya?",
+      "section": "Pencarian"
     },
-    "title": "Tentang sudo-flix"
+    "title": "Tentang P-Stream",
+    "sections": {
+      "language": "Bahasa & Pengaturan Subtitle",
+      "playback": "Masalah Pemutaran",
+      "search": "Pencarian & Ketersediaan konten",
+      "connections": "Jaringan Koneksi",
+      "general": "Umum"
+    },
+    "help": "Tidak dapat mencari jawaban? <0>Dapatkan dukungan di sini.</0>",
+    "searchPlaceholder": "Pencarian FAQ...",
+    "q6": {
+      "body": "Belum ada. Tapi bisa kamu install sebagai PWA (Progressive Web App). Pada IOS, menggunakan safari → Share → Tambahkan ke Home Screen. APK tersedia dalam Discord dan masih experiment, tidak direkomendasikan.",
+      "title": "Apakah ada aplikasi P-Stream?",
+      "section": "Umum"
+    },
+    "q10": {
+      "body": "Pencarian kami didukung oleh TMDB. Coba tekan ikon 🔎 untuk opsi pencarian lanjutan jika hasilnya kurang akurat.",
+      "title": "Saya tidak dapat menemukan film/tayangan yang dicari!",
+      "section": "Pencarian"
+    },
+    "q15": {
+      "body": "Pastikan perangkat kamu tidak dalam mode senyap dan coba beralih ke sumber lain. Masalah audio mungkin hanya terjadi pada sumber tertentu.",
+      "title": "Kenapa tidak ada suara?",
+      "section": "Pemutaran"
+    },
+    "q9": {
+      "body": "Tidak—karena kami tidak menyimpan konten sendiri, kami tidak dapat menambahkan atau mengubah konten yang tersedia. Daftar konten didasarkan pada apa yang bisa diakses publik melalui fitur pencarian.",
+      "title": "Konten tidak ada / Bisakah saya request konten?",
+      "section": "Pencarian"
+    },
+    "q13": {
+      "body": "Coba mengganti sumber. Kualitas bervariasi tergantung sumber; FED API biasanya tersedia banyak pilihan.",
+      "title": "Kualitas video tidak sesuai yang diharapkan.",
+      "section": "Pemutaran"
+    },
+    "q4": {
+      "body": "Semua data telah disinkron dalam dukungan komunitas, semua dapat menggunakannya.",
+      "title": "Bagaimna data dan sebagainya?",
+      "section": "Umum"
+    },
+    "q5": {
+      "title": "Bagaimana saya bisa mengetahui lebih lanjut?",
+      "body": "P-Stream memiliki Discord server yang bisa diakses melalui header dihalaman ini!",
+      "section": "Umum"
+    },
+    "q7": {
+      "title": "Bagaimana cara membuat akun?",
+      "body": "Tekan \"Sync to Cloud\" pada menu dropdown atau ke pengaturan untuk membuat dan sinkronsisasi akun.",
+      "section": "Umum"
+    },
+    "q11": {
+      "title": "Kenapa saya melihat layar hitam?",
+      "body": "Tampaknya file video tidak ada atau rusak. Coba mengganti sumber lain.",
+      "section": "Pemutaran"
+    },
+    "q12": {
+      "title": "Episode tidak sesuai.",
+      "body": "Beralih ke sumber berbeda. Kami tidak mengontrol konten maupun keakuratan episode.",
+      "section": "Pemutaran"
+    },
+    "q14": {
+      "title": "4K tidak tersedia.",
+      "body": "Jika 4K tidak muncul, kemungkinan format tersebut tidak tersedia dari sumber tersebut.",
+      "section": "Pemutaran"
+    },
+    "q16": {
+      "title": "Video terlihat memiliki warna yang tidak normal atau tampak pudar.",
+      "body": "Bisa jadi karena file rusak atau video HDR. Pastikan perangkat kamu mendukung HDR, atau coba ganti sumber.",
+      "section": "Pemutaran"
+    },
+    "q17": {
+      "title": "Saya mengalami gangguan visual."
+    }
   },
   "actions": {
     "copied": "Disalin",
@@ -44,7 +119,7 @@
       "information": {
         "color1": "Warna profil pertama",
         "color2": "Warna profil kedua",
-        "header": "Masukkan nama perangkat anda lalu pilih warna latar belakang dan ikon pengguna yang ingin anda gunakan",
+        "header": "Masukkan nama perangkat anda lalu pilih warna latar belakang dan ikon pengguna yang ingin anda gunakan!",
         "icon": "Ikon pengguna",
         "next": "Berikutnya",
         "title": "Informasi akun"
@@ -82,23 +157,23 @@
   "footer": {
     "legal": {
       "disclaimer": "Sanggahan",
-      "disclaimerText": "sudo-flix tidak menyimpan berkas media apapun, aplikasi ini hanya menampilkan tautan dari pihak ketiga. Sengketa hukum harus diajukan langsung kepada penyedia pihak ketiga. sudo-flix tidak bertanggung jawab atas berkas media yang ditampilkan oleh penyedia pihak ketiga."
+      "disclaimerText": "P-Stream tidak menyimpan berkas media apapun, aplikasi ini hanya menampilkan tautan dari pihak ketiga. Sengketa hukum harus diajukan langsung kepada penyedia pihak ketiga. P-Stream tidak bertanggung jawab atas berkas media yang ditampilkan oleh penyedia pihak ketiga."
     },
     "links": {
       "discord": "Discord",
-      "dmca": "DMCA",
+      "legal": "Legal / DMCA",
       "github": "GitHub"
     },
     "tagline": "Tonton serial televisi dan film favorit anda dengan aplikasi streaming sumber terbuka ini."
   },
   "global": {
-    "name": "sudo-flix",
+    "name": "P-Stream",
     "pages": {
       "about": "Tentang",
-      "dmca": "DMCA",
+      "legal": "Legal / DMCA",
       "login": "Masuk",
       "onboarding": "Penyiapan",
-      "pagetitle": "{{title}} - sudo-flix",
+      "pagetitle": "{{title}} - P-Stream",
       "register": "Daftar",
       "settings": "Pengaturan"
     }
@@ -114,10 +189,10 @@
       "stopEditing": "Berhenti menyunting"
     },
     "search": {
-      "allResults": "Hanya itu yang kami punya!",
+      "allResults": "Hanya itu yang kami punya...",
       "failed": "Gagal menemukan media, coba lagi!",
       "loading": "Memuat...",
-      "noResults": "Kami tidak dapat menemukan apapun!",
+      "noResults": "Kami tidak dapat menemukan apapun :(",
       "placeholder": {
         "default": "Apa yang ingin anda tonton?",
         "extra": [
@@ -161,7 +236,7 @@
     "menu": {
       "about": "Tentang kami",
       "logout": "Keluar",
-      "register": "Sinkronkan ke sudo-cloud",
+      "register": "Sinkronkan ke Cloud",
       "settings": "Pengaturan",
       "support": "Bantuan"
     }
@@ -182,7 +257,7 @@
     "extension": {
       "back": "Kembali",
       "explainer": "Menggunakan ekstensi browser, Anda dapat mendapatkan streaming terbaik yang kami tawarkan. Dengan instalasi sederhana.",
-      "explainerIos": "Sayangnya, ekstensi browser tidak didukung di iOS, Tekan <bold>Kembali<bold> untuk memilih opsi lain.",
+      "explainerIos": "Sayangnya, ekstensi browser tidak didukung di iOS, Tekan <bold>Kembali</bold> untuk memilih opsi lain.",
       "extensionHelp": "Jika Anda telah menginstal ekstensi tetapi tidak terdeteksi, <bold>buka ekstensi melalui menu ekstensi browser Anda</bold> dan ikuti instruksi di layar.",
       "linkChrome": "Instal ekstensi Chrome",
       "linkFirefox": "Instal ekstensi Firefox",
@@ -249,7 +324,7 @@
         "disclaimer": "Tautan unduhan diambil langsung dari penyedia pihak ketiga. Aplikasi ini tidak memiliki kendali bagaimana unduhan disediakan.",
         "downloadSubtitle": "Unduh subtitle saat ini",
         "downloadVideo": "Unduh media",
-        "hlsDisclaimer": "Unduhan didapatkan langsung dari penyedia. sudo-flix tidak memiliki kendali bagaimana unduan disediakan.<br /><br />Harap diperhatikan bahwa Anda mengunduh daftar putar HLS, <bold>ini tidak direkomendasikan untuk diunduh jika Anda tidak terbiasa dengan format streaming tingkat lanjut</bold>Coba sumber berbeda untuk format berbeda.",
+        "hlsDisclaimer": "Unduhan didapatkan langsung dari penyedia. P-Stream tidak memiliki kendali bagaimana unduan disediakan.<br /><br />Harap diperhatikan bahwa Anda mengunduh daftar putar HLS, <bold>ini tidak direkomendasikan untuk diunduh jika Anda tidak terbiasa dengan format streaming tingkat lanjut</bold>Coba sumber berbeda untuk format berbeda.",
         "onAndroid": {
           "1": "Untuk mengunduh di Android, klik tombol unduh, lalu di halaman baru <bold>klik dan tahan</bold> pada video, lalu pilih <bold>simpan</bold>.",
           "shortTitle": "Unduh / Android",
@@ -340,7 +415,6 @@
       }
     },
     "nextEpisode": {
-      "cancel": "Batal",
       "next": "Episode selanjutnya"
     },
     "playbackError": {
@@ -378,9 +452,8 @@
     }
   },
   "screens": {
-    "dmca": {
-      "text": "Selamat datang di halaman kontak DMCA sudo-flix! Kami menghormati hak kekayaan intelektual dan ingin menangani masalah hak cipta dengan cepat. Jika anda yakin bahwa karya berhak cipta anda telah digunakan secara tidak benar di platform kami, silakan kirim pemberitahuan DMCA secara terperinci ke email di bawah ini. Mohon sertakan deskripsi materi berhak cipta, detail kontak anda, dan pernyataan itikad baik. Kami berkomitmen untuk menyelesaikan masalah ini sesegera mungkin dan kami menghargai kerja sama anda dalam menjaga sudo-flix sebagai tempat yang menghormati kreativitas dan hak cipta.",
-      "title": "DMCA"
+    "legal": {
+      "title": "Legal / DMCA"
     },
     "loadingApp": "Memuat aplikasi",
     "loadingUser": "Memuat profil anda",
@@ -412,7 +485,12 @@
           "text": "Tindakan ini tidak dapat dibatalkan. Seluruh data akan dihapus dan tidak dapat dipulihkan.",
           "title": "Hapus akun"
         },
-        "title": "Tindakan"
+        "title": "Tindakan",
+        "logoutAllDevices": {
+          "title": "Akhiri Semua Sesi",
+          "text": "Ini akan mengeluarkan anda dari semua perangkat yang terhubung dengan akun anda.",
+          "button": "Keluar dari Semua Perangkat"
+        }
       },
       "devices": {
         "deviceNameLabel": "Nama perangkat",
@@ -430,7 +508,7 @@
       "register": {
         "cta": "Memulai",
         "text": "Bagikan dan sinkronkan antar perangkat progres tontonan anda.",
-        "title": "Sinkronkan ke sudo-cloud"
+        "title": "Sinkronkan ke Cloud"
       },
       "title": "Akun"
     },
