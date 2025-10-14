@@ -30,16 +30,16 @@ export function KeyboardEvents() {
   const enableHoldToBoost = usePreferencesStore((s) => s.enableHoldToBoost);
 
   const [isRolling, setIsRolling] = useState(false);
-  const volumeDebounce = useRef<ReturnType<typeof setTimeout> | undefined>();
-  const subtitleDebounce = useRef<ReturnType<typeof setTimeout> | undefined>();
+  const volumeDebounce = useRef<ReturnType<typeof setTimeout> | undefined>(null);
+  const subtitleDebounce = useRef<ReturnType<typeof setTimeout> | undefined>(null);
 
   // Speed boost
   const setSpeedBoosted = usePlayerStore((s) => s.setSpeedBoosted);
   const setShowSpeedIndicator = usePlayerStore((s) => s.setShowSpeedIndicator);
   const speedIndicatorTimeoutRef = useRef<
     ReturnType<typeof setTimeout> | undefined
-  >();
-  const boostTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+  >(null);
+  const boostTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(null);
   const isPendingBoostRef = useRef<boolean>(false);
   const previousRateRef = useRef<number>(1);
   const isSpaceHeldRef = useRef<boolean>(false);

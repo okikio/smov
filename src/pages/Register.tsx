@@ -13,6 +13,8 @@ import { TrustBackendPart } from "@/pages/parts/auth/TrustBackendPart";
 import { VerifyPassphrase } from "@/pages/parts/auth/VerifyPassphrasePart";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
 
+import type { JSX } from "react";
+
 function CaptchaProvider(props: {
   siteKey: string | null;
   children: JSX.Element;

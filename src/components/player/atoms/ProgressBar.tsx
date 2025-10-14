@@ -68,15 +68,15 @@ function ThumbnailDisplay(props: { at: number; show: boolean }) {
   );
 }
 
-function useMouseHoverPosition(barRef: RefObject<HTMLDivElement>) {
+function useMouseHoverPosition(barRef: RefObject<HTMLDivElement | null>) {
   const [mousePos, setMousePos] = useState(-1);
 
   const mouseMove = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       const bar = barRef.current;
       if (!bar) return;
-      const rect = barRef.current.getBoundingClientRect();
-      const pos = (e.pageX - rect.left) / barRef.current.offsetWidth;
+      const rect = barRef.current!.getBoundingClientRect();
+      const pos = (e.pageX - rect.left) / barRef.current!.offsetWidth;
       setMousePos(pos * 100);
     },
     [setMousePos, barRef],

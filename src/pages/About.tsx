@@ -11,6 +11,7 @@ import { Heading1, Heading2, Paragraph } from "@/components/utils/Text";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
+import type { JSX } from "react";
 
 function Question(props: { title: string; children: React.ReactNode }) {
   return (

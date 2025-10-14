@@ -3,6 +3,8 @@ import { useCallback, useState } from "react";
 import { Icon, Icons } from "@/components/Icon";
 import { conf } from "@/setup/config";
 
+import type { JSX } from "react";
+
 function getCookie(name: string): string | null {
   const cookies = document.cookie.split(";");
   for (let i = 0; i < cookies.length; i += 1) {
