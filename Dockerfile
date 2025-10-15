@@ -9,22 +9,17 @@ FROM base AS deps
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml .npmrc ./
 
 # Install ALL dependencies (including devDependencies for build)
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
-# Runtime builder stage - builds and serves with nginx
-FROM nginx:stable-alpine AS production
+# Production stage - just use Node to serve with a simple server
+FROM base AS production
 
-# Install Node.js and pnpm in the nginx image for runtime builds
-RUN apk add --no-cache nodejs npm && \
-    corepack enable && \
-    corepack prepare pnpm@latest --activate
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+# Install a simple static file server
+RUN pnpm add -g serve
 
 WORKDIR /app
 
@@ -37,8 +32,5 @@ COPY . .
 
 EXPOSE 80
 
-# Build the app at runtime with env vars, then start nginx
-# The build output goes to /app/dist which we'll copy to nginx's html directory
-CMD pnpm run build && \
-    cp -r /app/dist/* /usr/share/nginx/html/ && \
-    nginx -g 'daemon off;'
+# Build at runtime then serve with 'serve' on port 80
+CMD pnpm run build && serve -s dist -l 80
