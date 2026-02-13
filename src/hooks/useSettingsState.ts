@@ -58,6 +58,8 @@ export function useSettingsState(
     | undefined,
   enableThumbnails: boolean,
   enableAutoplay: boolean,
+  enableSkipCredits: boolean,
+  enableAutoSkipSegments: boolean,
   enableDiscover: boolean,
   enableFeatured: boolean,
   enableDetailsModal: boolean,
@@ -68,7 +70,6 @@ export function useSettingsState(
   embedOrder: string[],
   enableEmbedOrder: boolean,
   proxyTmdb: boolean,
-  enableSkipCredits: boolean,
   enableImageLogos: boolean,
   enableCarouselView: boolean,
   enableMinimalCards: boolean,
@@ -143,6 +144,12 @@ export function useSettingsState(
     resetEnableSkipCredits,
     enableSkipCreditsChanged,
   ] = useDerived(enableSkipCredits);
+  const [
+    enableAutoSkipSegmentsState,
+    setEnableAutoSkipSegmentsState,
+    resetEnableAutoSkipSegments,
+    enableAutoSkipSegmentsChanged,
+  ] = useDerived(enableAutoSkipSegments);
   const [
     enableDiscoverState,
     setEnableDiscoverState,
@@ -282,6 +289,7 @@ export function useSettingsState(
     resetEnableThumbnails();
     resetEnableAutoplay();
     resetEnableSkipCredits();
+    resetEnableAutoSkipSegments();
     resetEnableDiscover();
     resetEnableFeatured();
     resetEnableDetailsModal();
@@ -321,6 +329,7 @@ export function useSettingsState(
     enableThumbnailsChanged ||
     enableAutoplayChanged ||
     enableSkipCreditsChanged ||
+    enableAutoSkipSegmentsChanged ||
     enableDiscoverChanged ||
     enableFeaturedChanged ||
     enableDetailsModalChanged ||
@@ -420,6 +429,11 @@ export function useSettingsState(
       state: enableSkipCreditsState,
       set: setEnableSkipCreditsState,
       changed: enableSkipCreditsChanged,
+    },
+    enableAutoSkipSegments: {
+      state: enableAutoSkipSegmentsState,
+      set: setEnableAutoSkipSegmentsState,
+      changed: enableAutoSkipSegmentsChanged,
     },
     enableDiscover: {
       state: enableDiscoverState,

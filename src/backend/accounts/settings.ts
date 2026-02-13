@@ -15,6 +15,7 @@ export interface SettingsInput {
   enableThumbnails?: boolean;
   enableAutoplay?: boolean;
   enableSkipCredits?: boolean;
+  enableAutoSkipSegments?: boolean;
   enableDiscover?: boolean;
   enableFeatured?: boolean;
   enableDetailsModal?: boolean;
@@ -50,6 +51,7 @@ export interface SettingsResponse {
   enableThumbnails?: boolean;
   enableAutoplay?: boolean;
   enableSkipCredits?: boolean;
+  enableAutoSkipSegments?: boolean;
   enableDiscover?: boolean;
   enableFeatured?: boolean;
   enableDetailsModal?: boolean;

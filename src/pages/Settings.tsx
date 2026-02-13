@@ -399,6 +399,13 @@ export function SettingsPage() {
     (s) => s.setEnableSkipCredits,
   );
 
+  const enableAutoSkipSegments = usePreferencesStore(
+    (s) => s.enableAutoSkipSegments,
+  );
+  const setEnableAutoSkipSegments = usePreferencesStore(
+    (s) => s.setEnableAutoSkipSegments,
+  );
+
   const sourceOrder = usePreferencesStore((s) => s.sourceOrder);
   const setSourceOrder = usePreferencesStore((s) => s.setSourceOrder);
 
@@ -558,6 +565,8 @@ export function SettingsPage() {
     account ? account.profile : undefined,
     enableThumbnails,
     enableAutoplay,
+    enableSkipCredits,
+    enableAutoSkipSegments,
     enableDiscover,
     enableFeatured,
     enableDetailsModal,
@@ -568,7 +577,6 @@ export function SettingsPage() {
     embedOrder,
     enableEmbedOrder,
     proxyTmdb,
-    enableSkipCredits,
     enableImageLogos,
     enableCarouselView,
     enableMinimalCards,
@@ -629,6 +637,7 @@ export function SettingsPage() {
         state.enableThumbnails.changed ||
         state.enableAutoplay.changed ||
         state.enableSkipCredits.changed ||
+        state.enableAutoSkipSegments.changed ||
         state.enableDiscover.changed ||
         state.enableFeatured.changed ||
         state.enableDetailsModal.changed ||
@@ -658,6 +667,7 @@ export function SettingsPage() {
           enableThumbnails: state.enableThumbnails.state,
           enableAutoplay: state.enableAutoplay.state,
           enableSkipCredits: state.enableSkipCredits.state,
+          enableAutoSkipSegments: state.enableAutoSkipSegments.state,
           enableDiscover: state.enableDiscover.state,
           enableFeatured: state.enableFeatured.state,
           enableDetailsModal: state.enableDetailsModal.state,
@@ -706,6 +716,7 @@ export function SettingsPage() {
     setEnableThumbnails(state.enableThumbnails.state);
     setEnableAutoplay(state.enableAutoplay.state);
     setEnableSkipCredits(state.enableSkipCredits.state);
+    setEnableAutoSkipSegments(state.enableAutoSkipSegments.state);
     setEnableDiscover(state.enableDiscover.state);
     setEnableFeatured(state.enableFeatured.state);
     setEnableDetailsModal(state.enableDetailsModal.state);
@@ -769,6 +780,7 @@ export function SettingsPage() {
     setTIDBKey,
     setEnableAutoplay,
     setEnableSkipCredits,
+    setEnableAutoSkipSegments,
     setEnableDiscover,
     setEnableFeatured,
     setEnableDetailsModal,
@@ -855,6 +867,8 @@ export function SettingsPage() {
               setEnableAutoplay={state.enableAutoplay.set}
               enableSkipCredits={state.enableSkipCredits.state}
               setEnableSkipCredits={state.enableSkipCredits.set}
+              enableAutoSkipSegments={state.enableAutoSkipSegments.state}
+              setEnableAutoSkipSegments={state.enableAutoSkipSegments.set}
               sourceOrder={availableSources}
               setSourceOrder={state.sourceOrder.set}
               enableSourceOrder={state.enableSourceOrder.state}

@@ -24,6 +24,8 @@ export function PreferencesPart(props: {
   setEnableAutoplay: (v: boolean) => void;
   enableSkipCredits: boolean;
   setEnableSkipCredits: (v: boolean) => void;
+  enableAutoSkipSegments: boolean;
+  setEnableAutoSkipSegments: (v: boolean) => void;
   sourceOrder: string[];
   setSourceOrder: (v: string[]) => void;
   enableSourceOrder: boolean;
@@ -174,6 +176,29 @@ export function PreferencesPart(props: {
                     <p className="flex-1 text-white font-bold">
                       {t("settings.preferences.skipCreditsLabel")}
                     </p>
+                  </div>
+
+                  {/* Auto Skip Segments Preference */}
+                  <div className="pt-4 mt-4">
+                    <p className="text-white font-bold mb-3">
+                      {t("settings.preferences.autoSkipSegments")}
+                    </p>
+                    <p className="max-w-[25rem] font-medium">
+                      {t("settings.preferences.autoSkipSegmentsDescription")}
+                    </p>
+                    <div
+                      onClick={() =>
+                        props.setEnableAutoSkipSegments(
+                          !props.enableAutoSkipSegments,
+                        )
+                      }
+                      className="bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg"
+                    >
+                      <Toggle enabled={props.enableAutoSkipSegments} />
+                      <p className="flex-1 text-white font-bold">
+                        {t("settings.preferences.autoSkipSegmentsLabel")}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
