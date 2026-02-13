@@ -116,6 +116,7 @@ const MOVIES_DATA: EditorPick[] = [
   { id: 198184, type: "movie" }, // Chappie
   { id: 405774, type: "movie" }, // Bird Box
   { id: 333339, type: "movie" }, // Ready Player One
+  { id: 16859, type: "movie" }, // Kiki's Delivery Service
 ];
 
 const TV_SHOWS_DATA: EditorPick[] = [
