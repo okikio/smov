@@ -78,7 +78,7 @@ function bookmarkToDiscoverMedia(b: BookmarkSource): DiscoverMedia {
 /**
  * Fetches similar items from the fed-similar API
  */
-async function fetchFedSimilarItems(
+export async function fetchFedSimilarItems(
   tmdbId: string,
   isTVShow: boolean,
 ): Promise<string[]> {
