@@ -8,6 +8,7 @@ import type {
   TMDBShowData,
   TMDBShowSearchResult,
 } from "@/backend/metadata/types/tmdb";
+
 import { fetchFedSimilarItems } from "../lib/personalRecommendations";
 
 export function useSimilarMedia({
@@ -21,7 +22,9 @@ export function useSimilarMedia({
   limit?: number;
   enabled?: boolean;
 }) {
-  const [media, setMedia] = useState<TMDBMovieSearchResult[] | TMDBShowSearchResult[]>([]);
+  const [media, setMedia] = useState<
+    TMDBMovieSearchResult[] | TMDBShowSearchResult[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,7 +103,11 @@ export function useSimilarMedia({
 
         if (results.length >= limit / 2) {
           // If we have enough results from fed-similar, use them
-          setMedia(results.slice(0, limit));
+          setMedia(
+            results.slice(0, limit) as
+              | TMDBMovieSearchResult[]
+              | TMDBShowSearchResult[],
+          );
           return;
         }
       }

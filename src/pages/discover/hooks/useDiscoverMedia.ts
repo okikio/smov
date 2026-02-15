@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getMediaDetails, get } from "@/backend/metadata/tmdb";
-import type {
-  TMDBMovieData,
-  TMDBMovieSearchResult,
-  TMDBShowData,
-  TMDBShowSearchResult,
-} from "@/backend/metadata/types/tmdb";
-import { TMDBContentTypes } from "@/backend/metadata/types/tmdb";
+import { get, getMediaDetails } from "@/backend/metadata/tmdb";
 import {
   PROVIDER_TO_TRAKT_MAP,
   getAppleMovieReleases,
@@ -30,8 +23,16 @@ import {
   getPrimeTVShows,
 } from "@/backend/metadata/traktApi";
 import { paginateResults } from "@/backend/metadata/traktFunctions";
+import { TMDBContentTypes } from "@/backend/metadata/types/tmdb";
+import type {
+  TMDBMovieData,
+  TMDBMovieSearchResult,
+  TMDBShowData,
+  TMDBShowSearchResult,
+} from "@/backend/metadata/types/tmdb";
 import type { TraktListResponse } from "@/backend/metadata/types/trakt";
-import { EDITOR_PICKS_MOVIES,
+import {
+  EDITOR_PICKS_MOVIES,
   EDITOR_PICKS_TV_SHOWS,
   MOVIE_PROVIDERS,
   TV_PROVIDERS,
@@ -45,10 +46,11 @@ import type {
   UseDiscoverMediaProps,
   UseDiscoverMediaReturn,
 } from "@/pages/discover/types/discover";
-import { fetchFedSimilarItems } from "../lib/personalRecommendations";
 import { conf } from "@/setup/config";
 import { useLanguageStore } from "@/stores/language";
 import { getTmdbLanguageCode } from "@/utils/language";
+
+import { fetchFedSimilarItems } from "../lib/personalRecommendations";
 
 // Re-export types for backward compatibility
 export type {
@@ -417,17 +419,19 @@ export function useDiscoverMedia({
         console.info(
           "Fed-similar API returned insufficient or no results, falling back to TMDB",
         );
-        const data = await fetchTMDBMedia(`/${mediaType}/${mediaId}/recommendations`);
+        const data = await fetchTMDBMedia(
+          `/${mediaType}/${mediaId}/recommendations`,
+        );
         return data;
       } catch (err) {
         console.error("Error fetching fed-similar recommendations:", err);
 
         // Try TMDB fallback on error
         console.info("Attempting TMDB fallback...");
-        return await fetchTMDBMedia(`/${mediaType}/${mediaId}/recommendations`);
+        return fetchTMDBMedia(`/${mediaType}/${mediaId}/recommendations`);
       }
     },
-    [mediaType, formattedLanguage, isCarouselView, fetchTMDBMedia],
+    [mediaType, isCarouselView, fetchTMDBMedia],
   );
 
   const fetchMedia = useCallback(async () => {
