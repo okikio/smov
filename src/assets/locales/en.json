@@ -849,6 +849,7 @@
         "autoSelectChoice": "Auto select",
         "autoSelectDifferentChoice": "Tap again to auto select different subtitle",
         "SourceChoice": "Source Subtitles",
+        "source": "SOURCE",
         "OpenSubtitlesChoice": "External Subtitles",
         "loadingExternal": "Loading external subtitles...",
         "transcriptChoice": "Transcript",

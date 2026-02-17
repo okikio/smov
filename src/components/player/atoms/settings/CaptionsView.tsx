@@ -197,7 +197,7 @@ export function CaptionOption(props: CaptionOptionProps) {
               {props.subtitleType.toUpperCase()}
             </span>
           )}
-          {props.subtitleSource && (
+          {props.subtitleSource ? (
             <span
               className={classNames(
                 "ml-2 px-2 py-0.5 rounded text-white text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap",
@@ -210,6 +210,10 @@ export function CaptionOption(props: CaptionOptionProps) {
               )}
             >
               {props.subtitleSource.toUpperCase()}
+            </span>
+          ) : (
+            <span className="ml-2 px-2 py-0.5 rounded text-white text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap bg-grey-500">
+              {t("player.menus.subtitles.source")}
             </span>
           )}
           {props.isHearingImpaired && (
