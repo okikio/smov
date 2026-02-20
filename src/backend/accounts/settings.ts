@@ -4,6 +4,12 @@ import { getAuthHeaders } from "@/backend/accounts/auth";
 import { AccountWithToken } from "@/stores/auth";
 import { KeyboardShortcuts } from "@/utils/keyboardShortcuts";
 
+export interface CustomThemeSettings {
+  primary: string;
+  secondary: string;
+  tertiary: string;
+}
+
 export interface SettingsInput {
   applicationLanguage?: string;
   applicationTheme?: string | null;
@@ -38,6 +44,7 @@ export interface SettingsInput {
   enableDoubleClickToSeek?: boolean;
   enableAutoResumeOnPlaybackError?: boolean;
   keyboardShortcuts?: KeyboardShortcuts;
+  customTheme?: CustomThemeSettings;
 }
 
 export interface SettingsResponse {
@@ -74,6 +81,7 @@ export interface SettingsResponse {
   enableDoubleClickToSeek?: boolean;
   enableAutoResumeOnPlaybackError?: boolean;
   keyboardShortcuts?: KeyboardShortcuts;
+  customTheme?: CustomThemeSettings;
 }
 
 export function updateSettings(

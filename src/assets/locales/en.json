@@ -1200,6 +1200,7 @@
       "activeTheme": "Active",
       "themes": {
         "blue": "Blue",
+        "custom": "Custom",
         "default": "Default",
         "gray": "Gray",
         "red": "Red",
@@ -1222,6 +1223,11 @@
         "cobalt": "Cobalt",
         "frost": "Frost",
         "christmas": "Christmas"
+      },
+      "customParts": {
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "tertiary": "Tertiary"
       },
       "title": "Appearance",
       "options": {
