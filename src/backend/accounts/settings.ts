@@ -18,6 +18,7 @@ export interface SettingsInput {
   febboxKey?: string | null;
   debridToken?: string | null;
   debridService?: string;
+  tidbKey?: string | null;
   enableThumbnails?: boolean;
   enableAutoplay?: boolean;
   enableSkipCredits?: boolean;
@@ -55,6 +56,7 @@ export interface SettingsResponse {
   febboxKey?: string | null;
   debridToken?: string | null;
   debridService?: string;
+  tidbKey?: string | null;
   enableThumbnails?: boolean;
   enableAutoplay?: boolean;
   enableSkipCredits?: boolean;
