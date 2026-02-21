@@ -345,10 +345,36 @@ type MediaDetailReturn<T extends TMDBContentTypes> =
       ? TMDBShowData
       : never;
 
+export async function getSeasonDetails(
+  id: string,
+  season: number,
+): Promise<
+  Array<{
+    id: number;
+    name: string;
+    episode_number: number;
+    overview: string;
+    still_path: string | null;
+    air_date: string;
+    season_number: number;
+  }>
+> {
+  const seasonData = await get<TMDBSeason>(`/tv/${id}/season/${season}`);
+  return seasonData.episodes.map((episode) => ({
+    id: episode.id,
+    name: episode.name,
+    episode_number: episode.episode_number,
+    overview: episode.overview,
+    still_path: episode.still_path,
+    air_date: episode.air_date,
+    season_number: season,
+  }));
+}
+
 export async function getMediaDetails<
   T extends TMDBContentTypes,
   TReturn = MediaDetailReturn<T>,
->(id: string, type: T): Promise<TReturn> {
+>(id: string, type: T, fetchEpisodes: boolean = true): Promise<TReturn> {
   if (type === TMDBContentTypes.MOVIE) {
     return get<TReturn>(`/movie/${id}`, {
       append_to_response: "external_ids,credits,release_dates",
@@ -358,6 +384,13 @@ export async function getMediaDetails<
     const showData = await get<TReturn>(`/tv/${id}`, {
       append_to_response: "external_ids,credits,content_ratings",
     });
+
+    if (!fetchEpisodes) {
+      return {
+        ...showData,
+        episodes: [],
+      } as TReturn;
+    }
 
     // Fetch episodes for each season
     const showDetails = showData as TMDBShowData;
@@ -375,18 +408,8 @@ export async function getMediaDetails<
           const item = seasonsQueue.shift();
           if (!item) break;
           const { season, index } = item;
-          const seasonData = await get<TMDBSeason>(
-            `/tv/${id}/season/${season.season_number}`,
-          );
-          allEpisodesBySeason[index] = seasonData.episodes.map((episode) => ({
-            id: episode.id,
-            name: episode.name,
-            episode_number: episode.episode_number,
-            overview: episode.overview,
-            still_path: episode.still_path,
-            air_date: episode.air_date,
-            season_number: season.season_number,
-          }));
+          const episodes = await getSeasonDetails(id, season.season_number);
+          allEpisodesBySeason[index] = episodes;
         }
       },
     );
