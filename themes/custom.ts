@@ -21,9 +21,13 @@ function generateCustomThemeStructure(theme: any, prefix = ""): any {
   const result: any = {};
   for (const key in theme) {
     if (typeof theme[key] === "object" && theme[key] !== null) {
-      result[key] = generateCustomThemeStructure(theme[key], `${prefix}${key}-`);
+      result[key] = generateCustomThemeStructure(
+        theme[key],
+        `${prefix}${key}-`,
+      );
     } else {
-      result[key] = `rgb(var(${cssVarName(`${prefix}${key}`)}) / <alpha-value>)`;
+      result[key] =
+        `rgb(var(${cssVarName(`${prefix}${key}`)}) / <alpha-value>)`;
     }
   }
   return result;
