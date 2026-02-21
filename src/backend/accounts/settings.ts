@@ -44,6 +44,7 @@ export interface SettingsInput {
   manualSourceSelection?: boolean;
   enableDoubleClickToSeek?: boolean;
   enableAutoResumeOnPlaybackError?: boolean;
+  enablePauseOverlay?: boolean;
   enableNumberKeySeeking?: boolean;
   keyboardShortcuts?: KeyboardShortcuts;
   customTheme?: CustomThemeSettings;
@@ -83,6 +84,7 @@ export interface SettingsResponse {
   manualSourceSelection?: boolean;
   enableDoubleClickToSeek?: boolean;
   enableAutoResumeOnPlaybackError?: boolean;
+  enablePauseOverlay?: boolean;
   enableNumberKeySeeking?: boolean;
   keyboardShortcuts?: KeyboardShortcuts;
   customTheme?: CustomThemeSettings;

@@ -531,6 +531,11 @@ export function SettingsPage() {
     (s) => s.setEnableAutoResumeOnPlaybackError,
   );
 
+  const enablePauseOverlay = usePreferencesStore((s) => s.enablePauseOverlay);
+  const setEnablePauseOverlay = usePreferencesStore(
+    (s) => s.setEnablePauseOverlay,
+  );
+
   const account = useAuthStore((s) => s.account);
   const updateProfile = useAuthStore((s) => s.setAccountProfile);
   const updateDeviceName = useAuthStore((s) => s.updateDeviceName);
@@ -647,6 +652,9 @@ export function SettingsPage() {
             settings.enableAutoResumeOnPlaybackError,
           );
         }
+        if (settings.enablePauseOverlay !== undefined) {
+          setEnablePauseOverlay(settings.enablePauseOverlay);
+        }
         if (settings.customTheme) {
           setCustomTheme(settings.customTheme);
           setCustomThemeBaseline(settings.customTheme);
@@ -687,6 +695,7 @@ export function SettingsPage() {
     setManualSourceSelection,
     setEnableDoubleClickToSeek,
     setEnableAutoResumeOnPlaybackError,
+    setEnablePauseOverlay,
     setCustomTheme,
   ]);
 
@@ -728,6 +737,7 @@ export function SettingsPage() {
     manualSourceSelection,
     enableDoubleClickToSeek,
     enableAutoResumeOnPlaybackError,
+    enablePauseOverlay,
     customThemeBaseline ?? customTheme,
   );
 
@@ -797,6 +807,7 @@ export function SettingsPage() {
         state.manualSourceSelection.changed ||
         state.enableDoubleClickToSeek.changed ||
         state.enableAutoResumeOnPlaybackError.changed ||
+        state.enablePauseOverlay.changed ||
         state.customTheme.changed
       ) {
         await updateSettings(backendUrl, account, {
@@ -829,6 +840,7 @@ export function SettingsPage() {
           enableDoubleClickToSeek: state.enableDoubleClickToSeek.state,
           enableAutoResumeOnPlaybackError:
             state.enableAutoResumeOnPlaybackError.state,
+          enablePauseOverlay: state.enablePauseOverlay.state,
           customTheme: state.customTheme.state,
         });
       }
@@ -889,6 +901,7 @@ export function SettingsPage() {
     setEnableAutoResumeOnPlaybackError(
       state.enableAutoResumeOnPlaybackError.state,
     );
+    setEnablePauseOverlay(state.enablePauseOverlay.state);
     setCustomTheme(state.customTheme.state);
     setCustomThemeBaseline(state.customTheme.state);
 
@@ -951,6 +964,7 @@ export function SettingsPage() {
     setManualSourceSelection,
     setEnableDoubleClickToSeek,
     setEnableAutoResumeOnPlaybackError,
+    setEnablePauseOverlay,
     setCustomTheme,
   ]);
   return (
@@ -1067,6 +1081,8 @@ export function SettingsPage() {
               homeSectionOrder={state.homeSectionOrder.state}
               setHomeSectionOrder={state.homeSectionOrder.set}
               enableLowPerformanceMode={state.enableLowPerformanceMode.state}
+              enablePauseOverlay={state.enablePauseOverlay.state}
+              setEnablePauseOverlay={state.enablePauseOverlay.set}
               customTheme={state.customTheme.state}
               setCustomTheme={state.customTheme.set}
             />

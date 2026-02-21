@@ -81,6 +81,7 @@ export function useSettingsState(
   manualSourceSelection: boolean,
   enableDoubleClickToSeek: boolean,
   enableAutoResumeOnPlaybackError: boolean,
+  enablePauseOverlay: boolean,
   customTheme: {
     primary: string;
     secondary: string;
@@ -278,6 +279,12 @@ export function useSettingsState(
     enableAutoResumeOnPlaybackErrorChanged,
   ] = useDerived(enableAutoResumeOnPlaybackError);
   const [
+    enablePauseOverlayState,
+    setEnablePauseOverlayState,
+    resetEnablePauseOverlay,
+    enablePauseOverlayChanged,
+  ] = useDerived(enablePauseOverlay);
+  const [
     customThemeState,
     setCustomThemeState,
     resetCustomTheme,
@@ -323,6 +330,7 @@ export function useSettingsState(
     resetManualSourceSelection();
     resetEnableDoubleClickToSeek();
     resetEnableAutoResumeOnPlaybackError();
+    resetEnablePauseOverlay();
     resetCustomTheme();
   }
 
@@ -364,6 +372,7 @@ export function useSettingsState(
     manualSourceSelectionChanged ||
     enableDoubleClickToSeekChanged ||
     enableAutoResumeOnPlaybackErrorChanged ||
+    enablePauseOverlayChanged ||
     customThemeChanged;
 
   return {
@@ -553,6 +562,11 @@ export function useSettingsState(
       state: enableAutoResumeOnPlaybackErrorState,
       set: setEnableAutoResumeOnPlaybackErrorState,
       changed: enableAutoResumeOnPlaybackErrorChanged,
+    },
+    enablePauseOverlay: {
+      state: enablePauseOverlayState,
+      set: setEnablePauseOverlayState,
+      changed: enablePauseOverlayChanged,
     },
     customTheme: {
       state: customThemeState,

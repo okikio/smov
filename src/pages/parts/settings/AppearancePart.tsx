@@ -292,6 +292,9 @@ export function AppearancePart(props: {
   enableImageLogos: boolean;
   setEnableImageLogos: (v: boolean) => void;
 
+  enablePauseOverlay: boolean;
+  setEnablePauseOverlay: (v: boolean) => void;
+
   enableCarouselView: boolean;
   setEnableCarouselView: (v: boolean) => void;
 
@@ -355,6 +358,7 @@ export function AppearancePart(props: {
     setEnableFeatured,
     setEnableDetailsModal,
     setEnableImageLogos,
+    setEnablePauseOverlay,
     setForceCompactEpisodeView,
   } = props;
 
@@ -365,6 +369,7 @@ export function AppearancePart(props: {
       setEnableFeatured(false);
       setEnableDetailsModal(false);
       setEnableImageLogos(false);
+      setEnablePauseOverlay(false);
       setForceCompactEpisodeView(true);
     }
   }, [
@@ -373,6 +378,7 @@ export function AppearancePart(props: {
     setEnableFeatured,
     setEnableDetailsModal,
     setEnableImageLogos,
+    setEnablePauseOverlay,
     setForceCompactEpisodeView,
   ]);
 
@@ -549,6 +555,33 @@ export function AppearancePart(props: {
               <Toggle enabled={props.enableImageLogos} />
               <p className="flex-1 text-white font-bold">
                 {t("settings.appearance.options.logosLabel")}
+              </p>
+            </div>
+          </div>
+
+          {/* Pause Overlay */}
+          <div>
+            <p className="text-white font-bold mb-3">
+              {t("settings.appearance.options.pauseOverlay")}
+            </p>
+            <p className="max-w-[25rem] font-medium">
+              {t("settings.appearance.options.pauseOverlayDescription")}
+            </p>
+            <div
+              onClick={() =>
+                !props.enableLowPerformanceMode &&
+                props.setEnablePauseOverlay(!props.enablePauseOverlay)
+              }
+              className={classNames(
+                "bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg",
+                props.enableLowPerformanceMode
+                  ? "cursor-not-allowed opacity-50 pointer-events-none"
+                  : "cursor-pointer opacity-100 pointer-events-auto",
+              )}
+            >
+              <Toggle enabled={props.enablePauseOverlay} />
+              <p className="flex-1 text-white font-bold">
+                {t("settings.appearance.options.pauseOverlayLabel")}
               </p>
             </div>
           </div>
