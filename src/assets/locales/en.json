@@ -1442,7 +1442,8 @@
         "genreMovies": "{{genre}} Movies",
         "genreShows": "{{genre}} Shows",
         "categoryMovies": "{{category}} Movies",
-        "categoryShows": "{{category}} Shows"
+        "categoryShows": "{{category}} Shows",
+        "top10": "Top 10"
       },
       "change": "Change",
       "more": "View more"

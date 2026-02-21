@@ -6,6 +6,7 @@ export type DiscoverContentType =
   | "latest"
   | "latest4k"
   | "latesttv"
+  | "top10"
   | "genre"
   | "provider"
   | "editorPicks"

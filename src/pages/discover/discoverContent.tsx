@@ -76,6 +76,19 @@ export function DiscoverContent() {
       );
     }
 
+    // Top 10 Movies
+    carousels.push(
+      <LazyMediaCarousel
+        key="movie-top10"
+        content={{ type: "top10" }}
+        isTVShow={false}
+        carouselRefs={carouselRefs}
+        onShowDetails={handleShowDetails}
+        moreContent
+        priority={carousels.length < 2}
+      />,
+    );
+
     // Latest Releases
     carousels.push(
       <LazyMediaCarousel

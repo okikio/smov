@@ -21,6 +21,7 @@ import {
   getParamountTVShows,
   getPrimeMovies,
   getPrimeTVShows,
+  getTop10Movies,
 } from "@/backend/metadata/traktApi";
 import { paginateResults } from "@/backend/metadata/traktFunctions";
 import { TMDBContentTypes } from "@/backend/metadata/types/tmdb";
@@ -479,6 +480,11 @@ export function useDiscoverMedia({
           } else {
             throw new Error("nowPlaying is only available for movies");
           }
+          break;
+
+        case "top10":
+          data = await fetchTraktMedia(getTop10Movies);
+          setSectionTitle(t("discover.carousel.title.top10"));
           break;
 
         case "latest":
