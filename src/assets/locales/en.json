@@ -308,7 +308,9 @@
       "save": "Save",
       "cancel": "Cancel",
       "saveChanges": "Save Changes",
-      "resetToDefault": "Reset to default"
+      "resetToDefault": "Reset to default",
+      "numberKeySeeking": "Number key progress seeking",
+      "numberKeySeekingDescription": "Use number keys 0-9 to seek to specific positions in the video. 0 goes to the beginning, 1-8 jump to 10%-80%, and 9 goes to 90%."
     }
   },
   "home": {
