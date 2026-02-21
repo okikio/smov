@@ -535,6 +535,9 @@ export function SettingsPage() {
   const setEnablePauseOverlay = usePreferencesStore(
     (s) => s.setEnablePauseOverlay,
   );
+  const setEnableNumberKeySeeking = usePreferencesStore(
+    (s) => s.setEnableNumberKeySeeking,
+  );
 
   const account = useAuthStore((s) => s.account);
   const updateProfile = useAuthStore((s) => s.setAccountProfile);
@@ -655,6 +658,9 @@ export function SettingsPage() {
         if (settings.enablePauseOverlay !== undefined) {
           setEnablePauseOverlay(settings.enablePauseOverlay);
         }
+        if (settings.enableNumberKeySeeking !== undefined) {
+          setEnableNumberKeySeeking(settings.enableNumberKeySeeking);
+        }
         if (settings.customTheme) {
           setCustomTheme(settings.customTheme);
           setCustomThemeBaseline(settings.customTheme);
@@ -696,6 +702,7 @@ export function SettingsPage() {
     setEnableDoubleClickToSeek,
     setEnableAutoResumeOnPlaybackError,
     setEnablePauseOverlay,
+    setEnableNumberKeySeeking,
     setCustomTheme,
   ]);
 
