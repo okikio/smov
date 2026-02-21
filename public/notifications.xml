@@ -29,6 +29,7 @@ Additions:
 - Added support for preview segments from TheIntroDB!
 - Added a link to the desktop app on the onboarding page.
 - Added a toggle to disable 0-9 progress keyboard shortcuts.
+- Made custom source order collapsable.
 
 Fixes:
 - Fixed bookmarking a whole collection removing already bookmarked media from previous bookmark groups.
