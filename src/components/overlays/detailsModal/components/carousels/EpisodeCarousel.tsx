@@ -9,14 +9,11 @@ import { Icon, Icons } from "@/components/Icon";
 import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { hasAired } from "@/components/player/utils/aired";
 import { useBookmarkStore } from "@/stores/bookmarks";
-// eslint-disable-next-line import/no-cycle
-import {
-  ProgressEpisodeItem,
-  getProgressPercentage,
-  useProgressStore,
-} from "@/stores/progress";
+import { getProgressPercentage, useProgressStore } from "@/stores/progress";
 
 import { EpisodeCarouselProps } from "../../types";
+
+const EMPTY_ARRAY: string[] = [];
 
 export function EpisodeCarousel({
   episodes,
@@ -221,7 +218,6 @@ export function EpisodeCarousel({
     (s) => s.toggleFavoriteEpisode,
   );
   const bookmarks = useBookmarkStore((s) => s.bookmarks);
-  const getFavoriteEpisodes = useBookmarkStore((s) => s.getFavoriteEpisodes);
 
   const toggleFavoriteStatus = (episodeId: number, event: React.MouseEvent) => {
     event.preventDefault();
@@ -252,24 +248,26 @@ export function EpisodeCarousel({
   );
 
   // Get favorite episodes for this show
-  const favoriteEpisodeIds = useMemo(
-    () => (mediaId ? getFavoriteEpisodes(mediaId.toString()) : []),
-    [mediaId, getFavoriteEpisodes],
+  const favoriteEpisodeIds = useBookmarkStore((s) =>
+    mediaId
+      ? (s.bookmarks[mediaId.toString()]?.favoriteEpisodes ?? EMPTY_ARRAY)
+      : EMPTY_ARRAY,
   );
 
   // Calculate watched episodes count and percentage
   const watchedStats = useMemo(() => {
     if (!mediaId || !totalEpisodes) return { watched: 0, percentage: 0 };
 
-    const item = progress[mediaId.toString()];
-    if (!item?.episodes) return { watched: 0, percentage: 0 };
-
     let watchedCount = 0;
-    Object.values<ProgressEpisodeItem>(item.episodes).forEach((episode) => {
-      const percentage = getProgressPercentage(
-        episode.progress.watched,
-        episode.progress.duration,
-      );
+    episodes.forEach((episode) => {
+      const episodeProgress =
+        progress[mediaId.toString()]?.episodes?.[episode.id];
+      const percentage = episodeProgress
+        ? getProgressPercentage(
+            episodeProgress.progress.watched,
+            episodeProgress.progress.duration,
+          )
+        : 0;
       if (percentage > 90) {
         watchedCount += 1;
       }
@@ -278,7 +276,7 @@ export function EpisodeCarousel({
     const percentage = Math.round((watchedCount / totalEpisodes) * 100);
 
     return { watched: watchedCount, percentage };
-  }, [progress, mediaId, totalEpisodes]);
+  }, [episodes, progress, mediaId, totalEpisodes]);
 
   // Load favorite episodes when favorites is selected
   useEffect(() => {

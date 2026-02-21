@@ -24,6 +24,8 @@ import { scrollToElement } from "@/utils/scroll";
 
 import { hasAired } from "../utils/aired";
 
+const EMPTY_ARRAY: string[] = [];
+
 function CenteredText(props: { children: React.ReactNode }) {
   return (
     <div className="h-full w-full flex justify-center items-center p-8 text-center">
@@ -504,8 +506,11 @@ function SeasonsView({
     meta?.tmdbId ?? "",
     selectedSeason,
   );
-  const getFavoriteEpisodes = useBookmarkStore((s) => s.getFavoriteEpisodes);
-  const favoriteEpisodes = meta?.tmdbId ? getFavoriteEpisodes(meta.tmdbId) : [];
+  const favoriteEpisodes = useBookmarkStore((s) =>
+    meta?.tmdbId
+      ? (s.bookmarks[meta.tmdbId]?.favoriteEpisodes ?? EMPTY_ARRAY)
+      : EMPTY_ARRAY,
+  );
 
   let content: ReactNode = null;
   if (seasons) {
@@ -574,8 +579,11 @@ export function EpisodesView({
   );
   const progress = useProgressStore();
   const updateItem = useProgressStore((s) => s.updateItem);
-  const getFavoriteEpisodes = useBookmarkStore((s) => s.getFavoriteEpisodes);
-  const favoriteEpisodes = meta?.tmdbId ? getFavoriteEpisodes(meta.tmdbId) : [];
+  const favoriteEpisodes = useBookmarkStore((s) =>
+    meta?.tmdbId
+      ? (s.bookmarks[meta.tmdbId]?.favoriteEpisodes ?? EMPTY_ARRAY)
+      : EMPTY_ARRAY,
+  );
   const bookmarks = useBookmarkStore((s) => s.bookmarks);
 
   // Load all seasons for favorites view
