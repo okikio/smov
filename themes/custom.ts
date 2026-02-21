@@ -1,27 +1,15 @@
 import merge from "lodash.merge";
 import { createTheme } from "./types";
 import { defaultTheme } from "./default";
-import classic from "./list/classic";
-import blue from "./list/blue";
-import red from "./list/red";
-import teal from "./list/teal";
-import green from "./list/green";
-import pink from "./list/pink";
-import autumn from "./list/autumn";
-import frost from "./list/frost";
-import grape from "./list/grape";
 import { colorToRgbString } from "../src/utils/color";
+import { allThemes } from "./all";
 
 const availableThemes = [
-  { id: "classic", theme: classic },
-  { id: "blue", theme: blue },
-  { id: "red", theme: red },
-  { id: "teal", theme: teal },
-  { id: "green", theme: green },
-  { id: "pink", theme: pink },
-  { id: "autumn", theme: autumn },
-  { id: "frost", theme: frost },
-  { id: "grape", theme: grape },
+  { id: "default", theme: defaultTheme },
+  ...allThemes.map((t) => ({
+    id: t.name,
+    theme: { extend: t.extend },
+  })),
 ];
 
 function cssVarName(path: string) {
