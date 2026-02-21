@@ -51,13 +51,11 @@ export function PauseOverlay() {
 
   return (
     <div
-      className={`absolute inset-0 z-[60] flex items-center bg-black/60 transition-opacity duration-500 ${
-        shouldShow
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
+      className={`absolute inset-0 z-[60] flex items-center bg-black/60 transition-opacity duration-500 pointer-events-none ${
+        shouldShow ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="ml-16 max-w-2xl p-8 pointer-events-auto">
+      <div className="ml-16 max-w-2xl p-8">
         {logoUrl ? (
           <img
             src={logoUrl}
