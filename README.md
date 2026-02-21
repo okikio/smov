@@ -58,4 +58,4 @@ git push  # Push to YOUR repository
 
 ## Contact Me / Discord
 
-[Discord](https://discord.gg/zTxZQ4tmdj)
+[Discord](https://fluxer.gg/VLEQLVSM)
