@@ -16,7 +16,7 @@
 | ------------- | ----------------------------------------------- | ------------------------------------------------------ |
 | P-Stream Docs | [docs](https://docs.pstream.mov)                | [source code](https://github.com/p-stream/docs)        |
 | Extension     | [extension](https://docs.pstream.mov/extension) | [source code](https://github.com/p-stream/browser-ext) |
-| Proxy         | [simple-proxy](https://docs.pstream.mov/proxy)  | [source code](https://github.com/p-stream/sudo-proxy)  |
+| Proxy         | [simple-proxy](https://docs.pstream.mov/proxy)  | [source code](https://github.com/p-stream/simple-proxy)  |
 | Backend       | [backend](https://server.fifthwit.net)          | [source code](https://github.com/p-stream/backend)     |
 | Frontend      | [P-Stream](https://docs.pstream.mov/instances)  | [source code](https://github.com/p-stream/p-stream)    |
 | Weblate       | [weblate](https://weblate.pstream.mov)          |                                                        |
@@ -56,6 +56,8 @@ git commit -m "Update p-stream instance (merge upstream/production)"
 git push  # Push to YOUR repository
 ```
 
-## Contact Me / Discord
+## Contact Me / Fluxer
 
-[Discord](https://fluxer.gg/VLEQLVSM)
+[Fluxer](https://fluxer.gg/VLEQLVSM)
+
+(Fluxer is an OSS Discord alternative platform)
