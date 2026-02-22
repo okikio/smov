@@ -80,7 +80,7 @@ export function DiscoverContent() {
     carousels.push(
       <LazyMediaCarousel
         key="movie-top10"
-        content={{ type: "top10" }}
+        content={{ type: "top10", fallback: "popular" }}
         isTVShow={false}
         carouselRefs={carouselRefs}
         onShowDetails={handleShowDetails}
@@ -103,17 +103,17 @@ export function DiscoverContent() {
     );
 
     // 4K Releases
-    carousels.push(
-      <LazyMediaCarousel
-        key="movie-4k"
-        content={{ type: "latest4k", fallback: "popular" }}
-        isTVShow={false}
-        carouselRefs={carouselRefs}
-        onShowDetails={handleShowDetails}
-        moreContent
-        priority={carousels.length < 2}
-      />,
-    );
+    // carousels.push(
+    //   <LazyMediaCarousel
+    //     key="movie-4k"
+    //     content={{ type: "latest4k", fallback: "popular" }}
+    //     isTVShow={false}
+    //     carouselRefs={carouselRefs}
+    //     onShowDetails={handleShowDetails}
+    //     moreContent
+    //     priority={carousels.length < 2}
+    //   />,
+    // );
 
     // Top Rated
     carousels.push(
