@@ -40,7 +40,7 @@ If you do not have a GitHub account or want to discuss a feature or bug with us 
 
 Fluxer is an OSS Discord alternative.
 
-<!-- <a href="https://fluxer.gg/VLEQLVSM"><img src="https://fluxer.com/api/guilds/1267558147682205738/widget.png?style=banner2" alt="Fluxer Server"></a> -->
+<!-- <a href="https://fluxer.gg/rEBQ3B8E"><img src="https://fluxer.com/api/guilds/1267558147682205738/widget.png?style=banner2" alt="Fluxer Server"></a> -->
 
 ### GitHub Issues
 

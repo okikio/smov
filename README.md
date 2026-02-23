@@ -58,6 +58,6 @@ git push  # Push to YOUR repository
 
 ## Contact Me / Fluxer
 
-[Fluxer](https://fluxer.gg/VLEQLVSM)
+[Fluxer](https://fluxer.gg/rEBQ3B8E)
 
 (Fluxer is an OSS Discord alternative platform)
