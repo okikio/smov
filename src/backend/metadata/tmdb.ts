@@ -55,6 +55,24 @@ export function TMDBMediaToMediaItemType(
   throw new Error("unsupported type");
 }
 
+export function formatTMDBEpisode(v: TMDBEpisodeShort): {
+  id: string;
+  number: number;
+  title: string;
+  air_date: string;
+  still_path: string | null;
+  overview: string;
+} {
+  return {
+    id: v.id.toString(),
+    number: v.episode_number,
+    title: v.title,
+    air_date: v.air_date,
+    still_path: v.still_path,
+    overview: v.overview,
+  };
+}
+
 export function formatTMDBMeta(
   media: TMDBMediaResult,
   season?: TMDBSeasonMetaResult,
@@ -88,14 +106,7 @@ export function formatTMDBMeta(
           title: season.title,
           episodes: season.episodes
             .sort((a, b) => a.episode_number - b.episode_number)
-            .map((v) => ({
-              id: v.id.toString(),
-              number: v.episode_number,
-              title: v.title,
-              air_date: v.air_date,
-              still_path: v.still_path,
-              overview: v.overview,
-            })),
+            .map(formatTMDBEpisode),
         }
       : (undefined as any),
   };
