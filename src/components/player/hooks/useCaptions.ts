@@ -24,9 +24,6 @@ export function useCaptions() {
   const setIsOpenSubtitles = useSubtitleStore((s) => s.setIsOpenSubtitles);
 
   const captionList = usePlayerStore((s) => s.captionList);
-  const isLoadingExternalSubtitles = usePlayerStore(
-    (s) => s.isLoadingExternalSubtitles,
-  );
   const getHlsCaptionList = usePlayerStore((s) => s.display?.getCaptionList);
   const source = usePlayerStore((s) => s.source);
   const selectedCaption = usePlayerStore((s) => s.caption.selected);
@@ -188,9 +185,6 @@ export function useCaptions() {
   useEffect(() => {
     if (!selectedCaption) return;
 
-    // Don't clear while external subtitles are still loading - the caption might appear
-    if (isLoadingExternalSubtitles) return;
-
     // Skip validation for custom/pasted captions that aren't in the caption list
     const isCustomCaption =
       selectedCaption.id === "custom-caption" ||
@@ -232,7 +226,6 @@ export function useCaptions() {
     setCaption,
     selectCaptionById,
     currentTranslateTask,
-    isLoadingExternalSubtitles,
   ]);
 
   return {
