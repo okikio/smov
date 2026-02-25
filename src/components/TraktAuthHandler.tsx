@@ -19,11 +19,7 @@ export function TraktAuthHandler() {
       setStatus("syncing");
       setError(null);
       try {
-        const redirectUri = `${window.location.origin}${window.location.pathname}`;
-        const success = await traktService.exchangeCodeForToken(
-          code,
-          redirectUri,
-        );
+        const success = await traktService.exchangeCodeForToken(code);
         if (success) {
           const newParams = new URLSearchParams(searchParams);
           newParams.delete("code");

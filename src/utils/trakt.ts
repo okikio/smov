@@ -45,18 +45,14 @@ export class TraktService {
     }&redirect_uri=${encodeURIComponent(config.TRAKT_REDIRECT_URI)}`;
   }
 
-  public async exchangeCodeForToken(
-    code: string,
-    redirectUri?: string,
-  ): Promise<boolean> {
+  public async exchangeCodeForToken(code: string): Promise<boolean> {
     const config = conf();
-    if (!config.TRAKT_CLIENT_ID || !config.TRAKT_CLIENT_SECRET)
+    if (
+      !config.TRAKT_CLIENT_ID ||
+      !config.TRAKT_CLIENT_SECRET ||
+      !config.TRAKT_REDIRECT_URI
+    )
       throw new Error("Missing Trakt config");
-
-    const resolvedRedirectUri =
-      redirectUri ?? config.TRAKT_REDIRECT_URI ?? undefined;
-    if (!resolvedRedirectUri)
-      throw new Error("Missing redirect_uri for token exchange");
 
     try {
       const data = await ofetch(`${TRAKT_API_URL}/oauth/token`, {
@@ -66,7 +62,7 @@ export class TraktService {
           code,
           client_id: config.TRAKT_CLIENT_ID,
           client_secret: config.TRAKT_CLIENT_SECRET,
-          redirect_uri: resolvedRedirectUri,
+          redirect_uri: config.TRAKT_REDIRECT_URI,
           grant_type: "authorization_code",
         },
       });

@@ -780,18 +780,20 @@ export function TraktEdit() {
   const config = conf();
 
   const connect = () => {
-    const redirectUri =
-      config.TRAKT_REDIRECT_URI ??
-      `${window.location.origin}${window.location.pathname}`;
     const params = new URLSearchParams({
       response_type: "code",
       client_id: config.TRAKT_CLIENT_ID ?? "",
-      redirect_uri: redirectUri,
+      redirect_uri: config.TRAKT_REDIRECT_URI ?? "",
     });
     window.location.href = `https://trakt.tv/oauth/authorize?${params.toString()}`;
   };
 
-  if (!config.TRAKT_CLIENT_ID || !config.TRAKT_CLIENT_SECRET) return null;
+  if (
+    !config.TRAKT_CLIENT_ID ||
+    !config.TRAKT_CLIENT_SECRET ||
+    !config.TRAKT_REDIRECT_URI
+  )
+    return null;
 
   return (
     <SettingsCard>
