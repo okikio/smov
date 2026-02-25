@@ -8,10 +8,21 @@ import {
   useState,
 } from "react";
 
+import { useSkipTime } from "@/components/player/hooks/useSkipTime";
 import { useProgressBar } from "@/hooks/useProgressBar";
 import { nearestImageAt } from "@/stores/player/slices/thumbnails";
 import { usePlayerStore } from "@/stores/player/store";
 import { durationExceedsHour, formatSeconds } from "@/utils/formatSeconds";
+
+const SEGMENT_COLORS: Record<
+  "intro" | "recap" | "credits" | "preview",
+  string
+> = {
+  intro: "rgba(99, 102, 241, 0.75)", // indigo
+  recap: "rgba(245, 158, 11, 0.75)", // amber
+  credits: "rgba(34, 197, 94, 0.75)", // green
+  preview: "rgba(234, 179, 8, 0.75)", // yellow
+};
 
 function ThumbnailDisplay(props: { at: number; show: boolean }) {
   const thumbnailImages = usePlayerStore((s) => s.thumbnails.images);
@@ -99,6 +110,26 @@ export function ProgressBar() {
   const setDraggingTime = usePlayerStore((s) => s.setDraggingTime);
   const setSeeking = usePlayerStore((s) => s.setSeeking);
   const { isSeeking } = usePlayerStore((s) => s.interface);
+  const segments = useSkipTime();
+
+  const segmentRanges = useMemo(() => {
+    if (duration <= 0) return [];
+    return segments
+      .map((seg) => {
+        const startSec = (seg.start_ms ?? 0) / 1000;
+        const endSec = seg.end_ms != null ? seg.end_ms / 1000 : duration;
+        if (startSec >= endSec) return null;
+        const left = (startSec / duration) * 100;
+        const width = ((endSec - startSec) / duration) * 100;
+        return {
+          key: `${seg.type}-${seg.submission_count}-${seg.start_ms ?? "null"}`,
+          left,
+          width,
+          color: SEGMENT_COLORS[seg.type],
+        };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null);
+  }, [segments, duration]);
 
   const commitTime = useCallback(
     (percentage: number) => {
@@ -152,6 +183,18 @@ export function ProgressBar() {
               dragging ? "!h-1.5" : "",
             ].join(" ")}
           >
+            {/* Skip segment markers */}
+            {segmentRanges.map((range) => (
+              <div
+                key={range.key}
+                className="absolute top-0 bottom-0 rounded-full pointer-events-none"
+                style={{
+                  left: `${range.left}%`,
+                  width: `${range.width}%`,
+                  backgroundColor: range.color,
+                }}
+              />
+            ))}
             {/* Pre-loaded content bar */}
             <div
               className="absolute top-0 left-0 h-full rounded-full bg-progress-preloaded bg-opacity-50 flex justify-end items-center"
