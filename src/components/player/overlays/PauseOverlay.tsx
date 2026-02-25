@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useIdle } from "react-use";
 
-import { getMediaDetails, getMediaLogo } from "@/backend/metadata/tmdb";
+import {
+  getEpisodeDetails,
+  getMediaDetails,
+  getMediaLogo,
+} from "@/backend/metadata/tmdb";
 import { TMDBContentTypes } from "@/backend/metadata/types/tmdb";
 import { useShouldShowControls } from "@/components/player/hooks/useShouldShowControls";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -67,14 +71,35 @@ export function PauseOverlay() {
       try {
         const type =
           meta.type === "movie" ? TMDBContentTypes.MOVIE : TMDBContentTypes.TV;
+
+        // For shows with episode, fetch episode-specific rating
+        const isShowWithEpisode =
+          meta.type === "show" && meta.season && meta.episode;
+        let voteAverage: number | null = null;
+
+        if (isShowWithEpisode) {
+          const episodeData = await getEpisodeDetails(
+            meta.tmdbId,
+            meta.season?.number ?? 0,
+            meta.episode?.number ?? 0,
+          );
+          if (mounted && episodeData?.vote_average != null) {
+            voteAverage = episodeData.vote_average;
+          }
+        }
+
         const data = await getMediaDetails(meta.tmdbId, type, false);
         if (mounted && data) {
-          const voteAverage =
-            typeof data.vote_average === "number" ? data.vote_average : null;
           const genres = (data.genres ?? []).map(
             (g: { name: string }) => g.name,
           );
-          setDetails({ voteAverage, genres });
+          // Use episode rating for shows (never fall back to show rating)
+          const finalVoteAverage = isShowWithEpisode
+            ? voteAverage
+            : typeof data.vote_average === "number"
+              ? data.vote_average
+              : null;
+          setDetails({ voteAverage: finalVoteAverage, genres });
         }
       } catch {
         if (mounted) setDetails({ voteAverage: null, genres: [] });
@@ -85,7 +110,7 @@ export function PauseOverlay() {
     return () => {
       mounted = false;
     };
-  }, [meta?.tmdbId, meta?.type]);
+  }, [meta?.tmdbId, meta?.type, meta?.season, meta?.episode]);
 
   if (!meta) return null;
 

@@ -13,6 +13,7 @@ import {
   ExternalIdMovieSearchResult,
   TMDBContentTypes,
   TMDBCredits,
+  TMDBEpisode,
   TMDBEpisodeShort,
   TMDBMediaResult,
   TMDBMovieData,
@@ -356,6 +357,24 @@ type MediaDetailReturn<T extends TMDBContentTypes> =
     : T extends TMDBContentTypes.TV
       ? TMDBShowData
       : never;
+
+export async function getEpisodeDetails(
+  showId: string,
+  seasonNumber: number,
+  episodeNumber: number,
+): Promise<{ vote_average: number } | null> {
+  try {
+    const data = await get<TMDBEpisode>(
+      `/tv/${showId}/season/${seasonNumber}/episode/${episodeNumber}`,
+    );
+    return {
+      vote_average:
+        typeof data.vote_average === "number" ? data.vote_average : 0,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function getSeasonDetails(
   id: string,
