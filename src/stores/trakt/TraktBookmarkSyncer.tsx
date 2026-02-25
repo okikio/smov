@@ -70,8 +70,28 @@ export function TraktBookmarkSyncer() {
 
           if (item.action === "add") {
             await traktService.addToWatchlist(contentData);
-            if (hasLists && item.group?.length) {
-              for (const groupName of item.group) {
+            if (hasLists) {
+              const newGroups = item.group ?? [];
+              const prevGroups = item.previousGroup ?? [];
+
+              // Remove from Trakt lists that the bookmark no longer belongs to
+              const groupsToRemove = prevGroups.filter(
+                (g) => !newGroups.includes(g),
+              );
+              for (const groupName of groupsToRemove) {
+                const list = await findListByName(slug!, groupName);
+                if (list) {
+                  await traktService.removeFromList(slug!, listId(list), [
+                    contentData,
+                  ]);
+                }
+              }
+
+              // Add to Trakt lists that are new
+              const groupsToAdd = newGroups.filter(
+                (g) => !prevGroups.includes(g),
+              );
+              for (const groupName of groupsToAdd) {
                 const list = await ensureListExists(slug!, groupName);
                 if (list) {
                   await traktService.addToList(slug!, listId(list), [

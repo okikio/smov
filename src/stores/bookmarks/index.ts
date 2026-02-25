@@ -29,6 +29,8 @@ export interface BookmarkUpdateItem {
   poster?: string;
   type?: "show" | "movie";
   group?: string[];
+  /** Groups before modification - used to sync removals to Trakt lists */
+  previousGroup?: string[];
   favoriteEpisodes?: string[];
   action: "delete" | "add";
 }
@@ -115,6 +117,7 @@ export const useBookmarkStore = create(
       },
       addBookmarkWithGroups(meta, groups) {
         set((s) => {
+          const existingBookmark = s.bookmarks[meta.tmdbId];
           updateId += 1;
           const item: BookmarkUpdateItem = {
             id: updateId.toString(),
@@ -125,6 +128,7 @@ export const useBookmarkStore = create(
             year: meta.releaseYear,
             poster: meta.poster,
             group: groups,
+            previousGroup: existingBookmark?.group,
           };
           s.updateQueue.push(item);
           s.traktUpdateQueue.push(item);
@@ -245,13 +249,13 @@ export const useBookmarkStore = create(
         set((s) => {
           const { modifiedBookmarks, result: modificationResult } =
             modifyBookmarks(s.bookmarks, bookmarkIds, options);
-          s.bookmarks = modifiedBookmarks;
           result = modificationResult;
 
-          // Add to update queue for modified bookmarks
+          // Add to update queue for modified bookmarks (capture previousGroup before overwriting)
           if (result.hasChanges) {
             result.modifiedIds.forEach((bookmarkId) => {
-              const bookmark = s.bookmarks[bookmarkId];
+              const originalBookmark = s.bookmarks[bookmarkId];
+              const bookmark = modifiedBookmarks[bookmarkId];
               if (bookmark) {
                 updateId += 1;
                 const item: BookmarkUpdateItem = {
@@ -263,6 +267,7 @@ export const useBookmarkStore = create(
                   poster: bookmark.poster,
                   type: bookmark.type,
                   group: bookmark.group,
+                  previousGroup: originalBookmark?.group,
                   favoriteEpisodes: bookmark.favoriteEpisodes,
                 };
                 s.updateQueue.push(item);
@@ -270,6 +275,8 @@ export const useBookmarkStore = create(
               }
             });
           }
+
+          s.bookmarks = modifiedBookmarks;
         });
 
         return result;
@@ -285,13 +292,13 @@ export const useBookmarkStore = create(
         set((s) => {
           const { modifiedBookmarks, result: modificationResult } =
             modifyBookmarksByGroup(s.bookmarks, options);
-          s.bookmarks = modifiedBookmarks;
           result = modificationResult;
 
-          // Add to update queue for modified bookmarks
+          // Add to update queue for modified bookmarks (capture previousGroup before overwriting)
           if (result.hasChanges) {
             result.modifiedIds.forEach((bookmarkId) => {
-              const bookmark = s.bookmarks[bookmarkId];
+              const originalBookmark = s.bookmarks[bookmarkId];
+              const bookmark = modifiedBookmarks[bookmarkId];
               if (bookmark) {
                 updateId += 1;
                 const item: BookmarkUpdateItem = {
@@ -303,6 +310,7 @@ export const useBookmarkStore = create(
                   poster: bookmark.poster,
                   type: bookmark.type,
                   group: bookmark.group,
+                  previousGroup: originalBookmark?.group,
                   favoriteEpisodes: bookmark.favoriteEpisodes,
                 };
                 s.updateQueue.push(item);
@@ -310,6 +318,8 @@ export const useBookmarkStore = create(
               }
             });
           }
+
+          s.bookmarks = modifiedBookmarks;
         });
 
         return result;
