@@ -474,6 +474,26 @@ export function getMediaPoster(posterPath: string | null): string | undefined {
   if (posterPath) return imgUrl;
 }
 
+/**
+ * Fetches the poster URL for a movie or show from TMDB by ID.
+ * Use this when importing from external sources (e.g. Trakt) that may not have poster URLs.
+ */
+export async function getPosterForMedia(
+  tmdbId: string,
+  type: "movie" | "show",
+): Promise<string | undefined> {
+  try {
+    const tmdbType =
+      type === "movie" ? TMDBContentTypes.MOVIE : TMDBContentTypes.TV;
+    const details = await getMediaDetails(tmdbId, tmdbType, false);
+    const posterPath =
+      (details as TMDBMovieData | TMDBShowData).poster_path ?? null;
+    return getMediaPoster(posterPath);
+  } catch {
+    return undefined;
+  }
+}
+
 export async function getCollectionDetails(collectionId: number): Promise<any> {
   return get<any>(`/collection/${collectionId}`);
 }
@@ -491,6 +511,32 @@ export async function getEpisodes(
     still_path: e.still_path,
     overview: e.overview,
   }));
+}
+
+/**
+ * Resolve TMDB season and episode IDs for a show. Use when external sources
+ * (e.g. Trakt) only provide season/episode numbers.
+ */
+export async function getEpisodeIds(
+  showTmdbId: string,
+  seasonNumber: number,
+  episodeNumber: number,
+): Promise<{ seasonId: string; episodeId: string } | null> {
+  try {
+    const data = await get<TMDBSeason>(
+      `/tv/${showTmdbId}/season/${seasonNumber}`,
+    );
+    const episode = data.episodes.find(
+      (e) => e.episode_number === episodeNumber,
+    );
+    if (!episode) return null;
+    return {
+      seasonId: data.id.toString(),
+      episodeId: episode.id.toString(),
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function getMovieFromExternalId(
