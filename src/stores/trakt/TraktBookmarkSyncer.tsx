@@ -9,6 +9,7 @@ import { TraktContentData } from "@/utils/traktTypes";
 
 const TRAKT_SYNC_INTERVAL_MS = 5 * 60 * 1000; // 5 min
 const INITIAL_SYNC_DELAY_MS = 2000; // Re-sync after backend restore
+const QUEUE_RETRY_DELAY_MS = 5000; // Retry failed queue items after 5s
 
 // Collections/groups sync disabled for now - bookmarks only sync to watchlist
 // import { modifyBookmarks } from "@/utils/bookmarkModifications";
@@ -42,18 +43,19 @@ export function TraktBookmarkSyncer() {
   const { accessToken } = useTraktAuthStore();
   const isSyncingRef = useRef(false);
   const [hydrated, setHydrated] = useState(false);
+  const [retryTrigger, setRetryTrigger] = useState(0);
 
-  // Sync from Local to Trakt
+  // Sync from Local to Trakt (only remove from queue after API success; retry on failure)
   useEffect(() => {
     if (!accessToken) return;
+
+    let retryTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const processQueue = async () => {
       const queue = [...traktUpdateQueue];
       if (queue.length === 0) return;
 
       for (const item of queue) {
-        removeTraktUpdateItem(item.id);
-
         try {
           const contentData: TraktContentData = {
             title: item.title ?? "",
@@ -112,14 +114,25 @@ export function TraktBookmarkSyncer() {
             //   }
             // }
           }
+
+          removeTraktUpdateItem(item.id);
         } catch (error) {
           console.error("Failed to sync bookmark to Trakt", error);
+          if (!retryTimeoutId) {
+            retryTimeoutId = setTimeout(
+              () => setRetryTrigger((n) => n + 1),
+              QUEUE_RETRY_DELAY_MS,
+            );
+          }
         }
       }
     };
 
     processQueue();
-  }, [accessToken, traktUpdateQueue, removeTraktUpdateItem]);
+    return () => {
+      if (retryTimeoutId) clearTimeout(retryTimeoutId);
+    };
+  }, [accessToken, traktUpdateQueue, removeTraktUpdateItem, retryTrigger]);
 
   // Push local bookmarks to Trakt watchlist (TODO implement collections/groups sync)
   const syncBookmarksToTrakt = useCallback(async () => {
