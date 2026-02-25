@@ -11,6 +11,7 @@ import { AppInfoPart } from "./AppInfoPart";
 export function SidebarPart(props: {
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
+  onCategoryChange?: (category: string | null) => void;
   searchQuery: string;
 }) {
   const { t } = useTranslation();
@@ -102,6 +103,7 @@ export function SidebarPart(props: {
       // Set the selected category when clicking a sidebar link
       // null means "All Settings" - show all sections
       props.setSelectedCategory(id);
+      props.onCategoryChange?.(id);
     },
     [props],
   );

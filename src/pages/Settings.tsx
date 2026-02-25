@@ -54,6 +54,7 @@ function SettingsLayout(props: {
   onSearchUnFocus: (newSearch?: string) => void;
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
+  onCategoryChange?: (category: string | null) => void;
 }) {
   const { className } = props;
   const { t } = useTranslation();
@@ -105,6 +106,7 @@ function SettingsLayout(props: {
         <SidebarPart
           selectedCategory={props.selectedCategory}
           setSelectedCategory={props.setSelectedCategory}
+          onCategoryChange={props.onCategoryChange}
           searchQuery={props.searchQuery}
         />
         <div className={className}>{props.children}</div>
@@ -168,7 +170,6 @@ export function AccountSettings(props: {
 export function SettingsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const prevCategoryRef = useRef<string | null>(null);
   const backendChangeModal = useModal("settings-backend-change-confirmation");
   const [pendingBackendChange, setPendingBackendChange] = useState<
     string | null
@@ -271,22 +272,6 @@ export function SettingsPage() {
     };
   }, []);
 
-  // Scroll to top when category changes (but not on initial load or when searching)
-  useEffect(() => {
-    if (
-      prevCategoryRef.current !== null &&
-      prevCategoryRef.current !== selectedCategory &&
-      !searchQuery.trim()
-    ) {
-      // Only scroll to top if we're actually switching categories (not initial load)
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-    }
-    prevCategoryRef.current = selectedCategory;
-  }, [selectedCategory, searchQuery]);
-
   const { t } = useTranslation();
   const activeTheme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
@@ -380,6 +365,21 @@ export function SettingsPage() {
       setSearchQuery(newSearch);
     }
   }, []);
+
+  const handleCategoryChange = useCallback(
+    (category: string | null) => {
+      if (searchQuery.trim()) return;
+      const sectionId = category ?? "settings-account";
+      setTimeout(() => {
+        scrollToElement(`#${sectionId}`, {
+          behavior: "smooth",
+          block: "start",
+          offset: 120, // Account for fixed search bar
+        });
+      }, 100); // Wait for section to render after tab switch
+    },
+    [searchQuery],
+  );
 
   const appLanguage = useLanguageStore((s) => s.language);
   const setAppLanguage = useLanguageStore((s) => s.setLanguage);
@@ -983,6 +983,7 @@ export function SettingsPage() {
         onSearchUnFocus={handleSearchUnFocus}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        onCategoryChange={handleCategoryChange}
         className="space-y-28"
       >
         {(searchQuery.trim() ||
