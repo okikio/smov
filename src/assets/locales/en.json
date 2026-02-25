@@ -1330,6 +1330,7 @@
       "trakt": {
         "title": "Trakt",
         "description": "Sync your watchlist and history with Trakt.",
+        "details": "Syncing might take a few minutes to complete. Changes on Trakt may conflict with local changes, so local items are prioritized.",
         "connect": "Connect Trakt",
         "syncing": "Syncing...",
         "disconnect": "Disconnect"

@@ -802,6 +802,9 @@ export function TraktEdit() {
           </p>
           <p className="max-w-[30rem] font-medium">
             {t("settings.connections.trakt.description")}
+            <p className="text-type-secondary text-xs mt-2">
+              {t("settings.connections.trakt.details")}
+            </p>
           </p>
           {error && <p className="text-type-danger mt-2">{error}</p>}
         </div>
