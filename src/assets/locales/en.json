@@ -1326,6 +1326,13 @@
       "tidb": {
         "description": "Contribute to TheIntroDB by leaving feedback on intro, recap, and credits segments. <0>Learn more.</0>",
         "tokenLabel": "API Key"
+      },
+      "trakt": {
+        "title": "Trakt",
+        "description": "Sync your watchlist and history with Trakt.",
+        "connect": "Connect Trakt",
+        "syncing": "Syncing...",
+        "disconnect": "Disconnect"
       }
     },
     "preferences": {

@@ -775,6 +775,7 @@ export function TIDBEdit({ tidbKey, setTIDBKey }: TIDBKeyProps) {
 }
 
 export function TraktEdit() {
+  const { t } = useTranslation();
   const { user, status, logout, error } = useTraktStore();
   const config = conf();
 
@@ -796,9 +797,11 @@ export function TraktEdit() {
     <SettingsCard>
       <div className="flex justify-between items-center gap-4">
         <div className="my-3">
-          <p className="text-white font-bold mb-3">Trakt</p>
+          <p className="text-white font-bold mb-3">
+            {t("settings.connections.trakt.title")}
+          </p>
           <p className="max-w-[30rem] font-medium">
-            Sync your watchlist and history with Trakt.
+            {t("settings.connections.trakt.description")}
           </p>
           {error && <p className="text-type-danger mt-2">{error}</p>}
         </div>
@@ -816,7 +819,7 @@ export function TraktEdit() {
                 <span className="font-bold">{user.name || user.username}</span>
               </div>
               <Button theme="danger" onClick={logout}>
-                Disconnect
+                {t("settings.connections.trakt.disconnect")}
               </Button>
             </div>
           ) : (
@@ -825,7 +828,9 @@ export function TraktEdit() {
               onClick={connect}
               disabled={status === "syncing"}
             >
-              {status === "syncing" ? "Syncing..." : "Connect Trakt"}
+              {status === "syncing"
+                ? t("settings.connections.trakt.syncing")
+                : t("settings.connections.trakt.connect")}
             </Button>
           )}
         </div>
