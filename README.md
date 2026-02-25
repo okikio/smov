@@ -12,14 +12,14 @@
 
 ## Links And Resources
 
-| Service       | Link                                            | Source Code                                            |
-| ------------- | ----------------------------------------------- | ------------------------------------------------------ |
-| P-Stream Docs | [docs](https://docs.pstream.mov)                | [source code](https://github.com/p-stream/docs)        |
-| Extension     | [extension](https://docs.pstream.mov/extension) | [source code](https://github.com/p-stream/browser-ext) |
-| Proxy         | [simple-proxy](https://docs.pstream.mov/proxy)  | [source code](https://github.com/p-stream/simple-proxy)  |
-| Backend       | [backend](https://server.fifthwit.net)          | [source code](https://github.com/p-stream/backend)     |
-| Frontend      | [P-Stream](https://docs.pstream.mov/instances)  | [source code](https://github.com/p-stream/p-stream)    |
-| Weblate       | [weblate](https://weblate.pstream.mov)          |                                                        |
+| Service       | Link                                            | Source Code                                             |
+| ------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| P-Stream Docs | [docs](https://docs.pstream.mov)                | [source code](https://github.com/p-stream/docs)         |
+| Extension     | [extension](https://docs.pstream.mov/extension) | [source code](https://github.com/p-stream/browser-ext)  |
+| Proxy         | [simple-proxy](https://docs.pstream.mov/proxy)  | [source code](https://github.com/p-stream/simple-proxy) |
+| Backend       | [backend](https://server.fifthwit.net)          | [source code](https://github.com/p-stream/backend)      |
+| Frontend      | [P-Stream](https://docs.pstream.mov/instances)  | [source code](https://github.com/p-stream/p-stream)     |
+| Weblate       | [weblate](https://weblate.pstream.mov)          |                                                         |
 
 **_I provide these if you are not able to host yourself, though I do encourage hosting the frontend._**
 
