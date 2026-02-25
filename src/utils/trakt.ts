@@ -79,7 +79,11 @@ export class TraktService {
     } catch (error: any) {
       const msg =
         error?.data?.message ?? error?.message ?? "Failed to exchange code";
-      console.error("[TraktService] Failed to exchange code:", error);
+      const status = error?.response?.status;
+      console.error(
+        "[TraktService] Failed to exchange code:",
+        status ? `${status} - ${msg}` : msg,
+      );
       throw new Error(msg);
     }
   }
@@ -112,8 +116,14 @@ export class TraktService {
       useTraktAuthStore
         .getState()
         .setTokens(data.access_token, data.refresh_token, expiresAt);
-    } catch (error) {
-      console.error("[TraktService] Failed to refresh token:", error);
+    } catch (error: any) {
+      const msg =
+        error?.data?.message ?? error?.message ?? "Failed to refresh token";
+      const status = error?.response?.status;
+      console.error(
+        "[TraktService] Failed to refresh token:",
+        status ? `${status} - ${msg}` : msg,
+      );
       useTraktAuthStore.getState().clear();
       throw error;
     }
