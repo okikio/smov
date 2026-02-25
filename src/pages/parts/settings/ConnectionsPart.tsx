@@ -35,6 +35,7 @@ import {
 import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
+import { useTraktStore } from "@/stores/trakt/store";
 
 import { RegionSelectorPart } from "./RegionSelectorPart";
 
@@ -773,6 +774,76 @@ export function TIDBEdit({ tidbKey, setTIDBKey }: TIDBKeyProps) {
   );
 }
 
+export function TraktEdit() {
+  const { t } = useTranslation();
+  const { user, status, logout, error } = useTraktStore();
+  const config = conf();
+
+  const connect = () => {
+    const params = new URLSearchParams({
+      response_type: "code",
+      client_id: config.TRAKT_CLIENT_ID ?? "",
+      redirect_uri: config.TRAKT_REDIRECT_URI ?? "",
+    });
+    window.location.href = `https://trakt.tv/oauth/authorize?${params.toString()}`;
+  };
+
+  if (
+    !config.TRAKT_CLIENT_ID ||
+    !config.TRAKT_CLIENT_SECRET ||
+    !config.TRAKT_REDIRECT_URI
+  )
+    return null;
+
+  return (
+    <SettingsCard>
+      <div className="flex justify-between items-center gap-4">
+        <div className="my-3">
+          <p className="text-white font-bold mb-3">
+            {t("settings.connections.trakt.title")}
+          </p>
+          <p className="max-w-[30rem] font-medium">
+            {t("settings.connections.trakt.description")}
+            <p className="text-type-secondary text-xs mt-2">
+              {t("settings.connections.trakt.details")}
+            </p>
+          </p>
+          {error && <p className="text-type-danger mt-2">{error}</p>}
+        </div>
+        <div>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                {user.images?.avatar?.full && (
+                  <img
+                    src={user.images.avatar.full}
+                    alt={user.username}
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <span className="font-bold">{user.name || user.username}</span>
+              </div>
+              <Button theme="danger" onClick={logout}>
+                {t("settings.connections.trakt.disconnect")}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              theme="purple"
+              onClick={connect}
+              disabled={status === "syncing"}
+            >
+              {status === "syncing"
+                ? t("settings.connections.trakt.syncing")
+                : t("settings.connections.trakt.connect")}
+            </Button>
+          )}
+        </div>
+      </div>
+    </SettingsCard>
+  );
+}
+
 export function ConnectionsPart(
   props: BackendEditProps &
     ProxyEditProps &
@@ -812,6 +883,7 @@ export function ConnectionsPart(
           mode="settings"
         />
         <TIDBEdit tidbKey={props.tidbKey} setTIDBKey={props.setTIDBKey} />
+        <TraktEdit />
       </div>
     </div>
   );

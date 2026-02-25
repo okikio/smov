@@ -96,8 +96,10 @@ export function RealPlayerView() {
   });
   useEffect(() => {
     reset();
-    // Reset watch party state when media changes
     openedWatchPartyRef.current = false;
+    return () => {
+      reset();
+    };
   }, [paramsData, reset]);
 
   // Auto-open watch party menu if URL contains watchparty parameter
