@@ -987,12 +987,14 @@
     "segment": {
       "intro": "Intro",
       "recap": "Recap",
-      "credits": "Credits"
+      "credits": "Credits",
+      "preview": "Preview"
     },
     "skipTime": {
       "intro": "Skip Intro",
       "recap": "Skip Recap",
       "credits": "Skip Credits",
+      "preview": "Skip Preview",
       "skipSegments": "Skip Segments",
       "submitSegment": "Submit Segment",
       "noSegments": "No skip segments available",
