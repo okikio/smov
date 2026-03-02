@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useIdle } from "react-use";
 
 import {
@@ -12,6 +13,8 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
+import { durationExceedsHour, formatSeconds } from "@/utils/formatSeconds";
+import { uses12HourClock } from "@/utils/uses12HourClock";
 
 interface PauseDetails {
   voteAverage: number | null;
@@ -23,10 +26,14 @@ export function PauseOverlay() {
   const isPaused = usePlayerStore((s) => s.mediaPlaying.isPaused);
   const status = usePlayerStore((s) => s.status);
   const meta = usePlayerStore((s) => s.meta);
+  const { time, duration, draggingTime } = usePlayerStore((s) => s.progress);
+  const { isSeeking } = usePlayerStore((s) => s.interface);
+  const playbackRate = usePlayerStore((s) => s.mediaPlaying.playbackRate);
   const enablePauseOverlay = usePreferencesStore((s) => s.enablePauseOverlay);
   const enableImageLogos = usePreferencesStore((s) => s.enableImageLogos);
   const { isMobile } = useIsMobile();
   const { showTargets } = useShouldShowControls();
+  const { t } = useTranslation();
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [details, setDetails] = useState<PauseDetails>({
     voteAverage: null,
@@ -117,6 +124,25 @@ export function PauseOverlay() {
   const overview =
     meta.type === "show" ? meta.episode?.overview : meta.overview;
 
+  const hasHours = durationExceedsHour(duration);
+  const currentTime = Math.min(
+    Math.max(isSeeking ? draggingTime : time, 0),
+    duration,
+  );
+  const secondsRemaining = Math.abs(currentTime - duration);
+  const secondsRemainingAdjusted =
+    playbackRate > 0 ? secondsRemaining / playbackRate : secondsRemaining;
+
+  const timeLeft = formatSeconds(
+    secondsRemaining,
+    durationExceedsHour(secondsRemaining),
+  );
+  const timeWatched = formatSeconds(currentTime, hasHours);
+  const timeFinished = new Date(Date.now() + secondsRemainingAdjusted * 1e3);
+  const durationFormatted = formatSeconds(duration, hasHours);
+
+  const localizationKey = "remaining";
+
   // Don't render anything if we don't have content, but keep structure for fade if valid
   const hasDetails = details.voteAverage !== null || details.genres.length > 0;
   const hasContent = overview || logoUrl || meta.title || hasDetails;
@@ -128,7 +154,7 @@ export function PauseOverlay() {
         shouldShow ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="md:ml-16 max-w-sm lg:max-w-2xl p-8">
+      <div className="md:ml-16 max-w-md lg:max-w-2xl p-8">
         {logoUrl ? (
           <img
             src={logoUrl}
@@ -147,7 +173,9 @@ export function PauseOverlay() {
           </h2>
         )}
 
-        {(details.voteAverage !== null || details.genres.length > 0) && (
+        {(details.voteAverage !== null ||
+          details.genres.length > 0 ||
+          duration > 0) && (
           <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-white/80 drop-shadow-md">
             {details.voteAverage !== null && (
               <span>
@@ -161,6 +189,45 @@ export function PauseOverlay() {
                   <span className="text-white/60">•</span>
                 )}
                 <span>{details.genres.slice(0, 4).join(", ")}</span>
+              </>
+            )}
+            {duration > 0 && (
+              <>
+                {(details.voteAverage !== null ||
+                  details.genres.length > 0) && (
+                  <span className="text-white/60">•</span>
+                )}
+                <span>
+                  {(() => {
+                    const text = t(`player.time.${localizationKey}`, {
+                      timeFinished,
+                      timeWatched,
+                      timeLeft,
+                      duration: durationFormatted,
+                      formatParams: {
+                        timeFinished: {
+                          hour: "numeric",
+                          minute: "numeric",
+                          hour12: uses12HourClock(),
+                        },
+                      },
+                    });
+                    if (
+                      localizationKey === "remaining" &&
+                      text.includes(" • ")
+                    ) {
+                      const [left, right] = text.split(" • ");
+                      return (
+                        <>
+                          {left}
+                          <span className="text-white/60 mx-1">•</span>
+                          {right}
+                        </>
+                      );
+                    }
+                    return text;
+                  })()}
+                </span>
               </>
             )}
           </div>
