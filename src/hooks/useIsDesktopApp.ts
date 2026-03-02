@@ -2,6 +2,17 @@
 declare global {
   interface Window {
     __PSTREAM_DESKTOP__?: boolean;
+    desktopApi?: {
+      startDownload(data: {
+        url: string;
+        title: string;
+        poster?: string;
+        subtitleText?: string;
+        duration?: number;
+        type?: string;
+      }): void;
+      openOffline(): void;
+    };
   }
 }
 

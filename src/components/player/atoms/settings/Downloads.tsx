@@ -2,11 +2,13 @@ import { useCallback, useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useCopyToClipboard } from "react-use";
 
+import { downloadCaption } from "@/backend/helpers/subs";
 import { Button } from "@/components/buttons/Button";
 import { Icon, Icons } from "@/components/Icon";
 import { OverlayPage } from "@/components/overlays/OverlayPage";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { convertSubtitlesToSrtDataurl } from "@/components/player/utils/captions";
+import { useIsDesktopApp } from "@/hooks/useIsDesktopApp";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { usePlayerStore } from "@/stores/player/store";
 
@@ -64,6 +66,54 @@ export function DownloadView({ id }: { id: string }) {
 
   const sourceType = usePlayerStore((s) => s.source?.type);
   const selectedCaption = usePlayerStore((s) => s.caption?.selected);
+  const captionList = usePlayerStore((s) => s.captionList);
+  const meta = usePlayerStore((s) => s.meta);
+  const duration = usePlayerStore((s) => s.progress.duration);
+  const isDesktopApp = useIsDesktopApp();
+
+  const startOfflineDownload = useCallback(async () => {
+    if (!downloadUrl) return;
+    const title = meta?.title ? meta.title : "Video";
+    const poster = meta?.poster;
+    let subtitleText = null;
+
+    if (selectedCaption?.srtData) {
+      subtitleText = selectedCaption.srtData;
+    } else if (captionList.length > 0) {
+      // Auto-fetch the first English caption, or the first available one
+      const defaultCaption =
+        captionList.find((c) => c.language === "en") ?? captionList[0];
+      try {
+        subtitleText = await downloadCaption(defaultCaption);
+      } catch {
+        // Continue without subtitles if fetch fails
+      }
+    }
+
+    window.desktopApi?.startDownload({
+      url: downloadUrl,
+      title,
+      poster,
+      subtitleText,
+      duration,
+      type: sourceType,
+    });
+
+    if (window.desktopApi?.openOffline) {
+      window.desktopApi.openOffline();
+    } else {
+      router.navigate("/");
+    }
+  }, [
+    downloadUrl,
+    meta,
+    selectedCaption,
+    captionList,
+    duration,
+    router,
+    sourceType,
+  ]);
+
   const openSubtitleDownload = useCallback(() => {
     const dataUrl = selectedCaption
       ? convertSubtitlesToSrtDataurl(selectedCaption?.srtData)
@@ -83,21 +133,48 @@ export function DownloadView({ id }: { id: string }) {
         <div className="mb-4">
           {sourceType === "hls" ? (
             <div className="mb-6">
-              <Menu.Paragraph marginClass="mb-6">
-                <StyleTrans k="player.menus.downloads.hlsDisclaimer" />
-              </Menu.Paragraph>
+              {isDesktopApp ? (
+                <>
+                  <Menu.Paragraph marginClass="mb-6">
+                    <Trans i18nKey="player.menus.downloads.desktopDisclaimer">
+                      Download this video directly to your app for offline
+                      playback.
+                    </Trans>
+                  </Menu.Paragraph>
+                  <Button
+                    className="w-full mt-2"
+                    theme="purple"
+                    onClick={startOfflineDownload}
+                  >
+                    {t(
+                      "player.menus.downloads.offlineButton",
+                      "Download for Offline Use",
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Menu.Paragraph marginClass="mb-6">
+                    <StyleTrans k="player.menus.downloads.hlsDisclaimer" />
+                  </Menu.Paragraph>
 
-              <Button className="w-full mt-2" theme="purple" href={hlsDownload}>
-                {t("player.menus.downloads.button")}
-              </Button>
-              <p className="text-xs py-4">
-                <Trans i18nKey="player.menus.downloads.hlsDownloader">
-                  <a
-                    className="text-type-link"
-                    href="https://hls-downloader.pstream.mov/"
-                  />
-                </Trans>
-              </p>
+                  <Button
+                    className="w-full mt-2"
+                    theme="purple"
+                    href={hlsDownload}
+                  >
+                    {t("player.menus.downloads.button")}
+                  </Button>
+                  <p className="text-xs py-4">
+                    <Trans i18nKey="player.menus.downloads.hlsDownloader">
+                      <a
+                        className="text-type-link"
+                        href="https://hls-downloader.pstream.mov/"
+                      />
+                    </Trans>
+                  </p>
+                </>
+              )}
               <Button
                 className="w-full mt-2"
                 theme="secondary"
@@ -116,6 +193,42 @@ export function DownloadView({ id }: { id: string }) {
                 onClick={openSubtitleDownload}
                 disabled={!selectedCaption}
                 theme="secondary"
+              >
+                {t("player.menus.downloads.downloadSubtitle")}
+              </Button>
+            </div>
+          ) : sourceType === "file" ? (
+            <div className="mb-6">
+              {isDesktopApp ? (
+                <>
+                  <Menu.Paragraph marginClass="mb-6">
+                    <Trans i18nKey="player.menus.downloads.desktopDisclaimer">
+                      Download this video directly to your app for offline
+                      playback.
+                    </Trans>
+                  </Menu.Paragraph>
+                  <Button
+                    className="w-full mt-2"
+                    theme="purple"
+                    onClick={startOfflineDownload}
+                  >
+                    {t(
+                      "player.menus.downloads.offlineButton",
+                      "Download for Offline Use",
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <Button className="w-full" href={downloadUrl} theme="purple">
+                  {t("player.menus.downloads.downloadVideo")}
+                </Button>
+              )}
+              <Button
+                className="w-full mt-2"
+                onClick={openSubtitleDownload}
+                disabled={!selectedCaption}
+                theme="secondary"
+                download="subtitles.srt"
               >
                 {t("player.menus.downloads.downloadSubtitle")}
               </Button>
@@ -141,7 +254,6 @@ export function DownloadView({ id }: { id: string }) {
               <Menu.Paragraph marginClass="my-6">
                 <StyleTrans k="player.menus.downloads.disclaimer" />
               </Menu.Paragraph>
-
               <Button className="w-full" href={downloadUrl} theme="purple">
                 {t("player.menus.downloads.downloadVideo")}
               </Button>
