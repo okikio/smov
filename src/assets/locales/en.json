@@ -758,6 +758,8 @@
         "copyHlsPlaylist": "Copy HLS playlist link",
         "downloadSubtitle": "Download current subtitle",
         "downloadVideo": "Download video",
+        "desktopDisclaimer": "Download this video directly to your app for offline playback.",
+        "offlineButton": "Download for Offline Use",
         "openIn": "Open in...",
         "vlc": "VLC",
         "iina": "IINA",

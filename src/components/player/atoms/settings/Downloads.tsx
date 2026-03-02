@@ -16,10 +16,17 @@ export function useDownloadLink() {
   const source = usePlayerStore((s) => s.source);
   const currentQuality = usePlayerStore((s) => s.currentQuality);
   const url = useMemo(() => {
-    if (source?.type === "file" && currentQuality)
-      return source.qualities[currentQuality]?.url ?? null;
+    if (source?.type === "file") {
+      const quality = currentQuality
+        ? source.qualities[currentQuality]
+        : undefined;
+      if (quality) return quality.url;
+      // Fallback to the first available quality if currentQuality is not set
+      const firstQuality = Object.values(source.qualities)[0];
+      return firstQuality?.url;
+    }
     if (source?.type === "hls") return source.url;
-    return null;
+    return undefined;
   }, [source, currentQuality]);
   return url;
 }
@@ -73,7 +80,7 @@ export function DownloadView({ id }: { id: string }) {
 
   const startOfflineDownload = useCallback(async () => {
     if (!downloadUrl) return;
-    const title = meta?.title ? meta.title : "Video";
+    const title = meta?.title ? meta.title : t("player.menus.downloads.title");
     const poster = meta?.poster;
     let subtitleText: string | undefined;
 
@@ -112,6 +119,7 @@ export function DownloadView({ id }: { id: string }) {
     duration,
     router,
     sourceType,
+    t,
   ]);
 
   const openSubtitleDownload = useCallback(() => {
@@ -121,8 +129,6 @@ export function DownloadView({ id }: { id: string }) {
     if (!dataUrl) return;
     window.open(dataUrl);
   }, [selectedCaption]);
-
-  if (!downloadUrl) return null;
 
   return (
     <>
@@ -136,20 +142,18 @@ export function DownloadView({ id }: { id: string }) {
               {isDesktopApp ? (
                 <>
                   <Menu.Paragraph marginClass="mb-6">
-                    <Trans i18nKey="player.menus.downloads.desktopDisclaimer">
-                      Download this video directly to your app for offline
-                      playback.
-                    </Trans>
+                    <StyleTrans k="player.menus.downloads.disclaimer" />
+                  </Menu.Paragraph>
+
+                  <Menu.Paragraph marginClass="mb-6">
+                    <Trans i18nKey="player.menus.downloads.desktopDisclaimer" />
                   </Menu.Paragraph>
                   <Button
                     className="w-full mt-2"
                     theme="purple"
                     onClick={startOfflineDownload}
                   >
-                    {t(
-                      "player.menus.downloads.offlineButton",
-                      "Download for Offline Use",
-                    )}
+                    {t("player.menus.downloads.offlineButton")}
                   </Button>
                 </>
               ) : (
@@ -183,7 +187,7 @@ export function DownloadView({ id }: { id: string }) {
                   // Allow context menu & left click to copy
                   event.preventDefault();
 
-                  copyToClipboard(downloadUrl);
+                  copyToClipboard(downloadUrl ?? "");
                 }}
               >
                 {t("player.menus.downloads.copyHlsPlaylist")}
@@ -202,26 +206,43 @@ export function DownloadView({ id }: { id: string }) {
               {isDesktopApp ? (
                 <>
                   <Menu.Paragraph marginClass="mb-6">
-                    <Trans i18nKey="player.menus.downloads.desktopDisclaimer">
-                      Download this video directly to your app for offline
-                      playback.
-                    </Trans>
+                    <Trans i18nKey="player.menus.downloads.desktopDisclaimer" />
                   </Menu.Paragraph>
                   <Button
                     className="w-full mt-2"
                     theme="purple"
                     onClick={startOfflineDownload}
                   >
-                    {t(
-                      "player.menus.downloads.offlineButton",
-                      "Download for Offline Use",
-                    )}
+                    {t("player.menus.downloads.offlineButton")}
                   </Button>
                 </>
               ) : (
-                <Button className="w-full" href={downloadUrl} theme="purple">
-                  {t("player.menus.downloads.downloadVideo")}
-                </Button>
+                <>
+                  <Menu.ChevronLink
+                    onClick={() => router.navigate("/download/pc")}
+                  >
+                    {t("player.menus.downloads.onPc.title")}
+                  </Menu.ChevronLink>
+                  <Menu.ChevronLink
+                    onClick={() => router.navigate("/download/ios")}
+                  >
+                    {t("player.menus.downloads.onIos.title")}
+                  </Menu.ChevronLink>
+                  <Menu.ChevronLink
+                    onClick={() => router.navigate("/download/android")}
+                  >
+                    {t("player.menus.downloads.onAndroid.title")}
+                  </Menu.ChevronLink>
+
+                  <Menu.Divider />
+
+                  <Menu.Paragraph marginClass="my-6">
+                    <StyleTrans k="player.menus.downloads.disclaimer" />
+                  </Menu.Paragraph>
+                  <Button className="w-full" href={downloadUrl} theme="purple">
+                    {t("player.menus.downloads.downloadVideo")}
+                  </Button>
+                </>
               )}
               <Button
                 className="w-full mt-2"
