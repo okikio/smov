@@ -75,7 +75,7 @@ export function DownloadView({ id }: { id: string }) {
     if (!downloadUrl) return;
     const title = meta?.title ? meta.title : "Video";
     const poster = meta?.poster;
-    let subtitleText = null;
+    let subtitleText: string | undefined;
 
     if (selectedCaption?.srtData) {
       subtitleText = selectedCaption.srtData;
