@@ -123,16 +123,21 @@ export function getPrettyLanguageNameFromLocale(locale: string): string | null {
 /**
  * Sort locale codes by occurrence, rest on alphabetical order
  * @param langCodes list language codes to sort
+ * @param appLanguage optional app language to prioritize
  * @returns sorted version of inputted list
  */
-export function sortLangCodes(langCodes: string[]) {
-  const languagesOrder = [...languageOrder].reverse(); // Reverse is necessary, not sure why
+export function sortLangCodes(langCodes: string[], appLanguage?: string) {
+  const languagesOrder = [...languageOrder];
+  if (appLanguage && !languagesOrder.includes(appLanguage)) {
+    languagesOrder.unshift(appLanguage);
+  }
+  const reversedOrder = [...languagesOrder].reverse(); // Reverse is necessary, not sure why
 
   const results = langCodes.sort((a, b) => {
-    const langOrderA = languagesOrder.findIndex(
+    const langOrderA = reversedOrder.findIndex(
       (v) => a.startsWith(`${v}-`) || a === v,
     );
-    const langOrderB = languagesOrder.findIndex(
+    const langOrderB = reversedOrder.findIndex(
       (v) => b.startsWith(`${v}-`) || b === v,
     );
     if (langOrderA !== -1 || langOrderB !== -1) return langOrderB - langOrderA;

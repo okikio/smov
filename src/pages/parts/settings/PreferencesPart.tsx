@@ -47,7 +47,10 @@ export function PreferencesPart(props: {
   const { t } = useTranslation();
   const { showModal } = useOverlayStack();
   const [isSourceListExpanded, setIsSourceListExpanded] = useState(false);
-  const sorted = sortLangCodes(appLanguageOptions.map((item) => item.code));
+  const sorted = sortLangCodes(
+    appLanguageOptions.map((item) => item.code),
+    props.language,
+  );
 
   const allowAutoplay = isAutoplayAllowed();
 

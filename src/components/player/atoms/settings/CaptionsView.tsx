@@ -260,6 +260,7 @@ export function CaptionOption(props: CaptionOptionProps) {
 // Hook to filter and sort subtitle list with search
 export function useSubtitleList(subs: CaptionListItem[], searchQuery: string) {
   const { t: translate } = useTranslation();
+  const appLanguage = useLanguageStore((s) => s.language);
   const unknownChoice = translate("player.menus.subtitles.unknownLanguage");
   return useMemo(() => {
     const input = subs.map((t) => ({
@@ -267,7 +268,10 @@ export function useSubtitleList(subs: CaptionListItem[], searchQuery: string) {
       languageName:
         getPrettyLanguageNameFromLocale(t.language) ?? unknownChoice,
     }));
-    const sorted = sortLangCodes(input.map((t) => t.language));
+    const sorted = sortLangCodes(
+      input.map((t) => t.language),
+      appLanguage,
+    );
     let results = input.sort((a, b) => {
       return sorted.indexOf(a.language) - sorted.indexOf(b.language);
     });
@@ -283,7 +287,7 @@ export function useSubtitleList(subs: CaptionListItem[], searchQuery: string) {
     }
 
     return results;
-  }, [subs, searchQuery, unknownChoice]);
+  }, [subs, searchQuery, unknownChoice, appLanguage]);
 }
 
 export function CustomCaptionOption() {
@@ -529,8 +533,12 @@ export function CaptionsView({
     // Sort with app language first, then alphabetically
     return sortedGroups.sort((a, b) => {
       // App language always comes first
-      if (a.language === appLanguage) return -1;
-      if (b.language === appLanguage) return 1;
+      const isALang =
+        a.language === appLanguage || a.language.startsWith(`${appLanguage}-`);
+      const isBLang =
+        b.language === appLanguage || b.language.startsWith(`${appLanguage}-`);
+      if (isALang && !isBLang) return -1;
+      if (!isALang && isBLang) return 1;
 
       // Then sort alphabetically
       return a.languageName.localeCompare(b.languageName);
