@@ -1,3 +1,5 @@
+import Fuse from "fuse.js";
+
 import { SimpleCache } from "@/utils/cache";
 import { MediaItem } from "@/utils/mediaTypes";
 
@@ -8,7 +10,11 @@ import {
   getMediaPoster,
   multiSearch,
 } from "./tmdb";
-import { TMDBContentTypes } from "./types/tmdb";
+import {
+  TMDBContentTypes,
+  TMDBMovieSearchResult,
+  TMDBShowSearchResult,
+} from "./types/tmdb";
 
 export interface MWQuery {
   searchQuery: string;
@@ -22,6 +28,71 @@ cache.initialize();
 
 // detect "tmdb:123456" or "tmdb:123456:movie" or "tmdb:123456:tv"
 const tmdbIdPattern = /^tmdb:(\d+)(?::(movie|tv))?$/i;
+const trailingYearPattern = /\s+\b(19|20)\d{2}\b$/;
+
+function normalizeQuery(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getLenientQueries(searchQuery: string): string[] {
+  const base = searchQuery.trim();
+  const normalized = normalizeQuery(base);
+  const withoutTrailingYear = base.replace(trailingYearPattern, "").trim();
+  const normalizedWithoutYear = normalizeQuery(withoutTrailingYear);
+
+  return [
+    ...new Set([base, normalized, withoutTrailingYear, normalizedWithoutYear]),
+  ].filter((q) => q.length > 0);
+}
+
+function dedupeTMDBResults(
+  items: (TMDBMovieSearchResult | TMDBShowSearchResult)[],
+): (TMDBMovieSearchResult | TMDBShowSearchResult)[] {
+  const deduped = new Map<
+    string,
+    TMDBMovieSearchResult | TMDBShowSearchResult
+  >();
+
+  items.forEach((item) => {
+    deduped.set(`${item.media_type}:${item.id}`, item);
+  });
+
+  return Array.from(deduped.values());
+}
+
+function rankTMDBResultsFuzzy(
+  items: (TMDBMovieSearchResult | TMDBShowSearchResult)[],
+  query: string,
+): (TMDBMovieSearchResult | TMDBShowSearchResult)[] {
+  if (items.length <= 1) return items;
+
+  const fuse = new Fuse(items, {
+    includeScore: true,
+    ignoreLocation: true,
+    threshold: 0.45,
+    minMatchCharLength: 2,
+    keys: [
+      { name: "title", weight: 0.6 },
+      { name: "name", weight: 0.6 },
+      { name: "original_title", weight: 0.2 },
+      { name: "original_name", weight: 0.2 },
+    ],
+  });
+
+  const ranked = fuse.search(query).map((result) => result.item);
+  const rankedSet = new Set(
+    ranked.map((item) => `${item.media_type}:${item.id}`),
+  );
+  const remainder = items.filter(
+    (item) => !rankedSet.has(`${item.media_type}:${item.id}`),
+  );
+
+  return ranked.concat(remainder);
+}
 
 export async function searchForMedia(query: MWQuery): Promise<MediaItem[]> {
   if (cache.has(query)) return cache.get(query) as MediaItem[];
@@ -69,9 +140,14 @@ export async function searchForMedia(query: MWQuery): Promise<MediaItem[]> {
     }
   }
 
-  const data = await multiSearch(searchQuery);
+  const queryVariants = getLenientQueries(searchQuery);
+  const resultSets = await Promise.all(
+    queryVariants.map((q) => multiSearch(q)),
+  );
+  const data = dedupeTMDBResults(resultSets.flat());
+  const rankedData = rankTMDBResultsFuzzy(data, searchQuery);
 
-  const results = data.map((v) => {
+  const results = rankedData.map((v) => {
     const formattedResult = formatTMDBSearchResult(v, v.media_type);
     return formatTMDBMetaToMediaItem(formattedResult);
   });
