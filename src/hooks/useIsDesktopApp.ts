@@ -10,6 +10,7 @@ declare global {
         subtitleText?: string;
         duration?: number;
         type?: string;
+        headers?: Record<string, string>;
       }): void;
       openOffline(): void;
     };

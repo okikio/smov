@@ -76,6 +76,7 @@ export function DownloadView({ id }: { id: string }) {
   const captionList = usePlayerStore((s) => s.captionList);
   const meta = usePlayerStore((s) => s.meta);
   const duration = usePlayerStore((s) => s.progress.duration);
+  const source = usePlayerStore((s) => s.source);
   const isDesktopApp = useIsDesktopApp();
 
   const startOfflineDownload = useCallback(async () => {
@@ -97,6 +98,11 @@ export function DownloadView({ id }: { id: string }) {
       }
     }
 
+    const headers = {
+      ...(source?.headers ?? {}),
+      ...(source?.preferredHeaders ?? {}),
+    };
+
     window.desktopApi?.startDownload({
       url: downloadUrl,
       title,
@@ -104,6 +110,7 @@ export function DownloadView({ id }: { id: string }) {
       subtitleText,
       duration,
       type: sourceType,
+      headers,
     });
 
     if (window.desktopApi?.openOffline) {
@@ -118,6 +125,7 @@ export function DownloadView({ id }: { id: string }) {
     captionList,
     duration,
     router,
+    source,
     sourceType,
     t,
   ]);
