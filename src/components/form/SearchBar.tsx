@@ -26,7 +26,7 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarProps>(
     const [showTooltip, setShowTooltip] = useState(false);
 
     function setSearch(value: string) {
-      props.onChange(value, true);
+      props.onChange(value, false);
     }
 
     useEffect(() => {

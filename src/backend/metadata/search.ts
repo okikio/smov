@@ -40,13 +40,18 @@ function normalizeQuery(input: string): string {
 
 function getLenientQueries(searchQuery: string): string[] {
   const base = searchQuery.trim();
+  if (base.length < 3) return [base];
+
   const normalized = normalizeQuery(base);
   const withoutTrailingYear = base.replace(trailingYearPattern, "").trim();
   const normalizedWithoutYear = normalizeQuery(withoutTrailingYear);
 
-  return [
+  const variants = [
     ...new Set([base, normalized, withoutTrailingYear, normalizedWithoutYear]),
   ].filter((q) => q.length > 0);
+
+  // Keep fanout small to avoid TMDB rate-limit pressure.
+  return variants.slice(0, 2);
 }
 
 function dedupeTMDBResults(
@@ -141,10 +146,24 @@ export async function searchForMedia(query: MWQuery): Promise<MediaItem[]> {
   }
 
   const queryVariants = getLenientQueries(searchQuery);
-  const resultSets = await Promise.all(
+  const settledResults = await Promise.allSettled(
     queryVariants.map((q) => multiSearch(q)),
   );
-  const data = dedupeTMDBResults(resultSets.flat());
+  const fulfilledResults = settledResults
+    .filter(
+      (
+        result,
+      ): result is PromiseFulfilledResult<
+        (TMDBMovieSearchResult | TMDBShowSearchResult)[]
+      > => result.status === "fulfilled",
+    )
+    .map((result) => result.value);
+
+  if (fulfilledResults.length === 0) {
+    return [];
+  }
+
+  const data = dedupeTMDBResults(fulfilledResults.flat());
   const rankedData = rankTMDBResultsFuzzy(data, searchQuery);
 
   const results = rankedData.map((v) => {

@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useAsyncFn } from "react-use";
 
 import { searchForMedia } from "@/backend/metadata/search";
 import { MWQuery } from "@/backend/metadata/types/mw";
@@ -10,6 +9,7 @@ import { Icons } from "@/components/Icon";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { MediaGrid } from "@/components/media/MediaGrid";
 import { WatchedMediaCard } from "@/components/media/WatchedMediaCard";
+import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/pages/About";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
 import { MediaItem } from "@/utils/mediaTypes";
@@ -67,20 +67,47 @@ export function SearchListPart({
   const { t } = useTranslation();
 
   const [results, setResults] = useState<MediaItem[]>([]);
-  const [state, exec] = useAsyncFn((query: MWQuery) => searchForMedia(query));
+  const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const requestIdRef = useRef(0);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   useEffect(() => {
-    async function runSearch(query: MWQuery) {
-      const searchResults = await exec(query);
-      if (!searchResults) return;
-      setResults(searchResults);
+    async function runSearch(query: MWQuery, requestId: number) {
+      setLoading(true);
+      setFailed(false);
+
+      let nextResults: MediaItem[] = [];
+      let didFail = false;
+      try {
+        nextResults = (await searchForMedia(query)) ?? [];
+      } catch {
+        didFail = true;
+      }
+
+      // Ignore stale responses from older requests.
+      if (requestIdRef.current !== requestId) {
+        return;
+      }
+
+      setFailed(didFail);
+      if (!didFail) setResults(nextResults);
+      setLoading(false);
     }
 
-    if (searchQuery !== "") runSearch({ searchQuery });
-  }, [searchQuery, exec]);
+    if (debouncedSearchQuery === "") {
+      setResults([]);
+      setLoading(false);
+      setFailed(false);
+      return;
+    }
 
-  if (state.loading) return <SearchLoadingPart />;
-  if (state.error) return <SearchSuffix failed />;
+    requestIdRef.current += 1;
+    runSearch({ searchQuery: debouncedSearchQuery }, requestIdRef.current);
+  }, [debouncedSearchQuery]);
+
+  if (loading) return <SearchLoadingPart />;
+  if (failed) return <SearchSuffix failed />;
   if (!results) return null;
 
   return (
