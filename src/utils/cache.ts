@@ -7,17 +7,23 @@ export class SimpleCache<Key, Value> {
 
   protected _storage: { key: Key; value: Value; expiry: Date }[] = [];
 
+  private static isExpired(entry: { expiry: Date }): boolean {
+    return entry.expiry.getTime() <= Date.now();
+  }
+
+  private pruneExpired(): void {
+    this._storage = this._storage.filter(
+      (entry) => !SimpleCache.isExpired(entry),
+    );
+  }
+
   /*
    ** initialize store, will start the interval
    */
   public initialize(): void {
     if (this._interval) throw new Error("cache is already initialized");
     this._interval = setInterval(() => {
-      const now = new Date();
-      this._storage.filter((val) => {
-        if (val.expiry < now) return false; // remove if expiry date is in the past
-        return true;
-      });
+      this.pruneExpired();
     }, this.INTERVAL_MS);
   }
 
@@ -26,6 +32,7 @@ export class SimpleCache<Key, Value> {
    */
   public destroy(): void {
     if (this._interval) clearInterval(this._interval);
+    this._interval = null;
     this.clear();
   }
 
@@ -48,10 +55,15 @@ export class SimpleCache<Key, Value> {
    */
   public get(key: Key): Value | undefined {
     if (!this._compare) throw new Error("Compare function not set");
+    this.pruneExpired();
     const foundValue = this._storage.find(
       (item) => this._compare && this._compare(item.key, key),
     );
     if (!foundValue) return undefined;
+    if (SimpleCache.isExpired(foundValue)) {
+      this.remove(key);
+      return undefined;
+    }
     return foundValue.value;
   }
 
@@ -60,6 +72,7 @@ export class SimpleCache<Key, Value> {
    */
   public set(key: Key, value: Value, expirySeconds: number): void {
     if (!this._compare) throw new Error("Compare function not set");
+    this.pruneExpired();
     const foundValue = this._storage.find(
       (item) => this._compare && this._compare(item.key, key),
     );
@@ -86,10 +99,9 @@ export class SimpleCache<Key, Value> {
    */
   public remove(key: Key): void {
     if (!this._compare) throw new Error("Compare function not set");
-    this._storage.filter((val) => {
-      if (this._compare && this._compare(val.key, key)) return false; // remove if compare is success
-      return true;
-    });
+    this._storage = this._storage.filter(
+      (val) => !(this._compare && this._compare(val.key, key)),
+    );
   }
 
   /*

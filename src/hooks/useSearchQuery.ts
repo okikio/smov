@@ -21,6 +21,8 @@ export function useSearchQuery(): [
   const updateParams = (inp: string, commitToUrl = false) => {
     setSearch(inp);
     if (!commitToUrl) return;
+    const current = decode(params.query);
+    if (inp === current) return;
     if (inp.length === 0) {
       navigate("/", { replace: true });
       return;
