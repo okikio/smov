@@ -99,7 +99,7 @@ Here are some tips to make sure that your pull requests are :pinched_fingers: fi
 
 Language contributions help P-Stream massively, allowing people worldwide to use our app!
 
-We use Weblate for crowdsourcing our translations. [Click here to go to our translation tool.](https://docs.pstream.mov/links/weblate)
+We use Weblate for crowdsourcing our translations.
 
 1. First make sure you make an account. (click the link above)
 2. Click the language you want to help translate, if it's not listed you can click the plus top left to add a new language.

@@ -11,7 +11,7 @@ import type {
   TraktReleaseResponse,
 } from "./types/trakt";
 
-export const TRAKT_BASE_URL = "https://fed-airdate.pstream.mov";
+export const TRAKT_BASE_URL = "";
 
 // Token cookie configuration
 const TOKEN_COOKIE_NAME = "turnstile_token";

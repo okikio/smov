@@ -349,10 +349,6 @@ export function LinksDropdown(props: { children: React.ReactNode }) {
             )}
             <CircleDropdownLink href={conf().FLUXER_LINK} icon={Icons.FLUXER} />
             <CircleDropdownLink href="/support" icon={Icons.SUPPORT} />
-            <CircleDropdownLink
-              href="https://rentry.co/nnqtas3e"
-              icon={Icons.TIP_JAR}
-            />
           </div>
         </div>
       </Transition>
