@@ -253,7 +253,8 @@
       "register": "Register",
       "settings": "Settings",
       "migration": "Migrate Account",
-      "jip": "Jip"
+      "jip": "Jip",
+      "pas": "Pas"
     },
     "keyboardShortcuts": {
       "title": "Keyboard Shortcuts",
@@ -1107,15 +1108,11 @@
   },
   "jip": {
     "title": "Jip",
-    "text": "P-Stream didn't fall out of a coconut tree, it was made mostly by a single person (a very epic one at that).",
-    "q1": {
-      "body": "You can join the official <0>P-Stream fluxer</0> and ask questions there or you can email the one provided at the bottom of this page.",
-      "title": "Where can I get help?"
-    },
-    "q2": {
-      "body": "We have a <0>GitHub</0> where you can create a detailed issue in our repository. Additionally, if you wish, you can create a pull request to fix the issue yourself.",
-      "title": "How can I report a bug or issue?"
-    }
+    "text": "movie-web didn't fall out of a coconut tree, it was made mostly by a single person (a very epic one at that)."
+  },
+  "pas": {
+    "title": "Pas",
+    "text": "P-Stream was a dream and Pas made it a reality."
   },
   "screens": {
     "legal": {
