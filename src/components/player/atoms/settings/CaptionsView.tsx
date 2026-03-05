@@ -476,7 +476,7 @@ export function CaptionsView({
   );
   const delay = useSubtitleStore((s) => s.delay);
   const appLanguage = useLanguageStore((s) => s.language);
-  const setSubtitle = useSubtitleStore((s) => s.setSubtitle);
+  // const setSubtitle = useSubtitleStore((s) => s.setSubtitle);
   const matchScore = useCaptionMatchScore();
 
   // Get combined caption list
