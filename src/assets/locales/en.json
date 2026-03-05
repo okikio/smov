@@ -1509,7 +1509,7 @@
         "warning": "Don't try to use, it's fake.",
         "close": "Got it"
       },
-      "traffic": "{{used}} / {{limit}} High-speed Traffic • Resets in {{reset}}",
+      "traffic": "{{used}} / 100GB High-speed Traffic • Resets in {{reset}}",
       "trafficExplanation": "Febbox gives you 100GB/month of high-speed traffic, the streams might buffer more after you've used up your quota. Depends on your internet speed and the quality of the stream.",
       "useMp4": "Enable MP4 streams. May be faster outside of the U.S., but audio tracks cannot be changed."
     },
