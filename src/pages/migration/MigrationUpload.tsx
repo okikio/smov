@@ -361,7 +361,7 @@ export function MigrationUploadPage() {
       if (uploadedData.settings) {
         // Apply subtitle settings
         if (uploadedData.settings.defaultSubtitleLanguage) {
-          subtitleStore.setLanguage(
+          subtitleStore.importSubtitleLanguage(
             uploadedData.settings.defaultSubtitleLanguage,
           );
         }
