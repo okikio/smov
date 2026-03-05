@@ -294,7 +294,7 @@ export function CustomCaptionOption() {
   const { t } = useTranslation();
   const lang = usePlayerStore((s) => s.caption.selected?.language);
   const setCaption = usePlayerStore((s) => s.setCaption);
-  const setCustomSubs = useSubtitleStore((s) => s.setCustomSubs);
+  const setSubtitle = useSubtitleStore((s) => s.setSubtitle);
   const fileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -315,7 +315,7 @@ export function CustomCaptionOption() {
           srtData: converted,
           id: "custom-caption",
         });
-        setCustomSubs();
+        setSubtitle(true, "custom", "custom-caption");
       } catch (err) {
         setError(
           err instanceof Error
@@ -370,7 +370,7 @@ export function CustomCaptionOption() {
 export function PasteCaptionOption(props: { selected?: boolean }) {
   const { t } = useTranslation();
   const setCaption = usePlayerStore((s) => s.setCaption);
-  const setCustomSubs = useSubtitleStore((s) => s.setCustomSubs);
+  const setSubtitle = useSubtitleStore((s) => s.setSubtitle);
   const setDelay = useSubtitleStore((s) => s.setDelay);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -409,7 +409,7 @@ export function PasteCaptionOption(props: { selected?: boolean }) {
         srtData: converted,
         id: "pasted-caption",
       });
-      setCustomSubs();
+      setSubtitle(true, parsedData.language, "pasted-caption");
 
       // Set delay if included in the pasted data, otherwise reset to 0
       if (parsedData.delay !== undefined) {
@@ -476,7 +476,7 @@ export function CaptionsView({
   );
   const delay = useSubtitleStore((s) => s.delay);
   const appLanguage = useLanguageStore((s) => s.language);
-  const setCustomSubs = useSubtitleStore((s) => s.setCustomSubs);
+  const setSubtitle = useSubtitleStore((s) => s.setSubtitle);
   const matchScore = useCaptionMatchScore();
 
   // Get combined caption list
@@ -580,7 +580,6 @@ export function CaptionsView({
           srtData: converted,
           id: "custom-caption",
         });
-        setCustomSubs();
       } catch (err) {
         // Silently fail on drop - user can use the upload button for better error feedback
       }

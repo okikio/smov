@@ -26,12 +26,8 @@ export function useInitializeSource() {
   );
   const { selectLastUsedLanguageIfEnabled } = useCaptions();
 
-  // Only select subtitles on initial load, not when source changes
-  const hasInitializedRef = useRef(false);
-
   useEffect(() => {
-    if (sourceIdentifier && !hasInitializedRef.current) {
-      hasInitializedRef.current = true;
+    if (sourceIdentifier) {
       selectLastUsedLanguageIfEnabled();
     }
   }, [sourceIdentifier, selectLastUsedLanguageIfEnabled]);

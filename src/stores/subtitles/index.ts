@@ -59,6 +59,7 @@ export interface SubtitleStore {
   };
   enabled: boolean;
   lastSelectedLanguage: string | null;
+  lastSelectedSubtitleId: string | null;
   isOpenSubtitles: boolean;
   styling: SubtitleStyling;
   overrideCasing: boolean;
@@ -66,9 +67,12 @@ export interface SubtitleStore {
   showDelayIndicator: boolean;
   updateStyling(newStyling: Partial<SubtitleStyling>): void;
   resetStyling(): void;
-  setLanguage(language: string | null): void;
+  setSubtitle(
+    enabled: boolean,
+    language?: string | null,
+    subtitleId?: string | null,
+  ): void;
   setIsOpenSubtitles(isOpenSubtitles: boolean): void;
-  setCustomSubs(): void;
   setOverrideCasing(enabled: boolean): void;
   setDelay(delay: number): void;
   importSubtitleLanguage(lang: string | null): void;
@@ -84,6 +88,7 @@ export const useSubtitleStore = create(
         lastSelectedLanguage: null,
       },
       lastSelectedLanguage: null,
+      lastSelectedSubtitleId: null,
       isOpenSubtitles: false,
       overrideCasing: false,
       delay: 0,
@@ -103,6 +108,11 @@ export const useSubtitleStore = create(
         set((s) => {
           s.delay = 0;
           s.overrideCasing = false;
+        });
+      },
+      setIsOpenSubtitles(isOpenSubtitles) {
+        set((s) => {
+          s.isOpenSubtitles = isOpenSubtitles;
         });
       },
       updateStyling(newStyling) {
@@ -153,21 +163,16 @@ export const useSubtitleStore = create(
           };
         });
       },
-      setLanguage(lang) {
+      setSubtitle(enabled, language, subtitleId) {
         set((s) => {
-          s.enabled = !!lang;
-          if (lang) s.lastSelectedLanguage = lang;
-        });
-      },
-      setIsOpenSubtitles(isOpenSubtitles) {
-        set((s) => {
-          s.isOpenSubtitles = isOpenSubtitles;
-        });
-      },
-      setCustomSubs() {
-        set((s) => {
-          s.enabled = true;
-          s.lastSelectedLanguage = null;
+          s.enabled = enabled;
+          if (enabled) {
+            s.lastSelectedLanguage = language ?? null;
+            s.lastSelectedSubtitleId = subtitleId ?? null;
+          } else {
+            s.lastSelectedLanguage = null;
+            s.lastSelectedSubtitleId = null;
+          }
         });
       },
       setOverrideCasing(enabled) {

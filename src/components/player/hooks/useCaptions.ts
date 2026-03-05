@@ -13,7 +13,7 @@ import {
 } from "../utils/captions";
 
 export function useCaptions() {
-  const setLanguage = useSubtitleStore((s) => s.setLanguage);
+  const setSubtitle = useSubtitleStore((s) => s.setSubtitle);
   const enabled = useSubtitleStore((s) => s.enabled);
   const resetSubtitleSpecificSettings = useSubtitleStore(
     (s) => s.resetSubtitleSpecificSettings,
@@ -21,6 +21,9 @@ export function useCaptions() {
   const setCaption = usePlayerStore((s) => s.setCaption);
   const currentTranslateTask = usePlayerStore((s) => s.caption.translateTask);
   const lastSelectedLanguage = useSubtitleStore((s) => s.lastSelectedLanguage);
+  const lastSelectedSubtitleId = useSubtitleStore(
+    (s) => s.lastSelectedSubtitleId,
+  );
   const setIsOpenSubtitles = useSubtitleStore((s) => s.setIsOpenSubtitles);
 
   const captionList = usePlayerStore((s) => s.captionList);
@@ -53,7 +56,7 @@ export function useCaptions() {
         resetSubtitleSpecificSettings();
       }
 
-      setLanguage(caption.language);
+      setSubtitle(true, caption.language, caption.id);
 
       // Use native tracks for MP4 streams instead of custom rendering
       if (source?.type === "file" && enableNativeSubtitles) {
@@ -65,7 +68,7 @@ export function useCaptions() {
     },
     [
       setIsOpenSubtitles,
-      setLanguage,
+      setSubtitle,
       setCaption,
       resetSubtitleSpecificSettings,
       source,
@@ -135,14 +138,25 @@ export function useCaptions() {
   const disable = useCallback(async () => {
     setIsOpenSubtitles(false);
     setCaption(null);
-    setLanguage(null);
-  }, [setCaption, setLanguage, setIsOpenSubtitles]);
+    setSubtitle(false);
+  }, [setCaption, setSubtitle, setIsOpenSubtitles]);
 
   const selectLastUsedLanguage = useCallback(async () => {
+    if (lastSelectedSubtitleId) {
+      const caption = captions.find((v) => v.id === lastSelectedSubtitleId);
+      if (caption) return selectCaptionById(caption.id);
+    }
+
     const language = lastSelectedLanguage ?? "en";
     await selectLanguage(language);
     return true;
-  }, [lastSelectedLanguage, selectLanguage]);
+  }, [
+    lastSelectedLanguage,
+    selectLanguage,
+    lastSelectedSubtitleId,
+    captions,
+    selectCaptionById,
+  ]);
 
   const toggleLastUsed = useCallback(async () => {
     if (enabled) disable();
