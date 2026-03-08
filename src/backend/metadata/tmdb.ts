@@ -244,7 +244,7 @@ export async function get<T>(url: string, params?: object): Promise<T> {
     });
   }
 
-  let result: T;
+  let result!: T;
 
   if (proxy && shouldProxyTmdb) {
     try {

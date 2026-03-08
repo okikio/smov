@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { JSX } from "react";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -22,8 +23,6 @@ import { VerifyPassphrase } from "@/pages/parts/auth/VerifyPassphrasePart";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
 import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
-
-import type { JSX } from "react";
 
 function CaptchaProvider(props: {
   siteKey: string | null;
