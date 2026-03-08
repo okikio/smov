@@ -56,7 +56,7 @@ jobs:
 
       - name: Extract OCI image metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: latest=false
@@ -65,7 +65,7 @@ jobs:
             type=sha
 
       - name: Build image (no push — validates Dockerfile + OCI metadata)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
