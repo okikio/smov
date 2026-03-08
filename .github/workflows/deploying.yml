@@ -16,23 +16,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: pnpm/action-setup@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: "pnpm"
 
       - name: Install pnpm packages
         run: pnpm install
 
-      - name: Build project
+      - name: Build project (PWA)
         run: pnpm run build:pwa
 
-      - name: Upload production-ready build files
+      - name: Upload PWA build
         uses: actions/upload-artifact@v4
         with:
           name: pwa
@@ -44,14 +44,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: pnpm/action-setup@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: "pnpm"
 
       - name: Install pnpm packages
@@ -60,7 +60,7 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Upload production-ready build files
+      - name: Upload build
         uses: actions/upload-artifact@v4
         with:
           name: normal
@@ -75,7 +75,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Get version from package.json
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Download PWA artifact
         uses: actions/download-artifact@v4
@@ -83,61 +87,40 @@ jobs:
           name: pwa
           path: ./dist_pwa
 
-      - name: Zip PWA files
-        run: cd dist_pwa && zip -r ../p-stream.pwa.zip .
-
       - name: Download normal artifact
         uses: actions/download-artifact@v4
         with:
           name: normal
           path: ./dist_normal
 
-      - name: Zip normal files
-        run: cd dist_normal && zip -r ../p-stream.zip .
+      - name: Zip artifacts
+        run: |
+          cd dist_pwa   && zip -r ../p-stream.pwa.zip .
+          cd ../dist_normal && zip -r ../p-stream.zip .
 
-      - name: Get version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@main
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.pkg.outputs.version }}
+          name: P-Stream v${{ steps.pkg.outputs.version }}
+          generate_release_notes: true
+          files: |
+            p-stream.pwa.zip
+            p-stream.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.package-version.outputs.current-version }}
-          release_name: P-Stream v${{ steps.package-version.outputs.current-version }}
-          draft: false
-          prerelease: false
-
-      - name: Upload release (PWA)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./p-stream.pwa.zip
-          asset_name: p-stream.pwa.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release (Normal)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./p-stream.zip
-          asset_name: p-stream.zip
-          asset_content_type: application/zip
 
   # ── Docker images published to GHCR ──────────────────────────────────────
-  # Two variants are pushed:
-  #   • standard  ghcr.io/<owner>/smov:latest  / ghcr.io/<owner>/smov:vX.Y.Z
-  #   • pwa       ghcr.io/<owner>/smov:pwa     / ghcr.io/<owner>/smov:vX.Y.Z-pwa
   #
-  # Both images are OCI-compliant (provenance + SBOM attestations attached).
-  # Sensitive runtime config is injected via env vars at `docker run` time —
-  # no secrets are baked into image layers.
+  # Two OCI-compliant variants are pushed on every main-branch push:
+  #
+  #   Standard  ghcr.io/<owner>/smov:latest     ghcr.io/<owner>/smov:vX.Y.Z
+  #   PWA       ghcr.io/<owner>/smov:pwa        ghcr.io/<owner>/smov:vX.Y.Z-pwa
+  #
+  # • Provenance (SLSA) + SBOM attestations are attached to both images.
+  # • Multi-arch: linux/amd64 + linux/arm64.
+  # • NO secrets are baked into image layers; all config is injected at
+  #   `docker run` time via env vars or Docker secret files.
   registry:
     name: Push standard image to GHCR
     needs: [build, build_pwa]
@@ -145,9 +128,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # Required for OCI provenance attestation
-      id-token: write
-      attestations: write
+      id-token: write       # required for SLSA provenance attestation
+      attestations: write   # required for image attestation
 
     env:
       REGISTRY: ghcr.io
@@ -155,53 +137,51 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Set up QEMU (multi-arch)
-        uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU (multi-arch emulation)
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Get version from package.json
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@main
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
-      - name: Log into GitHub Container Registry
+      - name: Log into GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata (standard)
+      - name: Extract OCI image metadata (standard)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=true
+          flavor: latest=true
           tags: |
-            type=semver,pattern={{version}},value=v${{ steps.package-version.outputs.current-version }}
-            type=semver,pattern={{major}}.{{minor}},value=v${{ steps.package-version.outputs.current-version }}
+            type=semver,pattern={{version}},value=v${{ steps.pkg.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=v${{ steps.pkg.outputs.version }}
           labels: |
             org.opencontainers.image.title=P-Stream
             org.opencontainers.image.description=P-Stream — watch movies and TV shows for free
-            org.opencontainers.image.url=https://github.com/${{ github.repository }}
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.licenses=MIT
 
-      - name: Build and push standard Docker image
-        id: build-and-push
+      - name: Build and push standard image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          build-args: |
-            PWA_ENABLED=false
+          build-args: PWA_ENABLED=false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # OCI provenance and SBOM attestations
+          # OCI provenance (SLSA level 3) + SBOM attestations
           provenance: mode=max
           sbom: true
           cache-from: type=gha,scope=standard
@@ -223,26 +203,26 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Set up QEMU (multi-arch)
-        uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU (multi-arch emulation)
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Get version from package.json
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@main
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
-      - name: Log into GitHub Container Registry
+      - name: Log into GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata (PWA)
+      - name: Extract OCI image metadata (PWA)
         id: meta-pwa
         uses: docker/metadata-action@v5
         with:
@@ -252,23 +232,22 @@ jobs:
             suffix=-pwa,onlatest=true
           tags: |
             type=raw,value=pwa
-            type=semver,pattern={{version}},value=v${{ steps.package-version.outputs.current-version }}
-            type=semver,pattern={{major}}.{{minor}},value=v${{ steps.package-version.outputs.current-version }}
+            type=semver,pattern={{version}},value=v${{ steps.pkg.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=v${{ steps.pkg.outputs.version }}
           labels: |
             org.opencontainers.image.title=P-Stream (PWA)
-            org.opencontainers.image.description=P-Stream — watch movies and TV shows for free (PWA edition)
-            org.opencontainers.image.url=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=P-Stream — watch movies and TV shows for free (PWA edition with service worker)
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.licenses=MIT
 
-      - name: Build and push PWA Docker image
-        id: build-and-push-pwa
+      - name: Build and push PWA image
+        id: push-pwa
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          build-args: |
-            PWA_ENABLED=true
+          build-args: PWA_ENABLED=true
           tags: ${{ steps.meta-pwa.outputs.tags }}
           labels: ${{ steps.meta-pwa.outputs.labels }}
           provenance: mode=max

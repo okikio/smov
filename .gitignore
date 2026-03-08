@@ -29,3 +29,5 @@ package-lock.json
 # config
 .env
 .DS_Store
+# Docker secrets files (never commit)
+secrets/
