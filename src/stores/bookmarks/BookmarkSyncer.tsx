@@ -59,6 +59,7 @@ export function BookmarkSyncer() {
     clearUpdateQueue();
   }, [clearUpdateQueue]);
 
+  // Regular interval sync
   useEffect(() => {
     const interval = setInterval(() => {
       (async () => {
@@ -76,6 +77,70 @@ export function BookmarkSyncer() {
 
     return () => {
       clearInterval(interval);
+    };
+  }, [removeUpdateItem, url]);
+
+  // Immediate sync when items are added or removed
+  useEffect(() => {
+    let syncTimeout: NodeJS.Timeout | null = null;
+
+    const syncImmediately = async () => {
+      if (!url) return;
+      const state = useBookmarkStore.getState();
+      const user = useAuthStore.getState();
+      // Only sync if there are items in the queue
+      if (state.updateQueue.length > 0) {
+        await syncBookmarks(
+          state.updateQueue,
+          removeUpdateItem,
+          url,
+          user.account,
+        );
+      }
+    };
+
+    const debouncedSync = () => {
+      if (syncTimeout) {
+        clearTimeout(syncTimeout);
+      }
+      syncTimeout = setTimeout(syncImmediately, 100);
+    };
+
+    // Override the addBookmark function to trigger immediate sync
+    const originalAddBookmark = useBookmarkStore.getState().addBookmark;
+    useBookmarkStore.setState({
+      addBookmark: (...args) => {
+        originalAddBookmark(...args);
+        // Trigger debounced sync after adding bookmark
+        debouncedSync();
+      },
+    });
+
+    // Override removeBookmark to trigger immediate sync
+    const originalRemoveBookmark = useBookmarkStore.getState().removeBookmark;
+    useBookmarkStore.setState({
+      removeBookmark: (...args) => {
+        originalRemoveBookmark(...args);
+        // Trigger debounced sync after removing bookmark
+        debouncedSync();
+      },
+    });
+
+    // Override toggleFavoriteEpisode to trigger immediate sync
+    const originalToggleFavoriteEpisode =
+      useBookmarkStore.getState().toggleFavoriteEpisode;
+    useBookmarkStore.setState({
+      toggleFavoriteEpisode: (...args) => {
+        originalToggleFavoriteEpisode(...args);
+        // Trigger debounced sync after toggling favorite episode
+        debouncedSync();
+      },
+    });
+
+    return () => {
+      if (syncTimeout) {
+        clearTimeout(syncTimeout);
+      }
     };
   }, [removeUpdateItem, url]);
 

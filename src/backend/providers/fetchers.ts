@@ -6,11 +6,7 @@ import {
 
 import { sendExtensionRequest } from "@/backend/extension/messaging";
 import { getApiToken, setApiToken } from "@/backend/helpers/providerApi";
-import {
-  getM3U8ProxyUrls,
-  getProviderApiUrls,
-  getProxyUrls,
-} from "@/utils/proxyUrls";
+import { getM3U8ProxyUrls, getProxyUrls } from "@/utils/proxyUrls";
 
 import { convertBodyToObject, getBodyTypeFromBody } from "../extension/request";
 
@@ -28,8 +24,6 @@ function makeLoadbalancedList(getter: () => string[]) {
 }
 
 export const getLoadbalancedProxyUrl = makeLoadbalancedList(getProxyUrls);
-export const getLoadbalancedProviderApiUrl =
-  makeLoadbalancedList(getProviderApiUrls);
 function getEnabledM3U8ProxyUrls() {
   const allM3U8ProxyUrls = getM3U8ProxyUrls();
   const enabledProxies = localStorage.getItem("m3u8-proxy-enabled");

@@ -6,13 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/buttons/Button";
 import { EditButton } from "@/components/buttons/EditButton";
 import { EditButtonWithText } from "@/components/buttons/EditButtonWithText";
-import { Item } from "@/components/form/SortableList";
 import { Icon, Icons } from "@/components/Icon";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaGrid } from "@/components/media/MediaGrid";
 import { WatchedMediaCard } from "@/components/media/WatchedMediaCard";
-import { DetailsModal } from "@/components/overlays/detailsModal";
 import { EditGroupOrderModal } from "@/components/overlays/EditGroupOrderModal";
 import { useModal } from "@/components/overlays/Modal";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
@@ -55,21 +53,18 @@ export function AllBookmarks({ onShowDetails }: AllBookmarksProps) {
   const [editing, setEditing] = useState(false);
   const [gridRef] = useAutoAnimate<HTMLDivElement>();
   const editOrderModal = useModal("bookmark-edit-order-all");
-  const [tempGroupOrder, setTempGroupOrder] = useState<string[]>([]);
   const backendUrl = useBackendUrl();
   const account = useAuthStore((s) => s.account);
-  const [detailsData, setDetailsData] = useState<any>();
   const { showModal } = useOverlayStack();
 
   const handleShowDetails = async (media: MediaItem) => {
     if (onShowDetails) {
       onShowDetails(media);
     } else {
-      setDetailsData({
+      showModal("details", {
         id: Number(media.id),
         type: media.type === "movie" ? "movie" : "show",
       });
-      showModal("details");
     }
   };
 
@@ -146,41 +141,6 @@ export function AllBookmarks({ onShowDetails }: AllBookmarksProps) {
     return Array.from(groups);
   }, [bookmarks]);
 
-  const sortableItems = useMemo(() => {
-    const currentOrder = editOrderModal.isShown ? tempGroupOrder : groupOrder;
-
-    if (currentOrder.length === 0) {
-      return allGroups.map((group) => {
-        const { name } = parseGroupString(group);
-        return {
-          id: group,
-          name: group === "bookmarks" ? t("home.bookmarks.sectionTitle") : name,
-        } as Item;
-      });
-    }
-
-    const orderMap = new Map(
-      currentOrder.map((group, index) => [group, index]),
-    );
-    const sortedGroups = allGroups.sort((groupA, groupB) => {
-      const orderA = orderMap.has(groupA)
-        ? orderMap.get(groupA)!
-        : Number.MAX_SAFE_INTEGER;
-      const orderB = orderMap.has(groupB)
-        ? orderMap.get(groupB)!
-        : Number.MAX_SAFE_INTEGER;
-      return orderA - orderB;
-    });
-
-    return sortedGroups.map((group) => {
-      const { name } = parseGroupString(group);
-      return {
-        id: group,
-        name: group === "bookmarks" ? t("home.bookmarks.sectionTitle") : name,
-      } as Item;
-    });
-  }, [allGroups, t, editOrderModal.isShown, tempGroupOrder, groupOrder]);
-
   const sortedSections = useMemo(() => {
     const sections: Array<{
       type: "grouped" | "regular";
@@ -234,13 +194,6 @@ export function AllBookmarks({ onShowDetails }: AllBookmarksProps) {
   }, [groupedItems, regularItems, groupOrder]);
 
   const handleEditGroupOrder = () => {
-    // Initialize with current order or default order
-    if (groupOrder.length === 0) {
-      const defaultOrder = allGroups.map((group) => group);
-      setTempGroupOrder(defaultOrder);
-    } else {
-      setTempGroupOrder([...groupOrder]);
-    }
     editOrderModal.show();
   };
 
@@ -254,8 +207,8 @@ export function AllBookmarks({ onShowDetails }: AllBookmarksProps) {
     editOrderModal.hide();
   };
 
-  const handleSaveOrderClick = () => {
-    setGroupOrder(tempGroupOrder);
+  const handleSaveOrderClick = (newOrder: string[]) => {
+    setGroupOrder(newOrder);
     editOrderModal.hide();
 
     // Save to backend
@@ -423,16 +376,9 @@ export function AllBookmarks({ onShowDetails }: AllBookmarksProps) {
         <EditGroupOrderModal
           id={editOrderModal.id}
           isShown={editOrderModal.isShown}
-          items={sortableItems}
           onCancel={handleCancelOrder}
           onSave={handleSaveOrderClick}
-          onItemsChange={(newItems) => {
-            const newOrder = newItems.map((item) => item.id);
-            setTempGroupOrder(newOrder);
-          }}
         />
-
-        {detailsData && <DetailsModal id="details" data={detailsData} />}
       </WideContainer>
     </SubPageLayout>
   );

@@ -7,11 +7,11 @@ import { useWindowSize } from "react-use";
 import { isExtensionActive } from "@/backend/extension/messaging";
 import { get, getMediaLogo } from "@/backend/metadata/tmdb";
 import {
-  TraktReleaseResponse,
   getDiscoverContent,
   getReleaseDetails,
 } from "@/backend/metadata/traktApi";
 import { TMDBContentTypes } from "@/backend/metadata/types/tmdb";
+import type { TraktReleaseResponse } from "@/backend/metadata/types/trakt";
 import { Button } from "@/components/buttons/Button";
 import { Icon, Icons } from "@/components/Icon";
 import { Movie, TVShow } from "@/pages/discover/common";
@@ -573,10 +573,8 @@ export function FeaturedCarousel({
 
     if (hasDigitalRelease) {
       const digitalReleaseDate = new Date(releaseInfo.digital_release_date!);
-      const twoDaysAfter = new Date(digitalReleaseDate);
-      twoDaysAfter.setDate(twoDaysAfter.getDate() + 2);
 
-      if (new Date() >= twoDaysAfter) {
+      if (new Date() >= digitalReleaseDate) {
         return <span className="text-green-400">HD</span>;
       }
     }
@@ -585,10 +583,8 @@ export function FeaturedCarousel({
       const theatricalReleaseDate = new Date(
         releaseInfo.theatrical_release_date!,
       );
-      const fortyFiveDaysAfter = new Date(theatricalReleaseDate);
-      fortyFiveDaysAfter.setDate(fortyFiveDaysAfter.getDate() + 45);
 
-      if (new Date() >= fortyFiveDaysAfter) {
+      if (new Date() >= theatricalReleaseDate) {
         return (
           <div className="px-2 py-1 rounded-lg backdrop-blur-sm bg-gray-600/40">
             <span className="text-green-400">HD</span>

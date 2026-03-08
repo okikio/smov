@@ -19,7 +19,6 @@ import { useOnboardingStore } from "@/stores/onboarding";
 import { usePreferencesStore } from "@/stores/preferences";
 import { getExtensionState } from "@/utils/extension";
 import type { ExtensionStatus } from "@/utils/extension";
-import { getProviderApiUrls } from "@/utils/proxyUrls";
 
 import { ErrorCardInModal } from "../errors/ErrorCard";
 
@@ -42,9 +41,7 @@ export function ScrapeErrorPart(props: ScrapeErrorPartProps) {
   const error = useMemo(() => {
     const data = props.data;
     let str = "";
-    const apiUrls = getProviderApiUrls();
-    str += `URL - ${location.pathname}\n`;
-    str += `API - ${apiUrls.length > 0}\n\n`;
+    str += `URL - ${location.pathname}\n\n`;
     Object.values(data.sources).forEach((v) => {
       str += `${v.id}: ${v.status}\n`;
       if (v.reason) str += `${v.reason}\n`;

@@ -25,10 +25,13 @@ import { ScrapingPart } from "@/pages/parts/player/ScrapingPart";
 import { SourceSelectPart } from "@/pages/parts/player/SourceSelectPart";
 import { useLastNonPlayerLink } from "@/stores/history";
 import { PlayerMeta, playerStatus } from "@/stores/player/slices/source";
+import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
-import { useProgressStore } from "@/stores/progress";
+import { getProgressPercentage, useProgressStore } from "@/stores/progress";
 import { needsOnboarding } from "@/utils/onboarding";
 import { parseTimestamp } from "@/utils/timestamp";
+
+import { BlurEllipsis } from "./layouts/SubPageLayout";
 
 export function RealPlayerView() {
   const navigate = useNavigate();
@@ -41,6 +44,13 @@ export function RealPlayerView() {
     sources: Record<string, ScrapingSegment>;
     sourceOrder: ScrapingItems[];
   } | null>(null);
+  const [resumeFromSourceId, setResumeFromSourceId] = useState<string | null>(
+    null,
+  );
+  const storeResumeFromSourceId = usePlayerStore((s) => s.resumeFromSourceId);
+  const setResumeFromSourceIdInStore = usePlayerStore(
+    (s) => s.setResumeFromSourceId,
+  );
   const [startAtParam] = useQueryParam("t");
   const {
     status,
@@ -51,14 +61,33 @@ export function RealPlayerView() {
     setShouldStartFromBeginning,
     setStatus,
   } = usePlayer();
+  const sourceId = usePlayerStore((s) => s.sourceId);
   const { setPlayerMeta, scrapeMedia } = usePlayerMeta();
   const backUrl = useLastNonPlayerLink();
   const manualSourceSelection = usePreferencesStore(
     (s) => s.manualSourceSelection,
   );
+  const setLastSuccessfulSource = usePreferencesStore(
+    (s) => s.setLastSuccessfulSource,
+  );
   const router = useOverlayRouter("settings");
   const openedWatchPartyRef = useRef<boolean>(false);
   const progressItems = useProgressStore((s) => s.items);
+
+  // Reset last successful source when leaving the player
+  useEffect(() => {
+    return () => {
+      setLastSuccessfulSource(null);
+    };
+  }, [setLastSuccessfulSource]);
+
+  // Reset resume from source ID when leaving the player
+  useEffect(() => {
+    return () => {
+      setResumeFromSourceId(null);
+      setResumeFromSourceIdInStore(null);
+    };
+  }, [setResumeFromSourceIdInStore]);
 
   const paramsData = JSON.stringify({
     media: params.media,
@@ -67,8 +96,10 @@ export function RealPlayerView() {
   });
   useEffect(() => {
     reset();
-    // Reset watch party state when media changes
     openedWatchPartyRef.current = false;
+    return () => {
+      reset();
+    };
   }, [paramsData, reset]);
 
   // Auto-open watch party menu if URL contains watchparty parameter
@@ -107,16 +138,20 @@ export function RealPlayerView() {
 
       if (meta.type === "movie") {
         if (!item.progress) return false;
-        const percentage =
-          (item.progress.watched / item.progress.duration) * 100;
+        const percentage = getProgressPercentage(
+          item.progress.watched,
+          item.progress.duration,
+        );
         return percentage > 80;
       }
 
       if (meta.type === "show" && meta.episode?.tmdbId) {
         const episode = item.episodes?.[meta.episode.tmdbId];
         if (!episode) return false;
-        const percentage =
-          (episode.progress.watched / episode.progress.duration) * 100;
+        const percentage = getProgressPercentage(
+          episode.progress.watched,
+          episode.progress.duration,
+        );
         return percentage > 80;
       }
 
@@ -144,12 +179,43 @@ export function RealPlayerView() {
     setStatus(playerStatus.SCRAPING);
   }, [setShouldStartFromBeginning, setStatus]);
 
+  const handleResumeScraping = useCallback(
+    (startFromSourceId: string) => {
+      // Set resume source first
+      setResumeFromSourceId(startFromSourceId);
+      setResumeFromSourceIdInStore(startFromSourceId);
+      // Then change status in next tick to ensure re-render
+      setTimeout(() => {
+        setStatus(playerStatus.SCRAPING);
+      }, 0);
+    },
+    [setStatus, setResumeFromSourceIdInStore],
+  );
+
+  // Sync store value to local state when it changes (e.g., from settings)
+  // or when status changes to SCRAPING
+  useEffect(() => {
+    if (storeResumeFromSourceId && status === playerStatus.SCRAPING) {
+      if (
+        !resumeFromSourceId ||
+        resumeFromSourceId !== storeResumeFromSourceId
+      ) {
+        setResumeFromSourceId(storeResumeFromSourceId);
+      }
+    }
+  }, [storeResumeFromSourceId, resumeFromSourceId, status]);
+
   const playAfterScrape = useCallback(
     (out: RunOutput | null) => {
       if (!out) return;
 
       let startAt: number | undefined;
       if (startAtParam) startAt = parseTimestamp(startAtParam) ?? undefined;
+
+      // Clear failed sources and embeds when we successfully find a working source
+      const playerStore = usePlayerStore.getState();
+      playerStore.clearFailedSources();
+      playerStore.clearFailedEmbeds();
 
       playMedia(
         convertRunoutputToSource(out),
@@ -169,6 +235,7 @@ export function RealPlayerView() {
 
   return (
     <PlayerPart backUrl={backUrl} onMetaChange={metaChange}>
+      {status !== playerStatus.PLAYING ? <BlurEllipsis /> : null}
       {status === playerStatus.IDLE ? (
         <MetaPart onGetMeta={handleMetaReceived} />
       ) : null}
@@ -184,13 +251,20 @@ export function RealPlayerView() {
           <SourceSelectPart media={scrapeMedia} />
         ) : (
           <ScrapingPart
+            key={`scraping-${resumeFromSourceId || storeResumeFromSourceId || "default"}`}
             media={scrapeMedia}
+            startFromSourceId={
+              resumeFromSourceId || storeResumeFromSourceId || undefined
+            }
             onResult={(sources, sourceOrder) => {
               setErrorData({
                 sourceOrder,
                 sources,
               });
               setScrapeNotFound();
+              // Clear resume state after scraping
+              setResumeFromSourceId(null);
+              setResumeFromSourceIdInStore(null);
             }}
             onGetStream={playAfterScrape}
           />
@@ -199,7 +273,12 @@ export function RealPlayerView() {
       {status === playerStatus.SCRAPE_NOT_FOUND && errorData ? (
         <ScrapeErrorPart data={errorData} />
       ) : null}
-      {status === playerStatus.PLAYBACK_ERROR ? <PlaybackErrorPart /> : null}
+      {status === playerStatus.PLAYBACK_ERROR ? (
+        <PlaybackErrorPart
+          onResume={handleResumeScraping}
+          currentSourceId={sourceId}
+        />
+      ) : null}
     </PlayerPart>
   );
 }

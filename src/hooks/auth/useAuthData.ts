@@ -6,8 +6,10 @@ import {
   BookmarkResponse,
   ProgressResponse,
   UserResponse,
+  WatchHistoryResponse,
   bookmarkResponsesToEntries,
   progressResponsesToEntries,
+  watchHistoryResponsesToEntries,
 } from "@/backend/accounts/user";
 import { useAuthStore } from "@/stores/auth";
 import { useBookmarkStore } from "@/stores/bookmarks";
@@ -17,6 +19,7 @@ import { usePreferencesStore } from "@/stores/preferences";
 import { useProgressStore } from "@/stores/progress";
 import { useSubtitleStore } from "@/stores/subtitles";
 import { useThemeStore } from "@/stores/theme";
+import { useWatchHistoryStore } from "@/stores/watchHistory";
 
 export function useAuthData() {
   const loggedIn = !!useAuthStore((s) => s.account);
@@ -25,6 +28,7 @@ export function useAuthData() {
   const setProxySet = useAuthStore((s) => s.setProxySet);
   const clearBookmarks = useBookmarkStore((s) => s.clear);
   const clearProgress = useProgressStore((s) => s.clear);
+  const clearWatchHistory = useWatchHistoryStore((s) => s.clear);
   const clearGroupOrder = useGroupOrderStore((s) => s.clear);
   const setTheme = useThemeStore((s) => s.setTheme);
   const setAppLanguage = useLanguageStore((s) => s.setLanguage);
@@ -32,9 +36,12 @@ export function useAuthData() {
     (s) => s.importSubtitleLanguage,
   );
   const setFebboxKey = usePreferencesStore((s) => s.setFebboxKey);
+  const setdebridToken = usePreferencesStore((s) => s.setdebridToken);
+  const setdebridService = usePreferencesStore((s) => s.setdebridService);
 
   const replaceBookmarks = useBookmarkStore((s) => s.replaceBookmarks);
   const replaceItems = useProgressStore((s) => s.replaceItems);
+  const replaceWatchHistory = useWatchHistoryStore((s) => s.replaceItems);
 
   const setEnableThumbnails = usePreferencesStore((s) => s.setEnableThumbnails);
   const setEnableAutoplay = usePreferencesStore((s) => s.setEnableAutoplay);
@@ -50,10 +57,22 @@ export function useAuthData() {
   const setEnableCarouselView = usePreferencesStore(
     (s) => s.setEnableCarouselView,
   );
+  const setForceCompactEpisodeView = usePreferencesStore(
+    (s) => s.setForceCompactEpisodeView,
+  );
   const setSourceOrder = usePreferencesStore((s) => s.setSourceOrder);
   const setEnableSourceOrder = usePreferencesStore(
     (s) => s.setEnableSourceOrder,
   );
+  const setLastSuccessfulSource = usePreferencesStore(
+    (s) => s.setLastSuccessfulSource,
+  );
+  const setEnableLastSuccessfulSource = usePreferencesStore(
+    (s) => s.setEnableLastSuccessfulSource,
+  );
+  const setEmbedOrder = usePreferencesStore((s) => s.setEmbedOrder);
+  const setEnableEmbedOrder = usePreferencesStore((s) => s.setEnableEmbedOrder);
+
   const setProxyTmdb = usePreferencesStore((s) => s.setProxyTmdb);
 
   const setEnableLowPerformanceMode = usePreferencesStore(
@@ -65,11 +84,24 @@ export function useAuthData() {
   const setEnableHoldToBoost = usePreferencesStore(
     (s) => s.setEnableHoldToBoost,
   );
+  const setHomeSectionOrder = usePreferencesStore((s) => s.setHomeSectionOrder);
   const setEnableDoubleClickToSeek = usePreferencesStore(
     (s) => s.setEnableDoubleClickToSeek,
   );
   const setManualSourceSelection = usePreferencesStore(
     (s) => s.setManualSourceSelection,
+  );
+  const setEnableAutoResumeOnPlaybackError = usePreferencesStore(
+    (s) => s.setEnableAutoResumeOnPlaybackError,
+  );
+  const setEnableNumberKeySeeking = usePreferencesStore(
+    (s) => s.setEnableNumberKeySeeking,
+  );
+  const setKeyboardShortcuts = usePreferencesStore(
+    (s) => s.setKeyboardShortcuts,
+  );
+  const setEnableMinimalCards = usePreferencesStore(
+    (s) => s.setEnableMinimalCards,
   );
 
   const login = useCallback(
@@ -85,6 +117,7 @@ export function useAuthData() {
         sessionId: loginResponse.session.id,
         deviceName: session.device,
         profile: user.profile,
+        nickname: user.nickname,
         seed,
       };
       setAccount(account);
@@ -97,12 +130,14 @@ export function useAuthData() {
     removeAccount();
     clearBookmarks();
     clearProgress();
+    clearWatchHistory();
     clearGroupOrder();
     setFebboxKey(null);
   }, [
     removeAccount,
     clearBookmarks,
     clearProgress,
+    clearWatchHistory,
     clearGroupOrder,
     setFebboxKey,
   ]);
@@ -113,11 +148,13 @@ export function useAuthData() {
       _session: SessionResponse,
       progress: ProgressResponse[],
       bookmarks: BookmarkResponse[],
+      watchHistory: WatchHistoryResponse[],
       settings: SettingsResponse,
       groupOrder: { groupOrder: string[] },
     ) => {
       replaceBookmarks(bookmarkResponsesToEntries(bookmarks));
       replaceItems(progressResponsesToEntries(progress));
+      replaceWatchHistory(watchHistoryResponsesToEntries(watchHistory));
 
       if (groupOrder?.groupOrder) {
         useGroupOrderStore.getState().setGroupOrder(groupOrder.groupOrder);
@@ -171,12 +208,32 @@ export function useAuthData() {
         setEnableCarouselView(settings.enableCarouselView);
       }
 
+      if (settings.forceCompactEpisodeView !== undefined) {
+        setForceCompactEpisodeView(settings.forceCompactEpisodeView);
+      }
+
       if (settings.sourceOrder !== undefined) {
-        setSourceOrder(settings.sourceOrder);
+        setSourceOrder(settings.sourceOrder ?? []);
       }
 
       if (settings.enableSourceOrder !== undefined) {
         setEnableSourceOrder(settings.enableSourceOrder);
+      }
+
+      if (settings.lastSuccessfulSource !== undefined) {
+        setLastSuccessfulSource(settings.lastSuccessfulSource);
+      }
+
+      if (settings.enableLastSuccessfulSource !== undefined) {
+        setEnableLastSuccessfulSource(settings.enableLastSuccessfulSource);
+      }
+
+      if (settings.embedOrder !== undefined) {
+        setEmbedOrder(settings.embedOrder ?? []);
+      }
+
+      if (settings.enableEmbedOrder !== undefined) {
+        setEnableEmbedOrder(settings.enableEmbedOrder);
       }
 
       if (settings.proxyTmdb !== undefined) {
@@ -185,6 +242,14 @@ export function useAuthData() {
 
       if (settings.febboxKey !== undefined) {
         setFebboxKey(settings.febboxKey);
+      }
+
+      if (settings.debridToken !== undefined) {
+        setdebridToken(settings.debridToken);
+      }
+
+      if (settings.debridService !== undefined) {
+        setdebridService(settings.debridService);
       }
 
       if (settings.enableLowPerformanceMode !== undefined) {
@@ -199,6 +264,12 @@ export function useAuthData() {
         setEnableHoldToBoost(settings.enableHoldToBoost);
       }
 
+      if (settings.homeSectionOrder !== undefined) {
+        setHomeSectionOrder(
+          settings.homeSectionOrder ?? ["watching", "bookmarks"],
+        );
+      }
+
       if (settings.manualSourceSelection !== undefined) {
         setManualSourceSelection(settings.manualSourceSelection);
       }
@@ -206,10 +277,29 @@ export function useAuthData() {
       if (settings.enableDoubleClickToSeek !== undefined) {
         setEnableDoubleClickToSeek(settings.enableDoubleClickToSeek);
       }
+
+      if (settings.enableAutoResumeOnPlaybackError !== undefined) {
+        setEnableAutoResumeOnPlaybackError(
+          settings.enableAutoResumeOnPlaybackError,
+        );
+      }
+
+      if (settings.enableNumberKeySeeking !== undefined) {
+        setEnableNumberKeySeeking(settings.enableNumberKeySeeking);
+      }
+
+      if (settings.keyboardShortcuts !== undefined) {
+        setKeyboardShortcuts(settings.keyboardShortcuts);
+      }
+
+      if (settings.enableMinimalCards !== undefined) {
+        setEnableMinimalCards(settings.enableMinimalCards);
+      }
     },
     [
       replaceBookmarks,
       replaceItems,
+      replaceWatchHistory,
       setAppLanguage,
       importSubtitleLanguage,
       setTheme,
@@ -222,15 +312,27 @@ export function useAuthData() {
       setEnableDetailsModal,
       setEnableImageLogos,
       setEnableCarouselView,
+      setForceCompactEpisodeView,
       setSourceOrder,
       setEnableSourceOrder,
+      setLastSuccessfulSource,
+      setEnableLastSuccessfulSource,
+      setEmbedOrder,
+      setEnableEmbedOrder,
       setProxyTmdb,
       setFebboxKey,
+      setdebridToken,
+      setdebridService,
       setEnableLowPerformanceMode,
       setEnableNativeSubtitles,
       setEnableHoldToBoost,
+      setHomeSectionOrder,
       setManualSourceSelection,
       setEnableDoubleClickToSeek,
+      setEnableAutoResumeOnPlaybackError,
+      setEnableNumberKeySeeking,
+      setKeyboardShortcuts,
+      setEnableMinimalCards,
     ],
   );
 

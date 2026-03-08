@@ -2,6 +2,8 @@ import { t } from "i18next";
 import { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
+import { Icon, Icons } from "@/components/Icon";
+
 import { DetailsRatings } from "./DetailsRatings";
 import { DetailsInfoProps } from "../../types";
 
@@ -10,6 +12,7 @@ export function DetailsInfo({
   imdbData,
   rtData,
   provider,
+  onCollectionClick,
 }: DetailsInfoProps) {
   const [isShiftPressed, setIsShiftPressed] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
@@ -103,6 +106,32 @@ export function DetailsInfo({
             <span className="font-medium">{t("details.rating")}</span>{" "}
             {data.rating}
           </div>
+        )}
+
+        {/* Collection Button */}
+        {data.collection && data.type === "movie" && onCollectionClick && (
+          <button
+            type="button"
+            onClick={onCollectionClick}
+            className="flex items-center gap-2 text-white/80 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-200 w-full group"
+          >
+            <Icon
+              icon={Icons.FILM}
+              className="text-white/60 group-hover:text-white/80 transition-colors"
+            />
+            <div className="flex flex-col items-start flex-1 min-w-0">
+              <span className="text-[10px] text-white/50 font-medium uppercase tracking-wide">
+                Collection
+              </span>
+              <span className="text-xs font-medium truncate w-full text-left">
+                {data.collection.name}
+              </span>
+            </div>
+            <Icon
+              icon={Icons.CHEVRON_RIGHT}
+              className="text-white/40 group-hover:text-white/60 transition-colors flex-shrink-0"
+            />
+          </button>
         )}
 
         {/* Hidden TMDB ID */}

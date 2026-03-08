@@ -1,173 +1,158 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useSkipTimeSource } from "@/components/player/hooks/useSkipTime";
 import { useSkipTracking } from "@/components/player/hooks/useSkipTracking";
 import { usePlayerStore } from "@/stores/player/store";
 
+// Import SkipEvent type
+type SkipEvent = NonNullable<ReturnType<typeof useSkipTracking>["latestSkip"]>;
+
 /**
- * Component that tracks when users skip or scrub more than 15 seconds
- * Useful for gathering information about show intros and user behavior patterns
- * Currently logs to console - can be extended to send to backend analytics endpoint
+ * Component that tracks and reports completed skip sessions to analytics backend.
+ * Sessions are detected when users accumulate 20+ seconds of forward movement
+ * within a 6-second window and end after 5 seconds of no activity.
+ * Ignores skips that start after 20% of video duration (unlikely to be intro skipping).
  */
+interface PendingSkip {
+  skip: SkipEvent;
+  originalConfidence: number;
+  startTime: number;
+  endTime: number;
+  hasBackwardMovement: boolean;
+  skipTimeSource: "fed-skips" | null;
+  timer: ReturnType<typeof setTimeout>;
+}
+
 export function SkipTracker() {
-  const { skipHistory, latestSkip } = useSkipTracking(15); // Track skips > 15 seconds
+  const { latestSkip } = useSkipTracking(20);
   const lastLoggedSkipRef = useRef<number>(0);
+  const [pendingSkips, setPendingSkips] = useState<PendingSkip[]>([]);
+  const lastPlayerTimeRef = useRef<number>(0);
 
   // Player metadata for context
   const meta = usePlayerStore((s) => s.meta);
+  const progress = usePlayerStore((s) => s.progress);
+  const turnstileToken = "";
+  const skipTimeSource = useSkipTimeSource();
+
+  const sendSkipAnalytics = useCallback(
+    async (skip: SkipEvent, adjustedConfidence: number) => {
+      try {
+        await fetch("https://skips.pstream.mov/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start_time: skip.startTime,
+            end_time: skip.endTime,
+            skip_duration: skip.skipDuration,
+            content_id: meta?.tmdbId,
+            content_type: meta?.type,
+            season: meta?.season?.number,
+            episode: meta?.episode?.number,
+            confidence: adjustedConfidence,
+            turnstile_token: turnstileToken ?? "",
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to send skip analytics:", error);
+      }
+    },
+    [meta, turnstileToken],
+  );
+
+  const createPendingSkip = useCallback(
+    (skip: SkipEvent) => {
+      const timer = setTimeout(() => {
+        // Timer expired, send analytics with final confidence
+        setPendingSkips((prev) => {
+          const pendingSkip = prev.find(
+            (p) => p.skip.timestamp === skip.timestamp,
+          );
+          if (!pendingSkip) return prev;
+
+          const adjustedConfidence = pendingSkip.hasBackwardMovement
+            ? Math.max(0.1, pendingSkip.originalConfidence * 0.5) // Reduce confidence by half if adjusted
+            : pendingSkip.originalConfidence;
+
+          // Only send analytics if skip time came from fed-skips
+          if (pendingSkip.skipTimeSource === "fed-skips") {
+            // Send analytics
+            sendSkipAnalytics(pendingSkip.skip, adjustedConfidence);
+          }
+
+          // Remove from pending
+          return prev.filter((p) => p.skip.timestamp !== skip.timestamp);
+        });
+      }, 5000); // 5 second delay
+
+      return {
+        skip,
+        originalConfidence: skip.confidence,
+        startTime: skip.startTime,
+        endTime: skip.endTime,
+        hasBackwardMovement: false,
+        skipTimeSource,
+        timer,
+      };
+    },
+    [sendSkipAnalytics, skipTimeSource],
+  );
 
   useEffect(() => {
     if (!latestSkip || !meta) return;
 
-    // Avoid logging the same skip multiple times
+    // Avoid processing the same skip multiple times
     if (latestSkip.timestamp === lastLoggedSkipRef.current) return;
 
-    // Format skip duration for readability
-    const formatDuration = (seconds: number): string => {
-      const absSeconds = Math.abs(seconds);
-      const minutes = Math.floor(absSeconds / 60);
-      const remainingSeconds = Math.floor(absSeconds % 60);
-
-      if (minutes > 0) {
-        return `${minutes}m ${remainingSeconds}s`;
-      }
-      return `${remainingSeconds}s`;
-    };
-
-    // Format time position for readability
-    const formatTime = (seconds: number): string => {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = Math.floor(seconds % 60);
-      return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-    };
-
-    const skipDirection = latestSkip.skipDuration > 0 ? "forward" : "backward";
-    const skipType = Math.abs(latestSkip.skipDuration) >= 30 ? "scrub" : "skip";
-
-    // Log the skip event with detailed information
+    // Log completed skip session
     // eslint-disable-next-line no-console
-    console.log(`User ${skipType.toUpperCase()} detected`, {
-      // Basic skip info
-      direction: skipDirection,
-      duration: formatDuration(latestSkip.skipDuration),
-      from: formatTime(latestSkip.startTime),
-      to: formatTime(latestSkip.endTime),
+    console.log(`Skip session completed: ${latestSkip.skipDuration}s total`);
 
-      // Content context
-      content: {
-        title: latestSkip.meta?.title || "Unknown",
-        type: latestSkip.meta?.type || "Unknown",
-        tmdbId: latestSkip.meta?.tmdbId,
-      },
-
-      // Episode context (for TV shows)
-      ...(meta.type === "show" && {
-        episode: {
-          season: latestSkip.meta?.seasonNumber,
-          episode: latestSkip.meta?.episodeNumber,
-        },
-      }),
-
-      // Analytics data that could be sent to backend
-      analytics: {
-        timestamp: new Date(latestSkip.timestamp).toISOString(),
-        startTime: latestSkip.startTime,
-        endTime: latestSkip.endTime,
-        skipDuration: latestSkip.skipDuration,
-        contentId: latestSkip.meta?.tmdbId,
-        contentType: latestSkip.meta?.type,
-        seasonId: meta.season?.tmdbId,
-        episodeId: meta.episode?.tmdbId,
-      },
-    });
-
-    // Log special cases that might indicate intro skipping
-    if (
-      meta.type === "show" &&
-      latestSkip.startTime <= 30 && // Skip happened in first 30 seconds
-      latestSkip.skipDuration > 15 && // Forward skip of at least 15 seconds
-      latestSkip.skipDuration <= 120 // But not more than 2 minutes (reasonable intro length)
-    ) {
-      // eslint-disable-next-line no-console
-      console.log(`Potential intro skip dete`, {
-        show: latestSkip.meta?.title,
-        season: latestSkip.meta?.seasonNumber,
-        episode: latestSkip.meta?.episodeNumber,
-        introSkipDuration: formatDuration(latestSkip.skipDuration),
-        message: "User likely skipped intro sequence",
-      });
-    }
-
-    // Log potential outro/credits skipping
-    const progress = usePlayerStore.getState().progress;
-    const timeRemaining = progress.duration - latestSkip.endTime;
-    if (
-      latestSkip.skipDuration > 0 && // Forward skip
-      timeRemaining <= 300 && // Within last 5 minutes
-      latestSkip.skipDuration >= 15
-    ) {
-      // eslint-disable-next-line no-console
-      console.log(`Potential outro skip detected`, {
-        content: latestSkip.meta?.title,
-        timeRemaining: formatDuration(timeRemaining),
-        skipDuration: formatDuration(latestSkip.skipDuration),
-        message: "User likely skipped credits/outro",
-      });
-    }
+    // Create pending skip with 5-second delay
+    const pendingSkip = createPendingSkip(latestSkip);
+    setPendingSkips((prev) => [...prev, pendingSkip as PendingSkip]);
 
     lastLoggedSkipRef.current = latestSkip.timestamp;
-  }, [latestSkip, meta]);
+  }, [latestSkip, meta, createPendingSkip]);
 
-  // Log summary statistics occasionally... just for testing, we likely wont use it unless useful.
+  // Monitor for backward movements during pending skip periods
   useEffect(() => {
-    if (skipHistory.length > 0 && skipHistory.length % 5 === 0) {
-      const forwardSkips = skipHistory.filter((s) => s.skipDuration > 0);
-      const backwardSkips = skipHistory.filter((s) => s.skipDuration < 0);
-      const avgSkipDuration =
-        skipHistory.reduce((sum, s) => sum + Math.abs(s.skipDuration), 0) /
-        skipHistory.length;
+    const currentTime = progress.time;
 
-      // eslint-disable-next-line no-console
-      console.log(`skip analytics`, {
-        totalSkips: skipHistory.length,
-        forwardSkips: forwardSkips.length,
-        backwardSkips: backwardSkips.length,
-        averageSkipDuration: `${Math.round(avgSkipDuration)}s`,
-        content: meta?.title || "Unknown",
-      });
+    // Check for backward movement
+    if (
+      lastPlayerTimeRef.current > 0 &&
+      currentTime < lastPlayerTimeRef.current
+    ) {
+      // Backward movement detected, mark relevant pending skips as adjusted
+      setPendingSkips((prev) =>
+        prev.map((pending) => {
+          // Check if we're within the monitoring period (between start and end time of skip)
+          const isWithinSkipRange =
+            currentTime >= pending.startTime && currentTime <= pending.endTime;
+          if (isWithinSkipRange && !pending.hasBackwardMovement) {
+            // eslint-disable-next-line no-console
+            console.log(
+              `Backward adjustment detected for skip, reducing confidence`,
+            );
+            return { ...pending, hasBackwardMovement: true };
+          }
+          return pending;
+        }),
+      );
     }
-  }, [skipHistory.length, skipHistory, meta?.title]);
 
-  // TODO: When backend endpoint is ready, replace console.log with API calls
-  // Example implementation:
-  /*
+    lastPlayerTimeRef.current = currentTime;
+  }, [progress.time]);
+
+  // Cleanup timers on unmount
   useEffect(() => {
-    if (!latestSkip || !account?.userId) return;
-    
-    // Send skip data to analytics endpoint
-    const sendSkipAnalytics = async () => {
-      try {
-        await fetch(`${backendUrl}/api/analytics/skips`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: account.userId,
-            skipData: latestSkip,
-            contentContext: {
-              tmdbId: meta?.tmdbId,
-              type: meta?.type,
-              seasonId: meta?.season?.tmdbId,
-              episodeId: meta?.episode?.tmdbId,
-            }
-          })
-        });
-      } catch (error) {
-        console.error('Failed to send skip analytics:', error);
-      }
+    return () => {
+      pendingSkips.forEach((pending) => {
+        clearTimeout(pending.timer);
+      });
     };
-    
-    sendSkipAnalytics();
-  }, [latestSkip, account?.userId, meta]);
-  */
+  }, [pendingSkips]);
 
   return null;
 }

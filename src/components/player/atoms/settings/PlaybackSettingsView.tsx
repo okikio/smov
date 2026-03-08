@@ -2,10 +2,13 @@ import classNames from "classnames";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { updateSettings } from "@/backend/accounts/settings";
 import { Toggle } from "@/components/buttons/Toggle";
 import { Icon, Icons } from "@/components/Icon";
 import { Menu } from "@/components/player/internals/ContextMenu";
+import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
+import { useAuthStore } from "@/stores/auth";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useWatchPartyStore } from "@/stores/watchParty";
@@ -188,9 +191,42 @@ export function PlaybackSettingsView({ id }: { id: string }) {
   );
   const isInWatchParty = useWatchPartyStore((s) => s.enabled);
 
+  const account = useAuthStore((s) => s.account);
+  const backendUrl = useBackendUrl();
   const allowAutoplay = useMemo(() => isAutoplayAllowed(), []);
   const canShowAutoplay =
     !isInWatchParty && allowAutoplay && !enableLowPerformanceMode;
+
+  // Save settings to backend
+  const saveThumbnailSetting = useCallback(
+    async (value: boolean) => {
+      if (!account || !backendUrl) return;
+
+      try {
+        await updateSettings(backendUrl, account, {
+          enableThumbnails: value,
+        });
+      } catch (error) {
+        console.error("Failed to save thumbnail setting:", error);
+      }
+    },
+    [account, backendUrl],
+  );
+
+  const saveAutoplaySetting = useCallback(
+    async (value: boolean) => {
+      if (!account || !backendUrl) return;
+
+      try {
+        await updateSettings(backendUrl, account, {
+          enableAutoplay: value,
+        });
+      } catch (error) {
+        console.error("Failed to save autoplay setting:", error);
+      }
+    },
+    [account, backendUrl],
+  );
 
   const setPlaybackRate = useCallback(
     (v: number) => {
@@ -199,6 +235,20 @@ export function PlaybackSettingsView({ id }: { id: string }) {
     },
     [display, isInWatchParty],
   );
+
+  // Handle thumbnail toggle with backend save
+  const handleThumbnailToggle = useCallback(() => {
+    const newValue = !enableThumbnails;
+    setEnableThumbnails(newValue);
+    saveThumbnailSetting(newValue);
+  }, [enableThumbnails, setEnableThumbnails, saveThumbnailSetting]);
+
+  // Handle autoplay toggle with backend save
+  const handleAutoplayToggle = useCallback(() => {
+    const newValue = !enableAutoplay;
+    setEnableAutoplay(newValue);
+    saveAutoplaySetting(newValue);
+  }, [enableAutoplay, setEnableAutoplay, saveAutoplaySetting]);
 
   // Force 1x speed in watch party
   useEffect(() => {
@@ -239,23 +289,25 @@ export function PlaybackSettingsView({ id }: { id: string }) {
               rightSide={
                 <Toggle
                   enabled={enableAutoplay}
-                  onClick={() => setEnableAutoplay(!enableAutoplay)}
+                  onClick={handleAutoplayToggle}
                 />
               }
             >
               {t("settings.preferences.autoplayLabel")}
             </Menu.Link>
           )}
-          <Menu.Link
-            rightSide={
-              <Toggle
-                enabled={enableThumbnails}
-                onClick={() => setEnableThumbnails(!enableThumbnails)}
-              />
-            }
-          >
-            {t("settings.preferences.thumbnailLabel")}
-          </Menu.Link>
+          {!enableLowPerformanceMode && (
+            <Menu.Link
+              rightSide={
+                <Toggle
+                  enabled={enableThumbnails}
+                  onClick={handleThumbnailToggle}
+                />
+              }
+            >
+              {t("settings.preferences.thumbnailLabel")}
+            </Menu.Link>
+          )}
         </div>
       </Menu.Section>
     </>

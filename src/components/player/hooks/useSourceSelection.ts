@@ -8,20 +8,30 @@ import { useAsyncFn } from "react-use";
 import { isExtensionActiveCached } from "@/backend/extension/messaging";
 import { prepareStream } from "@/backend/extension/streams";
 import {
-  connectServerSideEvents,
-  makeProviderUrl,
-} from "@/backend/helpers/providerApi";
-import {
   scrapeSourceOutputToProviderMetric,
   useReportProviders,
 } from "@/backend/helpers/report";
-import { getLoadbalancedProviderApiUrl } from "@/backend/providers/fetchers";
 import { getProviders } from "@/backend/providers/providers";
 import { convertProviderCaption } from "@/components/player/utils/captions";
 import { convertRunoutputToSource } from "@/components/player/utils/convertRunoutputToSource";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { metaToScrapeMedia } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
+import { usePreferencesStore } from "@/stores/preferences";
+import { useProgressStore } from "@/stores/progress";
+
+function getSavedProgress(items: Record<string, any>, meta: any): number {
+  const item = items[meta?.tmdbId ?? ""];
+  if (!item || !meta) return 0;
+  if (meta.type === "movie") {
+    if (!item.progress) return 0;
+    return item.progress.watched;
+  }
+
+  const ep = item.episodes[meta.episode?.tmdbId ?? ""];
+  if (!ep) return 0;
+  return ep.progress.watched;
+}
 
 export function useEmbedScraping(
   routerId: string,
@@ -33,29 +43,25 @@ export function useEmbedScraping(
   const setCaption = usePlayerStore((s) => s.setCaption);
   const setSourceId = usePlayerStore((s) => s.setSourceId);
   const setEmbedId = usePlayerStore((s) => (s as any).setEmbedId);
-  const progress = usePlayerStore((s) => s.progress.time);
   const meta = usePlayerStore((s) => s.meta);
+  const progressItems = useProgressStore((s) => s.items);
   const router = useOverlayRouter(routerId);
   const { report } = useReportProviders();
+  const setLastSuccessfulSource = usePreferencesStore(
+    (s) => s.setLastSuccessfulSource,
+  );
+  const enableLastSuccessfulSource = usePreferencesStore(
+    (s) => s.enableLastSuccessfulSource,
+  );
 
   const [request, run] = useAsyncFn(async () => {
-    const providerApiUrl = getLoadbalancedProviderApiUrl();
     let result: EmbedOutput | undefined;
     if (!meta) return;
     try {
-      if (providerApiUrl && !isExtensionActiveCached()) {
-        const baseUrlMaker = makeProviderUrl(providerApiUrl);
-        const conn = await connectServerSideEvents<EmbedOutput>(
-          baseUrlMaker.scrapeEmbed(embedId, url),
-          ["completed", "noOutput"],
-        );
-        result = await conn.promise();
-      } else {
-        result = await getProviders().runEmbedScraper({
-          id: embedId,
-          url,
-        });
-      }
+      result = await getProviders().runEmbedScraper({
+        id: embedId,
+        url,
+      });
     } catch (err) {
       console.error(`Failed to scrape ${embedId}`, err);
       const notFound = err instanceof NotFoundError;
@@ -81,15 +87,29 @@ export function useEmbedScraping(
     setSource(
       convertRunoutputToSource({ stream: result.stream[0] }),
       convertProviderCaption(result.stream[0].captions),
-      progress,
+      getSavedProgress(progressItems, meta),
     );
+    // Save the last successful source when manually selected
+    if (enableLastSuccessfulSource) {
+      setLastSuccessfulSource(sourceId);
+    }
     router.close();
-  }, [embedId, sourceId, meta, router, report, setCaption]);
+  }, [
+    embedId,
+    sourceId,
+    meta,
+    router,
+    report,
+    setCaption,
+    enableLastSuccessfulSource,
+    setLastSuccessfulSource,
+  ]);
 
   return {
     run,
     loading: request.loading,
     errored: !!request.error,
+    notFound: request.error instanceof NotFoundError,
   };
 }
 
@@ -99,31 +119,27 @@ export function useSourceScraping(sourceId: string | null, routerId: string) {
   const setCaption = usePlayerStore((s) => s.setCaption);
   const setSourceId = usePlayerStore((s) => s.setSourceId);
   const setEmbedId = usePlayerStore((s) => (s as any).setEmbedId);
-  const progress = usePlayerStore((s) => s.progress.time);
+  const progressItems = useProgressStore((s) => s.items);
   const router = useOverlayRouter(routerId);
   const { report } = useReportProviders();
+  const setLastSuccessfulSource = usePreferencesStore(
+    (s) => s.setLastSuccessfulSource,
+  );
+  const enableLastSuccessfulSource = usePreferencesStore(
+    (s) => s.enableLastSuccessfulSource,
+  );
 
   const [request, run] = useAsyncFn(async () => {
     if (!sourceId || !meta) return null;
     setEmbedId(null);
     const scrapeMedia = metaToScrapeMedia(meta);
-    const providerApiUrl = getLoadbalancedProviderApiUrl();
 
     let result: SourcererOutput | undefined;
     try {
-      if (providerApiUrl && !isExtensionActiveCached()) {
-        const baseUrlMaker = makeProviderUrl(providerApiUrl);
-        const conn = await connectServerSideEvents<SourcererOutput>(
-          baseUrlMaker.scrapeSource(sourceId, scrapeMedia),
-          ["completed", "noOutput"],
-        );
-        result = await conn.promise();
-      } else {
-        result = await getProviders().runSourceScraper({
-          id: sourceId,
-          media: scrapeMedia,
-        });
-      }
+      result = await getProviders().runSourceScraper({
+        id: sourceId,
+        media: scrapeMedia,
+      });
     } catch (err) {
       console.error(`Failed to scrape ${sourceId}`, err);
       const notFound = err instanceof NotFoundError;
@@ -144,9 +160,13 @@ export function useSourceScraping(sourceId: string | null, routerId: string) {
       setSource(
         convertRunoutputToSource({ stream: result.stream[0] }),
         convertProviderCaption(result.stream[0].captions),
-        progress,
+        getSavedProgress(progressItems, meta),
       );
       setSourceId(sourceId);
+      // Save the last successful source when manually selected
+      if (enableLastSuccessfulSource) {
+        setLastSuccessfulSource(sourceId);
+      }
       router.close();
       return null;
     }
@@ -154,22 +174,10 @@ export function useSourceScraping(sourceId: string | null, routerId: string) {
       let embedResult: EmbedOutput | undefined;
       if (!meta) return;
       try {
-        if (providerApiUrl && !isExtensionActiveCached()) {
-          const baseUrlMaker = makeProviderUrl(providerApiUrl);
-          const conn = await connectServerSideEvents<EmbedOutput>(
-            baseUrlMaker.scrapeEmbed(
-              result.embeds[0].embedId,
-              result.embeds[0].url,
-            ),
-            ["completed", "noOutput"],
-          );
-          embedResult = await conn.promise();
-        } else {
-          embedResult = await getProviders().runEmbedScraper({
-            id: result.embeds[0].embedId,
-            url: result.embeds[0].url,
-          });
-        }
+        embedResult = await getProviders().runEmbedScraper({
+          id: result.embeds[0].embedId,
+          url: result.embeds[0].url,
+        });
       } catch (err) {
         console.error(`Failed to scrape ${result.embeds[0].embedId}`, err);
         const notFound = err instanceof NotFoundError;
@@ -201,12 +209,23 @@ export function useSourceScraping(sourceId: string | null, routerId: string) {
       setSource(
         convertRunoutputToSource({ stream: embedResult.stream[0] }),
         convertProviderCaption(embedResult.stream[0].captions),
-        progress,
+        getSavedProgress(progressItems, meta),
       );
+      // Save the last successful source when manually selected
+      if (enableLastSuccessfulSource) {
+        setLastSuccessfulSource(sourceId);
+      }
       router.close();
     }
     return result.embeds;
-  }, [sourceId, meta, router, setCaption]);
+  }, [
+    sourceId,
+    meta,
+    router,
+    setCaption,
+    enableLastSuccessfulSource,
+    setLastSuccessfulSource,
+  ]);
 
   return {
     run,

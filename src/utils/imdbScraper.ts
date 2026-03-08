@@ -55,6 +55,7 @@ interface IMDbMetadata {
   plot?: string;
   poster_url?: string;
   trailer_url?: string;
+  trailer_thumbnail?: string;
   url?: string;
   genre?: string[];
   cast?: string[];
@@ -96,18 +97,6 @@ const userAgents = [
 
 function getRandomUserAgent(): string {
   return userAgents[Math.floor(Math.random() * userAgents.length)];
-}
-
-function formatRuntime(seconds: number | null): string {
-  if (!seconds) return "";
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return `${hours}h ${remainingMinutes}m`;
-}
-
-function arrayToString(list: string[]): string {
-  return list.join(", ");
 }
 
 export async function scrapeIMDb(
@@ -251,9 +240,9 @@ export async function scrapeIMDb(
     metadata.imdb_rating = aboveTheFold.ratingsSummary?.aggregateRating || null;
     metadata.votes = aboveTheFold.ratingsSummary?.voteCount || null;
     metadata.poster_url = aboveTheFold.primaryImage?.url || "";
-    metadata.trailer_url =
-      aboveTheFold.primaryVideos?.edges?.[0]?.node?.playbackURLs?.[0]?.url ||
-      "";
+    const trailerNode = aboveTheFold.primaryVideos?.edges?.[0]?.node;
+    metadata.trailer_url = trailerNode?.playbackURLs?.[0]?.url || "";
+    metadata.trailer_thumbnail = trailerNode?.thumbnail?.url || "";
 
     // Extract arrays
     metadata.genre = aboveTheFold.genres?.genres?.map((g: any) => g.text) || [];
@@ -301,36 +290,4 @@ export async function scrapeIMDb(
   }
 
   return metadata;
-}
-
-// Helper function to print metadata (useful for debugging)
-export function printIMDbMetadata(metadata: IMDbMetadata): void {
-  console.log("\nTitle:", metadata.title);
-  if (metadata.title !== metadata.original_title) {
-    console.log("Original Title:", metadata.original_title);
-  }
-  console.log("Type:", metadata.title_type);
-  console.log("Year:", metadata.year);
-  console.log("Runtime:", formatRuntime(metadata.runtime || null));
-  console.log("Date:", metadata.date);
-  console.log("Age Rating:", metadata.age_rating);
-  console.log("Genre:", arrayToString(metadata.genre || []));
-  console.log("Cast:", arrayToString(metadata.cast || []));
-  console.log("Directed by:", arrayToString(metadata.directors || []));
-  console.log("Writers:", arrayToString(metadata.writers || []));
-  console.log("Countries:", arrayToString(metadata.countries || []));
-  console.log("Filming Locations:", arrayToString(metadata.locations || []));
-  console.log("Languages:", arrayToString(metadata.languages || []));
-  console.log("Keywords:", arrayToString(metadata.keywords || []));
-
-  if (metadata.season && metadata.episode) {
-    console.log("\nEpisode Details:");
-    console.log("Season:", metadata.season);
-    console.log("Episode:", metadata.episode);
-    console.log("Title:", metadata.episode_title);
-    console.log("Plot:", metadata.episode_plot);
-    console.log("Rating:", metadata.episode_rating);
-    console.log("Votes:", metadata.episode_votes);
-  }
-  console.log("\n");
 }

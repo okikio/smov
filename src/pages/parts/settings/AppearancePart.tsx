@@ -1,11 +1,23 @@
 import classNames from "classnames";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@/components/buttons/Button";
 import { Toggle } from "@/components/buttons/Toggle";
 import { SortableList } from "@/components/form/SortableList";
 import { Icon, Icons } from "@/components/Icon";
+import { EditGroupOrderModal } from "@/components/overlays/EditGroupOrderModal";
+import { useModal } from "@/components/overlays/Modal";
 import { Heading1 } from "@/components/utils/Text";
+import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
+import { useAuthStore } from "@/stores/auth";
+import { useBookmarkStore } from "@/stores/bookmarks";
+import { useGroupOrderStore } from "@/stores/groupOrder";
+import {
+  primaryOptions,
+  secondaryOptions,
+  tertiaryOptions,
+} from "@themes/custom";
 
 const availableThemes = [
   {
@@ -54,6 +66,11 @@ const availableThemes = [
     key: "settings.appearance.themes.autumn",
   },
   {
+    id: "frost",
+    selector: "theme-frost",
+    key: "settings.appearance.themes.frost",
+  },
+  {
     id: "mocha",
     selector: "theme-mocha",
     key: "settings.appearance.themes.mocha",
@@ -84,6 +101,11 @@ const availableThemes = [
     key: "settings.appearance.themes.spark",
   },
   {
+    id: "cobalt",
+    selector: "theme-cobalt",
+    key: "settings.appearance.themes.cobalt",
+  },
+  {
     id: "grape",
     selector: "theme-grape",
     key: "settings.appearance.themes.grape",
@@ -109,9 +131,14 @@ const availableThemes = [
     key: "settings.appearance.themes.popsicle",
   },
   {
-    id: "skyRealm",
-    selector: "theme-skyrealm",
-    key: "settings.appearance.themes.skyrealm",
+    id: "christmas",
+    selector: "theme-christmas",
+    key: "settings.appearance.themes.christmas",
+  },
+  {
+    id: "custom",
+    selector: "theme-custom",
+    key: "settings.appearance.themes.custom",
   },
 ];
 
@@ -208,6 +235,46 @@ function ThemePreview(props: {
   );
 }
 
+function ColorOption(props: {
+  active: boolean;
+  colors: Record<string, string>;
+  onClick: () => void;
+  title: string;
+}) {
+  const c1 =
+    props.colors["--colors-type-logo"] ||
+    props.colors["--colors-background-main"] ||
+    props.colors["--colors-type-text"];
+  const c2 =
+    props.colors["--colors-lightBar-light"] ||
+    props.colors["--colors-modal-background"] ||
+    props.colors["--colors-utils-divider"];
+
+  return (
+    <div
+      className={classNames(
+        "cursor-pointer p-1 rounded-full border-2 transition-all",
+        props.active
+          ? "border-type-link scale-110"
+          : "border-transparent hover:border-white/20 hover:scale-105",
+      )}
+      onClick={props.onClick}
+      title={props.title}
+    >
+      <div className="w-8 h-8 rounded-full overflow-hidden flex transform rotate-45">
+        <div
+          className="flex-1 h-full"
+          style={{ backgroundColor: `rgb(${c1})` }}
+        />
+        <div
+          className="flex-1 h-full"
+          style={{ backgroundColor: `rgb(${c2})` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function AppearancePart(props: {
   active: string;
   inUse: string;
@@ -225,8 +292,14 @@ export function AppearancePart(props: {
   enableImageLogos: boolean;
   setEnableImageLogos: (v: boolean) => void;
 
+  enablePauseOverlay: boolean;
+  setEnablePauseOverlay: (v: boolean) => void;
+
   enableCarouselView: boolean;
   setEnableCarouselView: (v: boolean) => void;
+
+  enableMinimalCards: boolean;
+  setEnableMinimalCards: (v: boolean) => void;
 
   forceCompactEpisodeView: boolean;
   setForceCompactEpisodeView: (v: boolean) => void;
@@ -235,13 +308,49 @@ export function AppearancePart(props: {
   setHomeSectionOrder: (v: string[]) => void;
 
   enableLowPerformanceMode: boolean;
+
+  customTheme: {
+    primary: string;
+    secondary: string;
+    tertiary: string;
+  };
+  setCustomTheme: (v: {
+    primary: string;
+    secondary: string;
+    tertiary: string;
+  }) => void;
 }) {
   const { t } = useTranslation();
+
+  const customTheme = props.customTheme;
+  const setCustomTheme = props.setCustomTheme;
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const activeThemeRef = useRef<HTMLDivElement>(null);
   const [isAtTop, setIsAtTop] = useState(true);
   const [isAtBottom, setIsAtBottom] = useState(false);
+
+  // Group order modal
+  const bookmarks = useBookmarkStore((s) => s.bookmarks);
+  const setGroupOrder = useGroupOrderStore((s) => s.setGroupOrder);
+  const editGroupOrderModal = useModal("bookmark-edit-order-settings");
+  const backendUrl = useBackendUrl();
+  const account = useAuthStore((s) => s.account);
+
+  // Check if there are groups
+  const hasGroups = useMemo(() => {
+    const groups = new Set<string>();
+
+    Object.values(bookmarks).forEach((bookmark) => {
+      if (Array.isArray(bookmark.group)) {
+        bookmark.group.forEach((group) => groups.add(group));
+      }
+    });
+
+    groups.add("bookmarks");
+
+    return groups.size > 1;
+  }, [bookmarks]);
 
   const {
     enableLowPerformanceMode,
@@ -249,6 +358,7 @@ export function AppearancePart(props: {
     setEnableFeatured,
     setEnableDetailsModal,
     setEnableImageLogos,
+    setEnablePauseOverlay,
     setForceCompactEpisodeView,
   } = props;
 
@@ -259,6 +369,7 @@ export function AppearancePart(props: {
       setEnableFeatured(false);
       setEnableDetailsModal(false);
       setEnableImageLogos(false);
+      setEnablePauseOverlay(false);
       setForceCompactEpisodeView(true);
     }
   }, [
@@ -267,6 +378,7 @@ export function AppearancePart(props: {
     setEnableFeatured,
     setEnableDetailsModal,
     setEnableImageLogos,
+    setEnablePauseOverlay,
     setForceCompactEpisodeView,
   ]);
 
@@ -310,6 +422,26 @@ export function AppearancePart(props: {
       checkScrollPosition(); // Update masks after scrolling
     }
   }, [props.active]);
+
+  const handleEditGroupOrder = () => {
+    editGroupOrderModal.show();
+  };
+
+  const handleCancelGroupOrder = () => {
+    editGroupOrderModal.hide();
+  };
+
+  const handleSaveGroupOrder = (newOrder: string[]) => {
+    setGroupOrder(newOrder);
+    editGroupOrderModal.hide();
+
+    // Save to backend
+    if (backendUrl && account) {
+      useGroupOrderStore
+        .getState()
+        .saveGroupOrderToBackend(backendUrl, account);
+    }
+  };
 
   return (
     <div className="space-y-12">
@@ -427,6 +559,33 @@ export function AppearancePart(props: {
             </div>
           </div>
 
+          {/* Pause Overlay */}
+          <div>
+            <p className="text-white font-bold mb-3">
+              {t("settings.appearance.options.pauseOverlay")}
+            </p>
+            <p className="max-w-[25rem] font-medium">
+              {t("settings.appearance.options.pauseOverlayDescription")}
+            </p>
+            <div
+              onClick={() =>
+                !props.enableLowPerformanceMode &&
+                props.setEnablePauseOverlay(!props.enablePauseOverlay)
+              }
+              className={classNames(
+                "bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg",
+                props.enableLowPerformanceMode
+                  ? "cursor-not-allowed opacity-50 pointer-events-none"
+                  : "cursor-pointer opacity-100 pointer-events-auto",
+              )}
+            >
+              <Toggle enabled={props.enablePauseOverlay} />
+              <p className="flex-1 text-white font-bold">
+                {t("settings.appearance.options.pauseOverlayLabel")}
+              </p>
+            </div>
+          </div>
+
           {/* Carousel View */}
           <div>
             <p className="text-white font-bold mb-3">
@@ -447,6 +606,30 @@ export function AppearancePart(props: {
               <Toggle enabled={props.enableCarouselView} />
               <p className="flex-1 text-white font-bold">
                 {t("settings.appearance.options.carouselViewLabel")}
+              </p>
+            </div>
+          </div>
+
+          {/* Minimal Cards */}
+          <div>
+            <p className="text-white font-bold mb-3">
+              {t("settings.appearance.options.minimalCards")}
+            </p>
+            <p className="max-w-[25rem] font-medium">
+              {t("settings.appearance.options.minimalCardsDescription")}
+            </p>
+            <div
+              onClick={() =>
+                props.setEnableMinimalCards(!props.enableMinimalCards)
+              }
+              className={classNames(
+                "bg-dropdown-background hover:bg-dropdown-hoverBackground select-none my-4 cursor-pointer space-x-3 flex items-center max-w-[25rem] py-3 px-4 rounded-lg",
+                "cursor-pointer opacity-100 pointer-events-auto",
+              )}
+            >
+              <Toggle enabled={props.enableMinimalCards} />
+              <p className="flex-1 text-white font-bold">
+                {t("settings.appearance.options.minimalCardsLabel")}
               </p>
             </div>
           </div>
@@ -500,6 +683,17 @@ export function AppearancePart(props: {
                 }}
               />
             </div>
+            {hasGroups && (
+              <div className="mt-4 max-w-[25rem]">
+                <Button
+                  theme="secondary"
+                  onClick={handleEditGroupOrder}
+                  className="w-full"
+                >
+                  {t("settings.appearance.options.homeSectionOrderGroups")}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -531,8 +725,75 @@ export function AppearancePart(props: {
               </div>
             ))}
           </div>
+
+          {props.active === "custom" && (
+            <div className="animate-fade-in space-y-6 pt-4 border-t border-utils-divider">
+              <div>
+                <p className="text-white font-bold mb-3">
+                  {t("settings.appearance.customParts.primary")}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {primaryOptions.map((opt) => (
+                    <ColorOption
+                      key={opt.id}
+                      active={customTheme.primary === opt.id}
+                      colors={opt.colors}
+                      onClick={() =>
+                        setCustomTheme({ ...customTheme, primary: opt.id })
+                      }
+                      title={t(`settings.appearance.themes.${opt.id}`)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-white font-bold mb-3">
+                  {t("settings.appearance.customParts.secondary")}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {secondaryOptions.map((opt) => (
+                    <ColorOption
+                      key={opt.id}
+                      active={customTheme.secondary === opt.id}
+                      colors={opt.colors}
+                      onClick={() =>
+                        setCustomTheme({ ...customTheme, secondary: opt.id })
+                      }
+                      title={t(`settings.appearance.themes.${opt.id}`)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-white font-bold mb-3">
+                  {t("settings.appearance.customParts.tertiary")}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {tertiaryOptions.map((opt) => (
+                    <ColorOption
+                      key={opt.id}
+                      active={customTheme.tertiary === opt.id}
+                      colors={opt.colors}
+                      onClick={() =>
+                        setCustomTheme({ ...customTheme, tertiary: opt.id })
+                      }
+                      title={t(`settings.appearance.themes.${opt.id}`)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Edit Group Order Modal */}
+      <EditGroupOrderModal
+        id={editGroupOrderModal.id}
+        isShown={editGroupOrderModal.isShown}
+        onCancel={handleCancelGroupOrder}
+        onSave={handleSaveGroupOrder}
+      />
     </div>
   );
 }

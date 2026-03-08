@@ -9,9 +9,11 @@ import { Icon, Icons } from "@/components/Icon";
 import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { hasAired } from "@/components/player/utils/aired";
 import { useBookmarkStore } from "@/stores/bookmarks";
-import { useProgressStore } from "@/stores/progress";
+import { getProgressPercentage, useProgressStore } from "@/stores/progress";
 
 import { EpisodeCarouselProps } from "../../types";
+
+const EMPTY_ARRAY: string[] = [];
 
 export function EpisodeCarousel({
   episodes,
@@ -23,6 +25,7 @@ export function EpisodeCarousel({
   mediaId,
   mediaTitle,
   mediaPosterUrl,
+  totalEpisodes,
 }: EpisodeCarouselProps) {
   const [showEpisodeMenu, setShowEpisodeMenu] = useState(false);
   const [customSeason, setCustomSeason] = useState("");
@@ -170,13 +173,15 @@ export function EpisodeCarousel({
         const episodeProgress =
           progress[mediaId.toString()]?.episodes?.[episodeId];
         const percentage = episodeProgress
-          ? (episodeProgress.progress.watched /
-              episodeProgress.progress.duration) *
-            100
+          ? getProgressPercentage(
+              episodeProgress.progress.watched,
+              episodeProgress.progress.duration,
+            )
           : 0;
 
         // If watched (>90%), reset to 0%, otherwise set to 100%
         const isWatched = percentage > 90;
+        const shouldMarkWatched = !isWatched;
 
         // Get the poster URL from the mediaPosterUrl prop
         const posterUrl = mediaPosterUrl;
@@ -201,7 +206,7 @@ export function EpisodeCarousel({
             },
           },
           progress: {
-            watched: isWatched ? 0 : 60,
+            watched: shouldMarkWatched ? 60 : 0, // 60 seconds (100%) for watched, 0 for unwatched
             duration: 60,
           },
         });
@@ -213,7 +218,6 @@ export function EpisodeCarousel({
     (s) => s.toggleFavoriteEpisode,
   );
   const bookmarks = useBookmarkStore((s) => s.bookmarks);
-  const getFavoriteEpisodes = useBookmarkStore((s) => s.getFavoriteEpisodes);
 
   const toggleFavoriteStatus = (episodeId: number, event: React.MouseEvent) => {
     event.preventDefault();
@@ -244,10 +248,35 @@ export function EpisodeCarousel({
   );
 
   // Get favorite episodes for this show
-  const favoriteEpisodeIds = useMemo(
-    () => (mediaId ? getFavoriteEpisodes(mediaId.toString()) : []),
-    [mediaId, getFavoriteEpisodes],
+  const favoriteEpisodeIds = useBookmarkStore((s) =>
+    mediaId
+      ? (s.bookmarks[mediaId.toString()]?.favoriteEpisodes ?? EMPTY_ARRAY)
+      : EMPTY_ARRAY,
   );
+
+  // Calculate watched episodes count and percentage
+  const watchedStats = useMemo(() => {
+    if (!mediaId || !totalEpisodes) return { watched: 0, percentage: 0 };
+
+    let watchedCount = 0;
+    episodes.forEach((episode) => {
+      const episodeProgress =
+        progress[mediaId.toString()]?.episodes?.[episode.id];
+      const percentage = episodeProgress
+        ? getProgressPercentage(
+            episodeProgress.progress.watched,
+            episodeProgress.progress.duration,
+          )
+        : 0;
+      if (percentage > 90) {
+        watchedCount += 1;
+      }
+    });
+
+    const percentage = Math.round((watchedCount / totalEpisodes) * 100);
+
+    return { watched: watchedCount, percentage };
+  }, [episodes, progress, mediaId, totalEpisodes]);
 
   // Load favorite episodes when favorites is selected
   useEffect(() => {
@@ -282,9 +311,10 @@ export function EpisodeCarousel({
         const episodeProgress =
           progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
         const percentage = episodeProgress
-          ? (episodeProgress.progress.watched /
-              episodeProgress.progress.duration) *
-            100
+          ? getProgressPercentage(
+              episodeProgress.progress.watched,
+              episodeProgress.progress.duration,
+            )
           : 0;
         const isAired = hasAired(episode.air_date);
         const isWatched = percentage > 90;
@@ -299,9 +329,10 @@ export function EpisodeCarousel({
         const episodeProgress =
           progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
         const percentage = episodeProgress
-          ? (episodeProgress.progress.watched /
-              episodeProgress.progress.duration) *
-            100
+          ? getProgressPercentage(
+              episodeProgress.progress.watched,
+              episodeProgress.progress.duration,
+            )
           : 0;
         const isAired = hasAired(episode.air_date);
         const isWatched = percentage > 90;
@@ -378,9 +409,10 @@ export function EpisodeCarousel({
       const episodeProgress =
         progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
       const percentage = episodeProgress
-        ? (episodeProgress.progress.watched /
-            episodeProgress.progress.duration) *
-          100
+        ? getProgressPercentage(
+            episodeProgress.progress.watched,
+            episodeProgress.progress.duration,
+          )
         : 0;
       const isAired = hasAired(episode.air_date);
       const isWatched = percentage > 90;
@@ -419,7 +451,7 @@ export function EpisodeCarousel({
             {showEpisodeMenu && (
               <div
                 ref={episodeMenuRef}
-                className="absolute top-full left-0 mt-2 p-4 bg-background-main rounded-lg shadow-lg border border-white/10 z-50 min-w-[250px]"
+                className="absolute top-full left-0 mt-2 p-4 bg-background-main rounded-xl shadow-lg  z-50 min-w-[250px]"
               >
                 <div className="space-y-4">
                   <div>
@@ -432,7 +464,7 @@ export function EpisodeCarousel({
                       onChange={(e) => setCustomSeason(e.target.value)}
                       min="1"
                       max={seasons.length}
-                      className="w-full px-3 py-2 bg-white/5 rounded border border-white/10 text-white focus:outline-none focus:border-white/30"
+                      className="w-full px-3 py-2 bg-white/5 rounded-xl text-white focus:outline-none focus:border-white/30"
                       placeholder={t("details.season")}
                     />
                   </div>
@@ -445,7 +477,7 @@ export function EpisodeCarousel({
                       value={customEpisode}
                       onChange={(e) => setCustomEpisode(e.target.value)}
                       min="1"
-                      className="w-full px-3 py-2 bg-white/5 rounded border border-white/10 text-white focus:outline-none focus:border-white/30"
+                      className="w-full px-3 py-2 bg-white/5 rounded-xl text-white focus:outline-none focus:border-white/30"
                       placeholder={t("details.episode")}
                     />
                   </div>
@@ -460,6 +492,15 @@ export function EpisodeCarousel({
               </div>
             )}
           </div>
+          {totalEpisodes && (
+            <span className="text-xs md:text-sm text-white/70">
+              {t("details.watched", {
+                watched: watchedStats.watched,
+                total: totalEpisodes,
+                percentage: watchedStats.percentage,
+              })}
+            </span>
+          )}
         </div>
 
         {/* Season Watched Confirmation */}
@@ -565,9 +606,10 @@ export function EpisodeCarousel({
                 const episodeProgress =
                   progress[mediaId?.toString() ?? ""]?.episodes?.[episode.id];
                 const percentage = episodeProgress
-                  ? (episodeProgress.progress.watched /
-                      episodeProgress.progress.duration) *
-                    100
+                  ? getProgressPercentage(
+                      episodeProgress.progress.watched,
+                      episodeProgress.progress.duration,
+                    )
                   : 0;
                 const isAired = hasAired(episode.air_date);
                 const isExpanded = expandedEpisodes[episode.id];

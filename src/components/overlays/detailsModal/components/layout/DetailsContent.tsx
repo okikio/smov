@@ -2,12 +2,13 @@ import { t } from "i18next";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 
+import { getSeasonDetails } from "@/backend/metadata/tmdb";
 import { getNetworkContent } from "@/backend/metadata/traktApi";
 import { TMDBContentTypes } from "@/backend/metadata/types/tmdb";
 import { Icon, Icons } from "@/components/Icon";
 import { useLanguageStore } from "@/stores/language";
 import { usePreferencesStore } from "@/stores/preferences";
-import { useProgressStore } from "@/stores/progress";
+import { getProgressPercentage, useProgressStore } from "@/stores/progress";
 import { shouldShowProgress } from "@/stores/progress/utils";
 import { scrapeIMDb } from "@/utils/imdbScraper";
 import { getTmdbLanguageCode } from "@/utils/language";
@@ -16,6 +17,9 @@ import { scrapeRottenTomatoes } from "@/utils/rottenTomatoesScraper";
 import { DetailsContentProps } from "../../types";
 import { EpisodeCarousel } from "../carousels/EpisodeCarousel";
 import { CastCarousel } from "../carousels/PeopleCarousel";
+import { SimilarMediaCarousel } from "../carousels/SimilarMediaCarousel";
+import { TrailerCarousel } from "../carousels/TrailerCarousel";
+import { CollectionOverlay } from "../overlays/CollectionOverlay";
 import { TrailerOverlay } from "../overlays/TrailerOverlay";
 import { DetailsBody } from "../sections/DetailsBody";
 import { DetailsInfo } from "../sections/DetailsInfo";
@@ -28,15 +32,35 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
   );
   const [, setIsLoadingImdb] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [showCollection, setShowCollection] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
+  const [fetchedSeasons, setFetchedSeasons] = useState<Record<number, any[]>>(
+    {},
+  );
+  const [loadingSeasons, setLoadingSeasons] = useState<Record<number, boolean>>(
+    {},
+  );
   const [, copyToClipboard] = useCopyToClipboard();
   const [hasCopiedShare, setHasCopiedShare] = useState(false);
   const [logoHeight, setLogoHeight] = useState<number>(0);
   const logoRef = useRef<HTMLDivElement>(null);
   const progress = useProgressStore((s) => s.items);
+  const updateItem = useProgressStore((s) => s.updateItem);
   const enableImageLogos = usePreferencesStore(
     (state) => state.enableImageLogos,
   );
+
+  // Check if movie is watched (>90% progress)
+  const isMovieWatched = useMemo(() => {
+    if (data.type !== "movie" || !data.id) return false;
+    const movieProgress = progress[data.id.toString()]?.progress;
+    if (!movieProgress) return false;
+    const percentage = getProgressPercentage(
+      movieProgress.watched,
+      movieProgress.duration,
+    );
+    return percentage > 90;
+  }, [data.type, data.id, progress]);
 
   const showProgress = useMemo(() => {
     if (!data.id) return null;
@@ -51,6 +75,54 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
       setSelectedSeason(showProgress.season.number);
     }
   }, [showProgress]);
+
+  // Fetch episodes for selected season
+  useEffect(() => {
+    const fetchSeason = async (seasonNumber: number) => {
+      if (
+        !data.id ||
+        seasonNumber === -1 ||
+        fetchedSeasons[seasonNumber] ||
+        loadingSeasons[seasonNumber]
+      )
+        return;
+
+      setLoadingSeasons((prev) => ({ ...prev, [seasonNumber]: true }));
+      try {
+        const episodes = await getSeasonDetails(
+          data.id.toString(),
+          seasonNumber,
+        );
+        setFetchedSeasons((prev) => ({ ...prev, [seasonNumber]: episodes }));
+      } catch (err) {
+        console.error("Failed to fetch season details:", err);
+      } finally {
+        setLoadingSeasons((prev) => ({ ...prev, [seasonNumber]: false }));
+      }
+    };
+
+    if (data.type === "show") {
+      if (selectedSeason !== -1) {
+        fetchSeason(selectedSeason);
+      } else if (data.seasonData?.seasons) {
+        // Fetch all seasons for favorites
+        data.seasonData.seasons.forEach((season) => {
+          fetchSeason(season.season_number);
+        });
+      }
+    }
+  }, [
+    data.id,
+    data.type,
+    selectedSeason,
+    fetchedSeasons,
+    loadingSeasons,
+    data.seasonData,
+  ]);
+
+  const allEpisodes = useMemo(() => {
+    return Object.values(fetchedSeasons).flat();
+  }, [fetchedSeasons]);
 
   // Add effect to measure logo height
   useEffect(() => {
@@ -185,6 +257,31 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
     }
   };
 
+  const toggleMovieWatchStatus = () => {
+    if (data.type !== "movie" || !data.id) return;
+
+    // Get the poster URL from the data
+    const posterUrl = data.posterUrl;
+
+    // Update progress - if watched, set to 0%, otherwise set to 100% (completed)
+    const shouldMarkWatched = !isMovieWatched;
+    updateItem({
+      meta: {
+        tmdbId: data.id.toString(),
+        title: data.title || "",
+        type: "movie",
+        releaseYear: data.releaseDate
+          ? new Date(data.releaseDate).getFullYear()
+          : new Date().getFullYear(),
+        poster: posterUrl,
+      },
+      progress: {
+        watched: shouldMarkWatched ? 60 : 0, // 60 seconds (100%) for watched, 0 for unwatched
+        duration: 60,
+      },
+    });
+  };
+
   return (
     <div className="relative h-full flex flex-col">
       {/* Share notification popup */}
@@ -204,6 +301,20 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
         <TrailerOverlay
           trailerUrl={imdbData.trailer_url}
           onClose={() => setShowTrailer(false)}
+        />
+      )}
+
+      {/* Collection Overlay */}
+      {showCollection && data.collection && (
+        <CollectionOverlay
+          collectionId={data.collection.id}
+          collectionName={data.collection.name}
+          onClose={() => setShowCollection(false)}
+          onMovieClick={(movieId) => {
+            setShowCollection(false);
+            // Optionally navigate to the movie details
+            window.location.href = `/media/tmdb-movie-${movieId}`;
+          }}
         />
       )}
 
@@ -250,7 +361,6 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
         <DetailsBody
           data={data}
           onPlayClick={handlePlayClick}
-          onTrailerClick={() => setShowTrailer(true)}
           onShareClick={handleShareClick}
           showProgress={showProgress}
           voteAverage={data.voteAverage}
@@ -273,20 +383,40 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
 
             {/* Genres */}
             {data.genres && data.genres.length > 0 && (
-              <div className="flex flex-wrap gap-2 items-center">
-                {data.genres.map((genre, index) => (
-                  <span
-                    key={genre.id}
-                    className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white/80 transition-all duration-300 hover:scale-110 animate-[scaleIn_0.6s_ease-out_forwards]"
-                    style={{
-                      animationDelay: `${((data.genres?.length ?? 0) - 1 - index) * 60}ms`,
-                      transform: "scale(0)",
-                      opacity: 0,
-                    }}
+              <div className="flex justify-between items-center">
+                <div className="flex flex-wrap gap-2 items-center">
+                  {data.genres.map((genre, index) => (
+                    <span
+                      key={genre.id}
+                      className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white/80 transition-all duration-300 hover:scale-110 animate-[scaleIn_0.6s_ease-out_forwards]"
+                      style={{
+                        animationDelay: `${((data.genres?.length ?? 0) - 1 - index) * 60}ms`,
+                        transform: "scale(0)",
+                        opacity: 0,
+                      }}
+                    >
+                      {genre.name}
+                    </span>
+                  ))}
+                </div>
+                {/* Movie Watch Toggle Button - Only show for movies and not in minimal modal */}
+                {data.type === "movie" && !minimal && (
+                  <button
+                    type="button"
+                    onClick={toggleMovieWatchStatus}
+                    className="p-1.5 bg-dropdown-background hover:bg-dropdown-hoverBackground transition-colors rounded-full ml-2"
+                    title={
+                      isMovieWatched
+                        ? t("player.menus.episodes.markAsUnwatched")
+                        : t("player.menus.episodes.markAsWatched")
+                    }
                   >
-                    {genre.name}
-                  </span>
-                ))}
+                    <Icon
+                      icon={isMovieWatched ? Icons.EYE_SLASH : Icons.EYE}
+                      className="h-5 w-5 text-white"
+                    />
+                  </button>
+                )}
               </div>
             )}
 
@@ -320,6 +450,7 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
               imdbData={imdbData}
               rtData={rtData}
               provider={providerData}
+              onCollectionClick={() => setShowCollection(true)}
             />
           </div>
         </div>
@@ -327,7 +458,7 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
         {/* Episodes Carousel for TV Shows */}
         {data.type === "show" && data.seasonData && !minimal && (
           <EpisodeCarousel
-            episodes={data.seasonData.episodes}
+            episodes={allEpisodes}
             showProgress={showProgress}
             progress={progress}
             selectedSeason={selectedSeason}
@@ -336,12 +467,53 @@ export function DetailsContent({ data, minimal = false }: DetailsContentProps) {
             mediaId={data.id}
             mediaTitle={data.title}
             mediaPosterUrl={data.posterUrl}
+            totalEpisodes={data.episodes}
           />
         )}
 
         {/* Cast Carousel */}
         {data.id && (
           <CastCarousel
+            mediaId={data.id.toString()}
+            mediaType={
+              data.type === "movie"
+                ? TMDBContentTypes.MOVIE
+                : TMDBContentTypes.TV
+            }
+          />
+        )}
+
+        {/* Trailer Carousel */}
+        {data.id && (
+          <TrailerCarousel
+            mediaId={data.id.toString()}
+            mediaType={
+              data.type === "movie"
+                ? TMDBContentTypes.MOVIE
+                : TMDBContentTypes.TV
+            }
+            imdbData={imdbData}
+            onTrailerClick={(videoKey, isImdbTrailer) => {
+              let trailerUrl: string;
+              if (isImdbTrailer) {
+                // IMDb trailer is already a full URL
+                trailerUrl = videoKey;
+              } else {
+                // TMDB trailer needs to be converted to YouTube embed URL
+                trailerUrl = `https://www.youtube.com/embed/${videoKey}?autoplay=1&rel=0`;
+              }
+              setShowTrailer(true);
+              setImdbData((prev: any) => ({
+                ...prev,
+                trailer_url: trailerUrl,
+              }));
+            }}
+          />
+        )}
+
+        {/* Similar Media Carousel */}
+        {data.id && (
+          <SimilarMediaCarousel
             mediaId={data.id.toString()}
             mediaType={
               data.type === "movie"

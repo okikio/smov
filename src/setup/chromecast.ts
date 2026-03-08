@@ -32,12 +32,19 @@ export function initializeChromecast() {
           const context = (
             window as any
           ).cast.framework.CastContext.getInstance();
-          context.setOptions({
+          const options: any = {
             receiverApplicationId: (window as any).chrome?.cast?.media
               ?.DEFAULT_MEDIA_RECEIVER_APP_ID,
-            autoJoinPolicy: (window as any).cast.framework.AutoJoinPolicy
-              .ORIGIN_SCOPED,
-          });
+          };
+
+          // Only set autoJoinPolicy if AutoJoinPolicy exists
+          if ((window as any).cast.framework.AutoJoinPolicy?.ORIGIN_SCOPED) {
+            options.autoJoinPolicy = (
+              window as any
+            ).cast.framework.AutoJoinPolicy.ORIGIN_SCOPED;
+          }
+
+          context.setOptions(options);
         }
       } catch (e) {
         console.warn("Chromecast initialization error:", e);

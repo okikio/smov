@@ -13,45 +13,21 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
-            
-      - uses: pnpm/action-setup@v4
+        uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v2
 
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24
-          cache: 'pnpm'
-  
+          node-version: 20
+          cache: "pnpm"
+
       - name: Install pnpm packages
         run: pnpm install
-      
+
       - name: Run ESLint
         run: pnpm run lint
-
-  building:
-    name: Build project
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-      
-      - uses: pnpm/action-setup@v4
-
-
-      - name: Install Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'pnpm'
-      
-      - name: Install pnpm packages
-        run: pnpm install
-
-      - name: Build Project
-        run: pnpm run build
 
   docker:
     name: Build Docker

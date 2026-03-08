@@ -1,5 +1,5 @@
 // This endpoint is not used anymore, but we keep it here for reference or if we feel like fixing the backend
-import { conf } from "@/utils/setup/config";
+import { conf } from "@/setup/config";
 
 export interface TmdbMovie {
   adult: boolean;

@@ -9,8 +9,6 @@ import { Icon, Icons } from "@/components/Icon";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaCard } from "@/components/media/MediaCard";
 import { MediaGrid } from "@/components/media/MediaGrid";
-import { DetailsModal } from "@/components/overlays/detailsModal";
-import { useModal } from "@/components/overlays/Modal";
 import { Heading1 } from "@/components/utils/Text";
 import {
   DiscoverContentType,
@@ -20,6 +18,7 @@ import {
 } from "@/pages/discover/hooks/useDiscoverMedia";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import { useDiscoverStore } from "@/stores/discover";
+import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { useProgressStore } from "@/stores/progress";
 import { MediaItem } from "@/utils/mediaTypes";
 
@@ -30,7 +29,6 @@ interface MoreContentProps {
 export function MoreContent({ onShowDetails }: MoreContentProps) {
   const { mediaType = "movie", contentType, id, category } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [detailsData, setDetailsData] = useState<any>();
   const [selectedProvider, setSelectedProvider] = useState<OptionItem | null>(
     null,
   );
@@ -40,7 +38,7 @@ export function MoreContent({ onShowDetails }: MoreContentProps) {
   const [isContentVisible, setIsContentVisible] = useState(false);
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const detailsModal = useModal("discover-details");
+  const { showModal } = useOverlayStack();
   const { lastView } = useDiscoverStore();
   const { width: windowWidth } = useWindowSize();
   const progressStore = useProgressStore();
@@ -58,6 +56,12 @@ export function MoreContent({ onShowDetails }: MoreContentProps) {
       id: itemId,
       title: item.title || "",
     }));
+
+  // Find selected recommendation source (used in multiple places)
+  const selectedRecommendationSource = React.useMemo(
+    () => recommendationSources.find((s) => s.id === selectedRecommendationId),
+    [recommendationSources, selectedRecommendationId],
+  );
 
   // Determine the actual content type and ID from URL parameters
   const actualContentType = contentType || category?.split("-")[0] || "popular";
@@ -81,9 +85,7 @@ export function MoreContent({ onShowDetails }: MoreContentProps) {
     page: currentPage,
     genreName: selectedGenre?.name,
     providerName: selectedProvider?.name,
-    mediaTitle: recommendationSources.find(
-      (s) => s.id === selectedRecommendationId,
-    )?.title,
+    mediaTitle: selectedRecommendationSource?.title,
     isCarouselView: false,
   });
 
@@ -99,6 +101,11 @@ export function MoreContent({ onShowDetails }: MoreContentProps) {
     setIsContentVisible(false);
   }, [isLoading, mediaItems, currentPage]);
 
+  // Scroll to top when entering the page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [contentType, mediaType, id]);
+
   const handleBack = () => {
     if (lastView) {
       navigate(lastView.url);
@@ -113,11 +120,10 @@ export function MoreContent({ onShowDetails }: MoreContentProps) {
       onShowDetails(media);
       return;
     }
-    setDetailsData({
+    showModal("discover-details", {
       id: Number(media.id),
       type: media.type === "movie" ? "movie" : "show",
     });
-    detailsModal.show();
   };
 
   const handleLoadMore = async () => {
@@ -216,15 +222,10 @@ export function MoreContent({ onShowDetails }: MoreContentProps) {
             <div className="relative pr-4">
               <Dropdown
                 selectedItem={
-                  recommendationSources.find(
-                    (s) => s.id === selectedRecommendationId,
-                  )
+                  selectedRecommendationSource
                     ? {
                         id: selectedRecommendationId,
-                        name:
-                          recommendationSources.find(
-                            (s) => s.id === selectedRecommendationId,
-                          )?.title || "",
+                        name: selectedRecommendationSource?.title || "",
                       }
                     : { id: "", name: "..." }
                 }
@@ -386,7 +387,6 @@ export function MoreContent({ onShowDetails }: MoreContentProps) {
           )}
         </div>
       </WideContainer>
-      {detailsData && <DetailsModal id="discover-details" data={detailsData} />}
     </SubPageLayout>
   );
 }

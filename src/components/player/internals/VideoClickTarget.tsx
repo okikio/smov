@@ -318,6 +318,7 @@ export function VideoClickTarget(props: { showingControls: boolean }) {
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerLeave}
+        onContextMenu={(e) => e.preventDefault()}
       />
     </>
   );

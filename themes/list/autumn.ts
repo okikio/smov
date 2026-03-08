@@ -36,55 +36,55 @@ const tokens = {
     },
   },
   blue: {
-    c50: "hsla(25, 100%, 85%, 1)",     // soft orange
-    c100: "hsla(25, 80%, 70%, 1)",     // brighter orange
-    c200: "hsla(25, 70%, 60%, 1)",     // theme primary: warm orange
-    c300: "hsla(25, 60%, 45%, 1)",     // accent B: darker orange
-    c400: "hsla(25, 50%, 35%, 1)",     // light bar
-    c500: "hsla(25, 45%, 25%, 1)",     // accent B background
+    c50: "hsla(25, 100%, 85%, 1)", // soft orange
+    c100: "hsla(25, 80%, 70%, 1)", // brighter orange
+    c200: "hsla(25, 70%, 60%, 1)", // theme primary: warm orange
+    c300: "hsla(25, 60%, 45%, 1)", // accent B: darker orange
+    c400: "hsla(25, 50%, 35%, 1)", // light bar
+    c500: "hsla(25, 45%, 25%, 1)", // accent B background
     c600: "hsla(25, 42%, 20%, 1)",
     c700: "hsla(25, 40%, 16%, 1)",
     c800: "hsla(25, 35%, 10%, 1)",
     c900: "hsla(25, 30%, 7%, 1)",
   },
   purple: {
-    c50: "hsla(15, 100%, 75%, 1)",     // soft red-orange for link hover - darker
-    c100: "hsla(15, 100%, 60%, 1)",    // bright red-orange logo/link - much darker
-    c200: "hsla(15, 90%, 50%, 1)",     // red-orange progress/loader - more saturated
-    c300: "hsla(15, 80%, 45%, 1)",    // toggle/onboarding bar - more saturated
-    c400: "hsla(15, 75%, 40%, 1)",     // card icon - more saturated
-    c500: "hsla(15, 70%, 32%, 1)",     // accent A background - more saturated
+    c50: "hsla(15, 100%, 75%, 1)", // soft red-orange for link hover - darker
+    c100: "hsla(15, 100%, 60%, 1)", // bright red-orange logo/link - much darker
+    c200: "hsla(15, 90%, 50%, 1)", // red-orange progress/loader - more saturated
+    c300: "hsla(15, 80%, 45%, 1)", // toggle/onboarding bar - more saturated
+    c400: "hsla(15, 75%, 40%, 1)", // card icon - more saturated
+    c500: "hsla(15, 70%, 32%, 1)", // accent A background - more saturated
     c600: "hsla(15, 65%, 25%, 1)",
     c700: "hsla(15, 60%, 18%, 1)",
     c800: "hsla(15, 55%, 12%, 1)",
     c900: "hsla(15, 50%, 8%, 1)",
   },
   ash: {
-    c50: "hsla(45, 39%, 60%, 1)",        // subtle yellow-tinted gray
-    c100: "hsla(45, 24%, 55%, 1)",      // warm yellow-gray
-    c200: "hsla(45, 10%, 35%, 1)",      // sidebar border - yellow tint
-    c300: "hsla(45, 8%, 28%, 1)",       // card divider - yellow tint
-    c400: "hsla(45, 6%, 22%, 1)",       // bg + hover accents - yellow tint
-    c500: "hsla(25, 45%, 25%, 1)",      // accent B background
+    c50: "hsla(45, 39%, 60%, 1)", // subtle yellow-tinted gray
+    c100: "hsla(45, 24%, 55%, 1)", // warm yellow-gray
+    c200: "hsla(45, 10%, 35%, 1)", // sidebar border - yellow tint
+    c300: "hsla(45, 8%, 28%, 1)", // card divider - yellow tint
+    c400: "hsla(45, 6%, 22%, 1)", // bg + hover accents - yellow tint
+    c500: "hsla(25, 45%, 25%, 1)", // accent B background
     c600: "hsla(25, 42%, 20%, 1)",
     c700: "hsla(25, 40%, 16%, 1)",
     c800: "hsla(25, 35%, 10%, 1)",
-    c900: "hsla(25, 30%, 7%, 1)",       // deepest shade, shadows
+    c900: "hsla(25, 30%, 7%, 1)", // deepest shade, shadows
   },
   shade: {
-    c25: "hsla(24, 80%, 70%, 1)",        // red hover accent
-    c50: "hsla(25, 100%, 72%, 1)",      // rich pumpkin for main text
-    c100: "hsla(25, 80%, 60%, 1)",      // placeholder/icon
-    c200: "hsla(25, 60%, 45%, 1)",      // hover bg
-    c300: "hsla(25, 60%, 35%, 1)",      // pill background, auth border
-    c400: "hsla(25, 50%, 21%, 1)",      // light bar
-    c500: "hsla(35, 25%, 22%, 1)",      // dropdown background - subtle yellow tint
-    c600: "hsla(45, 20%, 16%, 1)",      // modal/dropdown background - washed out yellow
-    c700: "hsla(60, 15%, 12%, 1)",      // alt bg - subtle green tint
-    c800: "hsla(25, 38%, 8%, 1)",       // main bg - lighter
-    c900: "hsla(25, 35%, 5%, 1)",       // hover shadow - lighter
+    c25: "hsla(24, 80%, 70%, 1)", // red hover accent
+    c50: "hsla(25, 100%, 72%, 1)", // rich pumpkin for main text
+    c100: "hsla(25, 80%, 60%, 1)", // placeholder/icon
+    c200: "hsla(25, 60%, 45%, 1)", // hover bg
+    c300: "hsla(25, 60%, 35%, 1)", // pill background, auth border
+    c400: "hsla(25, 50%, 21%, 1)", // light bar
+    c500: "hsla(35, 25%, 22%, 1)", // dropdown background - subtle yellow tint
+    c600: "hsla(45, 20%, 16%, 1)", // modal/dropdown background - washed out yellow
+    c700: "hsla(60, 15%, 12%, 1)", // alt bg - subtle green tint
+    c800: "hsla(25, 38%, 8%, 1)", // main bg - lighter
+    c900: "hsla(25, 35%, 5%, 1)", // hover shadow - lighter
   },
-}
+};
 
 export default createTheme({
   name: "autumn",
@@ -340,4 +340,4 @@ export default createTheme({
       },
     },
   },
-})
+});

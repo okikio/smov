@@ -7,6 +7,7 @@ interface SkipEvent {
   endTime: number;
   skipDuration: number;
   timestamp: number;
+  confidence: number; // 0.0-1.0 confidence score
   meta?: {
     title: string;
     type: string;
@@ -23,93 +24,46 @@ interface SkipTrackingResult {
   latestSkip: SkipEvent | null;
   /** Clear the skip history */
   clearHistory: () => void;
+  /** Add a manual skip event (e.g., from skip intro button) */
+  addSkipEvent: (event: Omit<SkipEvent, "timestamp">) => void;
 }
 
 /**
- * Hook that tracks when users skip or scrub more than 15 seconds
- * Useful for gathering information about show intros and user behavior
+ * Hook that tracks manual skip events and monitors user behavior patterns for confidence adjustment.
+ * Only processes skip events added via addSkipEvent (e.g., from skip intro button).
  *
- * @param minSkipThreshold Minimum skip duration in seconds to track (default: 15)
+ * @param minSkipThreshold Minimum total forward movement in 5-second window to start session (default: 20)
  * @param maxHistory Maximum number of skip events to keep in history (default: 50)
  */
 export function useSkipTracking(
-  minSkipThreshold: number = 15,
+  minSkipThreshold: number = 20,
   maxHistory: number = 50,
 ): SkipTrackingResult {
   const [skipHistory, setSkipHistory] = useState<SkipEvent[]>([]);
   const previousTimeRef = useRef<number>(0);
-  const lastUpdateTimeRef = useRef<number>(0);
-  const isSeekingRef = useRef<boolean>(false);
+  const skipWindowRef = useRef<Array<{ time: number; delta: number }>>([]);
+  const isInSkipSessionRef = useRef<boolean>(false);
+  const skipSessionStartRef = useRef<number>(0);
+  const sessionTotalRef = useRef<number>(0);
 
   // Get current player state
   const progress = usePlayerStore((s) => s.progress);
-  const mediaPlaying = usePlayerStore((s) => s.mediaPlaying);
   const meta = usePlayerStore((s) => s.meta);
-  const isSeeking = usePlayerStore((s) => s.interface.isSeeking);
-
-  // Track seeking state to avoid false positives during drag seeking
-  useEffect(() => {
-    isSeekingRef.current = isSeeking;
-  }, [isSeeking]);
 
   const clearHistory = useCallback(() => {
     setSkipHistory([]);
     previousTimeRef.current = 0;
-    lastUpdateTimeRef.current = 0;
+    skipWindowRef.current = [];
+    isInSkipSessionRef.current = false;
+    skipSessionStartRef.current = 0;
+    sessionTotalRef.current = 0;
   }, []);
 
-  const detectSkip = useCallback(() => {
-    const now = Date.now();
-    const currentTime = progress.time;
-
-    // Don't track if video hasn't started playing or if we're actively seeking
-    if (!mediaPlaying.hasPlayedOnce || isSeekingRef.current) {
-      previousTimeRef.current = currentTime;
-      lastUpdateTimeRef.current = now;
-      return;
-    }
-
-    // Initialize on first run
-    if (previousTimeRef.current === 0) {
-      previousTimeRef.current = currentTime;
-      lastUpdateTimeRef.current = now;
-      return;
-    }
-
-    const timeDelta = currentTime - previousTimeRef.current;
-    const realTimeDelta = now - lastUpdateTimeRef.current;
-
-    // Calculate expected time change based on playback rate and real time passed
-    const expectedTimeDelta = mediaPlaying.isPlaying
-      ? (realTimeDelta / 1000) * mediaPlaying.playbackRate
-      : 0;
-
-    // Detect if the time jump is significantly different from expected
-    // This accounts for normal playback, pausing, and small buffering hiccups
-    const unexpectedJump = Math.abs(timeDelta - expectedTimeDelta);
-
-    // Only consider it a skip if:
-    // 1. The time jump is greater than our threshold
-    // 2. The unexpected jump is significant (more than 3 seconds difference from expected)
-    // 3. We're not in a seeking state
-    if (Math.abs(timeDelta) >= minSkipThreshold && unexpectedJump >= 3) {
+  const addSkipEvent = useCallback(
+    (event: Omit<SkipEvent, "timestamp">) => {
       const skipEvent: SkipEvent = {
-        startTime: previousTimeRef.current,
-        endTime: currentTime,
-        skipDuration: timeDelta,
-        timestamp: now,
-        meta: meta
-          ? {
-              title:
-                meta.type === "show" && meta.episode
-                  ? `${meta.title} - S${meta.season?.number || 0}E${meta.episode.number || 0}`
-                  : meta.title,
-              type: meta.type === "movie" ? "Movie" : "TV Show",
-              tmdbId: meta.tmdbId,
-              seasonNumber: meta.season?.number,
-              episodeNumber: meta.episode?.number,
-            }
-          : undefined,
+        ...event,
+        timestamp: Date.now(),
       };
 
       setSkipHistory((prev) => {
@@ -118,22 +72,72 @@ export function useSkipTracking(
           ? newHistory.slice(newHistory.length - maxHistory)
           : newHistory;
       });
+    },
+    [maxHistory],
+  );
+
+  const detectSkip = useCallback(() => {
+    const now = Date.now();
+    const currentTime = progress.time;
+
+    // Initialize on first run
+    if (previousTimeRef.current === 0) {
+      previousTimeRef.current = currentTime;
+      return;
+    }
+
+    const timeDelta = currentTime - previousTimeRef.current;
+
+    // Track forward movements >= 1 second in sliding 6-second window
+    if (timeDelta >= 1) {
+      // Add forward movement to window and remove entries older than 6 seconds
+      skipWindowRef.current.push({ time: now, delta: timeDelta });
+      skipWindowRef.current = skipWindowRef.current.filter(
+        (entry) => entry.time > now - 6000,
+      );
+
+      // Calculate total forward movement in current window
+      const totalForwardMovement = skipWindowRef.current.reduce(
+        (sum, entry) => sum + entry.delta,
+        0,
+      );
+
+      // Start session when threshold exceeded
+      if (
+        totalForwardMovement >= minSkipThreshold &&
+        !isInSkipSessionRef.current
+      ) {
+        isInSkipSessionRef.current = true;
+        skipSessionStartRef.current = previousTimeRef.current;
+        sessionTotalRef.current = totalForwardMovement;
+      }
+      // Update session total while active
+      else if (isInSkipSessionRef.current) {
+        sessionTotalRef.current = totalForwardMovement;
+      }
+    }
+
+    // End session if no forward movement in last 8 seconds
+    const recentEntries = skipWindowRef.current.filter(
+      (entry) => entry.time > now - 8000,
+    );
+
+    if (isInSkipSessionRef.current && recentEntries.length === 0) {
+      // Session ended - reset state but DON'T create skip event
+      isInSkipSessionRef.current = false;
+      skipSessionStartRef.current = 0;
+      sessionTotalRef.current = 0;
+      skipWindowRef.current = [];
     }
 
     previousTimeRef.current = currentTime;
-    lastUpdateTimeRef.current = now;
-  }, [progress.time, mediaPlaying, meta, minSkipThreshold, maxHistory]);
+  }, [progress.time, minSkipThreshold]);
 
   useEffect(() => {
-    // Run detection every second when video is playing
-    const interval = setInterval(() => {
-      if (mediaPlaying.hasPlayedOnce) {
-        detectSkip();
-      }
-    }, 1000);
-
+    // Monitor time changes every 100ms to catch rapid skipping
+    const interval = setInterval(detectSkip, 100);
     return () => clearInterval(interval);
-  }, [detectSkip, mediaPlaying.hasPlayedOnce]);
+  }, [detectSkip]);
 
   // Reset tracking when content changes
   useEffect(() => {
@@ -145,5 +149,6 @@ export function useSkipTracking(
     latestSkip:
       skipHistory.length > 0 ? skipHistory[skipHistory.length - 1] : null,
     clearHistory,
+    addSkipEvent,
   };
 }
