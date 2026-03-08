@@ -262,7 +262,7 @@ export async function get<T>(url: string, params?: object): Promise<T> {
     }
   }
 
-  if (!result!) {
+  if (!result) {
     try {
       result = await mwFetch<T>(encodeURI(url), {
         headers: tmdbHeaders,
