@@ -175,42 +175,27 @@ importers:
       '@types/chromecast-caf-sender':
         specifier: ^1.0.11
         version: 1.0.11
-      '@types/crypto-js':
-        specifier: ^4.2.2
-        version: 4.2.2
       '@types/fscreen':
         specifier: ^1.0.4
         version: 1.0.4
       '@types/lodash.merge':
         specifier: ^4.6.9
         version: 4.6.9
-      '@types/lodash.throttle':
-        specifier: ^4.1.9
-        version: 4.1.9
       '@types/node':
         specifier: ^20.19.23
         version: 20.19.23
-      '@types/pako':
-        specifier: ^2.0.4
-        version: 2.0.4
       '@types/react':
         specifier: ^18.3.26
         version: 18.3.26
       '@types/react-dom':
         specifier: ^18.3.7
         version: 18.3.7(@types/react@18.3.26)
-      '@types/react-lazy-load-image-component':
-        specifier: ^1.6.4
-        version: 1.6.4
       '@types/react-router':
         specifier: ^5.1.20
         version: 5.1.20
       '@types/react-router-dom':
         specifier: ^5.3.3
         version: 5.3.3
-      '@types/react-stickynode':
-        specifier: ^4.0.3
-        version: 4.0.3
       '@types/react-transition-group':
         specifier: ^4.4.12
         version: 4.4.12(@types/react@18.3.26)
@@ -271,9 +256,6 @@ importers:
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
-      postcss-rtl:
-        specifier: ^2.0.0
-        version: 2.0.0(postcss@8.5.6)
       postcss-rtlcss:
         specifier: ^4.0.9
         version: 4.0.9(postcss@8.5.6)
@@ -1737,9 +1719,6 @@ packages:
   '@types/chromecast-caf-sender@1.0.11':
     resolution: {integrity: sha512-Pv3xvNYtxD/cTM/tKfuZRlLasvpxAm+CFni0GJd6Cp8XgiZS9g9tMZkR1uymsi5fIFv057SZKKAWVFFgy7fJtw==}
 
-  '@types/crypto-js@4.2.2':
-    resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
-
   '@types/estree@0.0.39':
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
 
@@ -1776,9 +1755,6 @@ packages:
   '@types/lodash.merge@4.6.9':
     resolution: {integrity: sha512-23sHDPmzd59kUgWyKGiOMO2Qb9YtqRO/x4IhkgNUiPQ1+5MUVqi6bCZeq9nBJ17msjIMbEIO5u+XW4Kz6aGUhQ==}
 
-  '@types/lodash.throttle@4.1.9':
-    resolution: {integrity: sha512-PCPVfpfueguWZQB7pJQK890F2scYKoDUL3iM522AptHWn7d5NQmeS/LTEHIcLr5PaTzl3dK2Z0xSUHHTHwaL5g==}
-
   '@types/lodash@4.17.20':
     resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
 
@@ -1788,9 +1764,6 @@ packages:
   '@types/node@20.19.23':
     resolution: {integrity: sha512-yIdlVVVHXpmqRhtyovZAcSy0MiPcYWGkoO4CGe/+jpP0hmNuihm4XhHbADpK++MsiLHP5MVlv+bcgdF99kSiFQ==}
 
-  '@types/pako@2.0.4':
-    resolution: {integrity: sha512-VWDCbrLeVXJM9fihYodcLiIv0ku+AlOa/TQ1SvYOaBuyrSKgEcro95LJyIsJ4vSo6BXIxOKxiJAat04CmST9Fw==}
-
   '@types/prop-types@15.7.15':
     resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
 
@@ -1799,17 +1772,11 @@ packages:
     peerDependencies:
       '@types/react': ^18.0.0
 
-  '@types/react-lazy-load-image-component@1.6.4':
-    resolution: {integrity: sha512-8pFPeDPF4yVG4lU1/ixZidJEEDZmEOYOTYDvmIu2IAabyuv97Q7n/93nMCocHvQ7vD1czKGiW+op55D9m3MkdA==}
-
   '@types/react-router-dom@5.3.3':
     resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
 
   '@types/react-router@5.1.20':
     resolution: {integrity: sha512-jGjmu/ZqS7FjSH6owMcD5qpq19+1RS9DeVRqfl1FeBMxTDQAGwlMWOcs52NDoXaNKyG3d1cYQFMs9rCrb88o9Q==}
-
-  '@types/react-stickynode@4.0.3':
-    resolution: {integrity: sha512-K7YkwdhXQE4YVxIVweix4nkpdG4onm/dcnKK+qCj0vgUrNiKng+09zOfjF5AlOcC1HQkg5yxVLwp/0AzT84R0w==}
 
   '@types/react-transition-group@4.4.12':
     resolution: {integrity: sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==}
@@ -3700,12 +3667,6 @@ packages:
     peerDependencies:
       postcss: '>=8.4.31'
 
-  postcss-rtl@2.0.0:
-    resolution: {integrity: sha512-vFu78CvaGY9BafWRHNgDm6OjUxzRCWWCrp+KtnyXdgwibLwb/j5ls8Z/ubvOsk9B/Q2NLwSPrXRARKMaa9RBmA==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      postcss: '>=8.4.31'
-
   postcss-rtlcss@4.0.9:
     resolution: {integrity: sha512-dCNKEf+FgTv+EA3XI8ysg2RnpS5s3/iZmU+9qpCNFxHU/BhK+4hz7jyCsCAfo0CLnDrMPtaQENhwb+EGm1wh7Q==}
     engines: {node: '>=18.0.0'}
@@ -4005,11 +3966,6 @@ packages:
 
   rtl-css-js@1.16.1:
     resolution: {integrity: sha512-lRQgou1mu19e+Ya0LsTvKrVJ5TYUbqCVPAiImX3UfLTenarvPUl1QFdvu5Z3PYmHT9RCcwIfbjRQBntExyj3Zg==}
-
-  rtlcss@4.0.0:
-    resolution: {integrity: sha512-j6oypPP+mgFwDXL1JkLCtm6U/DQntMUqlv5SOhpgHhdIE+PmBcjrtAHIpXfbIup47kD5Sgja9JDsDF1NNOsBwQ==}
-    engines: {node: '>=12.0.0'}
-    hasBin: true
 
   rtlcss@4.1.1:
     resolution: {integrity: sha512-/oVHgBtnPNcggP2aVXQjSy6N1mMAfHg4GSag0QtZBlD5bdDgAHwr4pydqJGd+SUCu9260+Pjqbjwtvu7EMH1KQ==}
@@ -6733,8 +6689,6 @@ snapshots:
     dependencies:
       '@types/chrome': 0.1.22
 
-  '@types/crypto-js@4.2.2': {}
-
   '@types/estree@0.0.39': {}
 
   '@types/estree@1.0.7': {}
@@ -6763,10 +6717,6 @@ snapshots:
     dependencies:
       '@types/lodash': 4.17.20
 
-  '@types/lodash.throttle@4.1.9':
-    dependencies:
-      '@types/lodash': 4.17.20
-
   '@types/lodash@4.17.20': {}
 
   '@types/node-forge@1.3.14':
@@ -6777,18 +6727,11 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/pako@2.0.4': {}
-
   '@types/prop-types@15.7.15': {}
 
   '@types/react-dom@18.3.7(@types/react@18.3.26)':
     dependencies:
       '@types/react': 18.3.26
-
-  '@types/react-lazy-load-image-component@1.6.4':
-    dependencies:
-      '@types/react': 18.3.26
-      csstype: 3.1.3
 
   '@types/react-router-dom@5.3.3':
     dependencies:
@@ -6799,10 +6742,6 @@ snapshots:
   '@types/react-router@5.1.20':
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 18.3.26
-
-  '@types/react-stickynode@4.0.3':
-    dependencies:
       '@types/react': 18.3.26
 
   '@types/react-transition-group@4.4.12(@types/react@18.3.26)':
@@ -8887,11 +8826,6 @@ snapshots:
       postcss: 8.5.6
       postcss-selector-parser: 6.1.2
 
-  postcss-rtl@2.0.0(postcss@8.5.6):
-    dependencies:
-      postcss: 8.5.6
-      rtlcss: 4.0.0
-
   postcss-rtlcss@4.0.9(postcss@8.5.6):
     dependencies:
       postcss: 8.5.6
@@ -9164,13 +9098,6 @@ snapshots:
   rtl-css-js@1.16.1:
     dependencies:
       '@babel/runtime': 7.28.4
-
-  rtlcss@4.0.0:
-    dependencies:
-      escalade: 3.2.0
-      picocolors: 1.1.1
-      postcss: 8.5.6
-      strip-json-comments: 3.1.1
 
   rtlcss@4.1.1:
     dependencies:
