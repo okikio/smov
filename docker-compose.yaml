@@ -1,26 +1,68 @@
 version: "3.8"
 
 services:
-  movieweb:
-    build:
-      context: .
-      # args:
-      #   PWA_ENABLED: "false"
-      #   GA_ID: ""
-      #   APP_DOMAIN: ""
-      #   OPENSEARCH_ENABLED: "false"
-      #   TMDB_READ_API_KEY: ""
-      #   CORS_PROXY_URL: ""
-      #   DMCA_EMAIL: ""
-      #   NORMAL_ROUTER: "false"
-      #   BACKEND_URL: ""
-      #   HAS_ONBOARDING: "false"
-      #   ONBOARDING_CHROME_EXTENSION_INSTALL_LINK: ""
-      #   ONBOARDING_PROXY_INSTALL_LINK: ""
-      #   DISALLOWED_IDS: ""
-      #   CDN_REPLACEMENTS: ""
+  pstream:
+    image: ghcr.io/okikio/smov:latest
+    # To build locally instead of pulling from GHCR:
+    # build:
+    #   context: .
+    #   args:
+    #     PWA_ENABLED: "false"   # set to "true" to enable the PWA service worker
     ports:
       - "4331:80"
     restart: unless-stopped
-    env_file:
-      - stack.env
+    # All configuration is injected at runtime — no image rebuild needed.
+    # Copy this file to stack.env, fill in your values, and uncomment env_file.
+    # env_file:
+    #   - stack.env
+    environment:
+      # ── Core ────────────────────────────────────────────────────────────
+      # TMDB read-only API key  (https://www.themoviedb.org/settings/api)
+      VITE_TMDB_READ_API_KEY: ""
+      # CORS proxy URL — must NOT end with a slash
+      VITE_CORS_PROXY_URL: ""
+      # M3U8 / HLS proxy URL
+      VITE_M3U8_PROXY_URL: ""
+      # Backend sync server URL (or comma-separated list)
+      VITE_BACKEND_URL: ""
+      # DMCA contact email shown in footer (leave empty to hide)
+      VITE_DMCA_EMAIL: ""
+
+      # ── Router ──────────────────────────────────────────────────────────
+      # Use path-based routing instead of hash-based routing
+      VITE_NORMAL_ROUTER: "false"
+      # Allow media to auto-play
+      VITE_ALLOW_AUTOPLAY: "false"
+      # Comma-separated list of blocked media IDs, e.g. "movie-123,series-456"
+      VITE_DISALLOWED_IDS: ""
+      # CDN replacement pairs, e.g. "old.cdn.com:new.cdn.com"
+      VITE_CDN_REPLACEMENTS: ""
+
+      # ── Onboarding ──────────────────────────────────────────────────────
+      VITE_HAS_ONBOARDING: "false"
+      VITE_ONBOARDING_CHROME_EXTENSION_INSTALL_LINK: ""
+      VITE_ONBOARDING_FIREFOX_EXTENSION_INSTALL_LINK: ""
+      VITE_ONBOARDING_PROXY_INSTALL_LINK: ""
+      VITE_HIDE_PROXY_ONBOARDING: "false"
+
+      # ── Optional features ───────────────────────────────────────────────
+      VITE_ALLOW_FEBBOX_KEY: "false"
+      VITE_ALLOW_DEBRID_KEY: "false"
+
+      # ── Trakt ───────────────────────────────────────────────────────────
+      VITE_USE_TRAKT: "false"
+      VITE_TRAKT_CLIENT_ID: ""
+      VITE_TRAKT_CLIENT_SECRET: ""
+      VITE_TRAKT_REDIRECT_URI: ""
+
+      # ── Ads / banners ───────────────────────────────────────────────────
+      VITE_SHOW_AD: "false"
+      VITE_AD_CONTENT_URL: ""
+      VITE_BANNER_MESSAGE: ""
+      VITE_BANNER_ID: ""
+      VITE_SHOW_SUPPORT_BAR: "false"
+      VITE_SUPPORT_BAR_VALUE: ""
+
+      # ── Tracking ────────────────────────────────────────────────────────
+      # Raw HTML <script> tag for analytics (e.g. Umami)
+      VITE_TRACK_SCRIPT: ""
