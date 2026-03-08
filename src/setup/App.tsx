@@ -11,7 +11,12 @@ import {
 
 import { convertLegacyUrl, isLegacyUrl } from "@/backend/metadata/getmeta";
 import { generateQuickSearchMediaUrl } from "@/backend/metadata/tmdb";
+import { DetailsModal } from "@/components/overlays/detailsModal";
+import { KeyboardCommandsEditModal } from "@/components/overlays/KeyboardCommandsEditModal";
+import { KeyboardCommandsModal } from "@/components/overlays/KeyboardCommandsModal";
 import { NotificationModal } from "@/components/overlays/notificationsModal";
+import { SupportInfoModal } from "@/components/overlays/SupportInfoModal";
+import { TraktAuthHandler } from "@/components/TraktAuthHandler";
 import { useGlobalKeyboardEvents } from "@/hooks/useGlobalKeyboardEvents";
 import { useOnlineListener } from "@/hooks/usePing";
 import { AboutPage } from "@/pages/About";
@@ -34,10 +39,13 @@ import { MigrationUploadPage } from "@/pages/migration/MigrationUpload";
 import { OnboardingPage } from "@/pages/onboarding/Onboarding";
 import { OnboardingExtensionPage } from "@/pages/onboarding/OnboardingExtension";
 import { OnboardingProxyPage } from "@/pages/onboarding/OnboardingProxy";
+import { PasPage } from "@/pages/Pas";
 import { RegisterPage } from "@/pages/Register";
 import { SupportPage } from "@/pages/Support";
+import { WatchHistory } from "@/pages/watchHistory/WatchHistory";
 import { Layout } from "@/setup/Layout";
 import { useHistoryListener } from "@/stores/history";
+import { useClearModalsOnNavigation } from "@/stores/interface/overlayStack";
 import { LanguageProvider } from "@/stores/language";
 
 const DeveloperPage = lazy(() => import("@/pages/DeveloperPage"));
@@ -87,7 +95,7 @@ function QueryView() {
 
   useEffect(() => {
     if (query) {
-      navigate(`/browse/${query}`, { replace: true });
+      navigate(`/browse/${encodeURIComponent(query)}`, { replace: true });
     } else {
       navigate("/", { replace: true });
     }
@@ -102,6 +110,7 @@ function App() {
   useHistoryListener();
   useOnlineListener();
   useGlobalKeyboardEvents();
+  useClearModalsOnNavigation();
   const maintenance = false; // Shows maintance page
   const [showDowntime, setShowDowntime] = useState(maintenance);
 
@@ -119,8 +128,15 @@ function App() {
 
   return (
     <Layout>
+      <TraktAuthHandler />
       <LanguageProvider />
       <NotificationModal id="notifications" />
+      <KeyboardCommandsModal id="keyboard-commands" />
+      <KeyboardCommandsEditModal id="keyboard-commands-edit" />
+      <SupportInfoModal id="support-info" />
+      <DetailsModal id="details" />
+      <DetailsModal id="discover-details" />
+      <DetailsModal id="player-details" />
       {!showDowntime && (
         <Routes>
           {/* functional routes */}
@@ -175,6 +191,7 @@ function App() {
           {/* Support page */}
           <Route path="/support" element={<SupportPage />} />
           <Route path="/jip" element={<JipPage />} />
+          <Route path="/pas" element={<PasPage />} />
           {/* Discover pages */}
           <Route path="/discover" element={<Discover />} />
           <Route
@@ -189,6 +206,8 @@ function App() {
           <Route path="/discover/all" element={<DiscoverMore />} />
           {/* Bookmarks page */}
           <Route path="/bookmarks" element={<AllBookmarks />} />
+          {/* Watch History page */}
+          <Route path="/watch-history" element={<WatchHistory />} />
           {/* Settings page */}
           <Route
             path="/settings"

@@ -1,5 +1,6 @@
 import { t } from "i18next";
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { getRoomStatuses, sendPlayerStatus } from "@/backend/player/status";
 import { usePlayerStatusPolling } from "@/components/player/hooks/usePlayerStatusPolling";
@@ -24,6 +25,8 @@ export function WatchPartyReporter() {
   const lastReportTime = useRef<number>(0);
   const lastReportedStateRef = useRef<string>("");
   const contentValidatedRef = useRef<boolean>(false);
+  const hostEpisodeRef = useRef<{ seasonId?: number; episodeId?: number }>({});
+  const navigate = useNavigate();
 
   // Auth data
   const account = useAuthStore((s) => s.account);
@@ -45,6 +48,7 @@ export function WatchPartyReporter() {
   useEffect(() => {
     if (!watchPartyEnabled) {
       contentValidatedRef.current = false;
+      hostEpisodeRef.current = {};
     }
   }, [watchPartyEnabled]);
 
@@ -92,6 +96,14 @@ export function WatchPartyReporter() {
             const currentEpisodeId = meta.episode?.tmdbId
               ? parseInt(meta.episode.tmdbId, 10)
               : undefined;
+
+            // Initialize host episode tracking
+            if (hostSeasonId && hostEpisodeId) {
+              hostEpisodeRef.current = {
+                seasonId: hostSeasonId,
+                episodeId: hostEpisodeId,
+              };
+            }
 
             // Validate episode match (if host has this info)
             if (
@@ -144,6 +156,112 @@ export function WatchPartyReporter() {
     disable,
   ]);
 
+  // Monitor for episode changes from host and auto-navigate guests
+  useEffect(() => {
+    if (
+      !watchPartyEnabled ||
+      !roomCode ||
+      isHost ||
+      !meta?.tmdbId ||
+      meta.type !== "show"
+    ) {
+      return;
+    }
+
+    const checkForEpisodeChange = async () => {
+      try {
+        const roomData = await getRoomStatuses(backendUrl, account, roomCode);
+        const users = Object.values(roomData.users).flat();
+        const hostUser = users.find((user) => user.isHost);
+
+        if (!hostUser || hostUser.content.type !== "TV Show") return;
+
+        const hostSeasonId = hostUser.content.seasonId;
+        const hostEpisodeId = hostUser.content.episodeId;
+
+        // Initialize host episode ref on first check
+        if (
+          !hostEpisodeRef.current.seasonId &&
+          !hostEpisodeRef.current.episodeId
+        ) {
+          hostEpisodeRef.current = {
+            seasonId: hostSeasonId,
+            episodeId: hostEpisodeId,
+          };
+          return;
+        }
+
+        // Check if host has changed episodes
+        const hasHostChangedEpisode =
+          hostSeasonId !== hostEpisodeRef.current.seasonId ||
+          hostEpisodeId !== hostEpisodeRef.current.episodeId;
+
+        if (hasHostChangedEpisode && hostSeasonId && hostEpisodeId) {
+          // Update our reference
+          hostEpisodeRef.current = {
+            seasonId: hostSeasonId,
+            episodeId: hostEpisodeId,
+          };
+
+          // Check if we're already on the correct episode
+          const currentSeasonId = meta.season?.tmdbId
+            ? parseInt(meta.season.tmdbId, 10)
+            : undefined;
+          const currentEpisodeId = meta.episode?.tmdbId
+            ? parseInt(meta.episode.tmdbId, 10)
+            : undefined;
+
+          if (
+            currentSeasonId === hostSeasonId &&
+            currentEpisodeId === hostEpisodeId
+          ) {
+            // Already on the correct episode
+            return;
+          }
+
+          // Navigate to the new episode
+          // eslint-disable-next-line no-console
+          console.log("Host changed episode, following to new episode:", {
+            seasonId: hostSeasonId,
+            episodeId: hostEpisodeId,
+          });
+
+          const url = new URL(
+            `/media/tmdb-tv-${meta.tmdbId}/${hostSeasonId}/${hostEpisodeId}`,
+            window.location.origin,
+          );
+          url.searchParams.set("watchparty", roomCode);
+
+          // Reset content validation so it re-validates on the new episode
+          contentValidatedRef.current = false;
+
+          navigate(url.pathname + url.search);
+        }
+      } catch (error) {
+        console.error("Failed to check for episode change:", error);
+      }
+    };
+
+    // Check every 1.5 seconds for episode changes
+    const interval = setInterval(checkForEpisodeChange, 1500);
+
+    // Initial check
+    checkForEpisodeChange();
+
+    return () => clearInterval(interval);
+  }, [
+    watchPartyEnabled,
+    roomCode,
+    isHost,
+    meta?.tmdbId,
+    meta?.season?.tmdbId,
+    meta?.episode?.tmdbId,
+    meta?.type,
+    backendUrl,
+    account,
+    navigate,
+  ]);
+
   useEffect(() => {
     // Skip if watch party is not enabled
     if (
@@ -171,10 +289,10 @@ export function WatchPartyReporter() {
     // Check if state has changed meaningfully OR
     // it's been at least 2 seconds since last report
     const hasStateChanged = stateFingerprint !== lastReportedStateRef.current;
-    const timeThresholdMet = now - lastReportTime.current >= 10000; // Less frequent updates (10s)
+    const timeThresholdMet = now - lastReportTime.current >= 2000; // Update every 2 seconds
 
     // Always update more frequently if we're the host to ensure guests stay in sync
-    const shouldUpdateForHost = isHost && now - lastReportTime.current >= 1000;
+    const shouldUpdateForHost = isHost && now - lastReportTime.current >= 500; // Host updates every 500ms
 
     if (!hasStateChanged && !timeThresholdMet && !shouldUpdateForHost) return;
 

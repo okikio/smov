@@ -1,24 +1,25 @@
-import React, { useMemo, useState } from "react";
+import { Listbox } from "@headlessui/react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { EditButton } from "@/components/buttons/EditButton";
 import { EditButtonWithText } from "@/components/buttons/EditButtonWithText";
-import { Item } from "@/components/form/SortableList";
+import { Dropdown, OptionItem } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { WatchedMediaCard } from "@/components/media/WatchedMediaCard";
-import { EditGroupOrderModal } from "@/components/overlays/EditGroupOrderModal";
+import { EditBookmarkModal } from "@/components/overlays/EditBookmarkModal";
+import { EditGroupModal } from "@/components/overlays/EditGroupModal";
 import { useModal } from "@/components/overlays/Modal";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
 import { Flare } from "@/components/utils/Flare";
-import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { CarouselNavButtons } from "@/pages/discover/components/CarouselNavButtons";
-import { useAuthStore } from "@/stores/auth";
 import { useBookmarkStore } from "@/stores/bookmarks";
 import { useGroupOrderStore } from "@/stores/groupOrder";
 import { useProgressStore } from "@/stores/progress";
+import { SortOption, sortMediaItems } from "@/utils/mediaSorting";
 import { MediaItem } from "@/utils/mediaTypes";
 
 function parseGroupString(group: string): { icon: UserIcons; name: string } {
@@ -58,22 +59,24 @@ function MoreBookmarksCard() {
   return (
     <div className="relative mt-4 group cursor-pointer rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto">
       <Link to="/bookmarks" className="block">
-        <Flare.Base className="group -m-[0.705em] h-[20rem] hover:scale-95 transition-all rounded-xl bg-background-main duration-300 hover:bg-mediaCard-hoverBackground tabbable">
+        <Flare.Base className="group -m-[0.705em] hover:scale-95 transition-all rounded-xl bg-background-main duration-300 hover:bg-mediaCard-hoverBackground tabbable">
           <Flare.Light
             flareSize={300}
             cssColorVar="--colors-mediaCard-hoverAccent"
             backgroundClass="bg-mediaCard-hoverBackground duration-100"
             className="rounded-xl bg-background-main group-hover:opacity-100"
           />
-          <Flare.Child className="pointer-events-auto h-[20rem] relative mb-2 p-[0.4em] transition-transform duration-300">
-            <div className="flex absolute inset-0 flex-col items-center justify-center">
-              <Icon
-                icon={Icons.ARROW_RIGHT}
-                className="text-4xl mb-2 transition-transform duration-300"
-              />
-              <span className="text-sm text-center px-2">
-                {t("home.bookmarks.showAll")}
-              </span>
+          <Flare.Child className="pointer-events-auto relative mb-2 p-[0.4em] transition-transform duration-300">
+            <div className="relative pb-[150%] w-full flex items-center justify-center">
+              <div className="flex absolute inset-0 flex-col items-center justify-center">
+                <Icon
+                  icon={Icons.ARROW_RIGHT}
+                  className="text-4xl mb-2 transition-transform duration-300"
+                />
+                <span className="text-sm text-center px-2">
+                  {t("home.bookmarks.showAll")}
+                </span>
+              </div>
             </div>
           </Flare.Child>
         </Flare.Base>
@@ -90,15 +93,27 @@ export function BookmarksCarousel({
   const browser = !!window.chrome;
   let isScrolling = false;
   const [editing, setEditing] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>(() => {
+    const saved = localStorage.getItem("__MW::bookmarksSort");
+    return (saved as SortOption) || "date";
+  });
   const removeBookmark = useBookmarkStore((s) => s.removeBookmark);
-  const backendUrl = useBackendUrl();
-  const account = useAuthStore((s) => s.account);
 
-  // Group order editing state
-  const groupOrder = useGroupOrderStore((s) => s.groupOrder);
-  const setGroupOrder = useGroupOrderStore((s) => s.setGroupOrder);
-  const editOrderModal = useModal("bookmark-edit-order-carousel");
-  const [tempGroupOrder, setTempGroupOrder] = useState<string[]>([]);
+  useEffect(() => {
+    localStorage.setItem("__MW::bookmarksSort", sortBy);
+  }, [sortBy]);
+
+  // Editing modals
+  const editBookmarkModal = useModal("bookmark-edit-carousel");
+  const editGroupModal = useModal("bookmark-edit-group-carousel");
+  const [editingBookmarkId, setEditingBookmarkId] = useState<string | null>(
+    null,
+  );
+  const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
+  const modifyBookmarks = useBookmarkStore((s) => s.modifyBookmarks);
+  const modifyBookmarksByGroup = useBookmarkStore(
+    (s) => s.modifyBookmarksByGroup,
+  );
 
   const { isMobile } = useIsMobile();
 
@@ -108,28 +123,18 @@ export function BookmarksCarousel({
 
   const progressItems = useProgressStore((state) => state.items);
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
+  const groupOrder = useGroupOrderStore((s) => s.groupOrder);
 
   const items = useMemo(() => {
-    let output: MediaItem[] = [];
+    const output: MediaItem[] = [];
     Object.entries(bookmarks).forEach((entry) => {
       output.push({
         id: entry[0],
         ...entry[1],
       });
     });
-    output = output.sort((a, b) => {
-      const bookmarkA = bookmarks[a.id];
-      const bookmarkB = bookmarks[b.id];
-      const progressA = progressItems[a.id];
-      const progressB = progressItems[b.id];
-
-      const dateA = Math.max(bookmarkA.updatedAt, progressA?.updatedAt ?? 0);
-      const dateB = Math.max(bookmarkB.updatedAt, progressB?.updatedAt ?? 0);
-
-      return dateB - dateA;
-    });
-    return output;
-  }, [bookmarks, progressItems]);
+    return sortMediaItems(output, sortBy, bookmarks, progressItems);
+  }, [bookmarks, progressItems, sortBy]);
 
   const { groupedItems, regularItems } = useMemo(() => {
     const grouped: Record<string, MediaItem[]> = {};
@@ -149,75 +154,27 @@ export function BookmarksCarousel({
       }
     });
 
-    // Sort items within each group by date
+    // Sort items within each group
     Object.keys(grouped).forEach((group) => {
-      grouped[group].sort((a, b) => {
-        const bookmarkA = bookmarks[a.id];
-        const bookmarkB = bookmarks[b.id];
-        const progressA = progressItems[a.id];
-        const progressB = progressItems[b.id];
-
-        const dateA = Math.max(bookmarkA.updatedAt, progressA?.updatedAt ?? 0);
-        const dateB = Math.max(bookmarkB.updatedAt, progressB?.updatedAt ?? 0);
-
-        return dateB - dateA;
-      });
+      grouped[group] = sortMediaItems(
+        grouped[group],
+        sortBy,
+        bookmarks,
+        progressItems,
+      );
     });
 
-    return { groupedItems: grouped, regularItems: regular };
-  }, [items, bookmarks, progressItems]);
-
-  // group sorting
-  const allGroups = useMemo(() => {
-    const groups = new Set<string>();
-
-    Object.values(bookmarks).forEach((bookmark) => {
-      if (Array.isArray(bookmark.group)) {
-        bookmark.group.forEach((group) => groups.add(group));
-      }
-    });
-
-    groups.add("bookmarks");
-
-    return Array.from(groups);
-  }, [bookmarks]);
-
-  const sortableItems = useMemo(() => {
-    const currentOrder = editOrderModal.isShown ? tempGroupOrder : groupOrder;
-
-    if (currentOrder.length === 0) {
-      return allGroups.map((group) => {
-        const { name } = parseGroupString(group);
-        return {
-          id: group,
-          name: group === "bookmarks" ? t("home.bookmarks.sectionTitle") : name,
-        } as Item;
-      });
-    }
-
-    const orderMap = new Map(
-      currentOrder.map((group, index) => [group, index]),
+    // Sort regular items
+    const sortedRegular = sortMediaItems(
+      regular,
+      sortBy,
+      bookmarks,
+      progressItems,
     );
-    const sortedGroups = allGroups.sort((groupA, groupB) => {
-      const orderA = orderMap.has(groupA)
-        ? orderMap.get(groupA)!
-        : Number.MAX_SAFE_INTEGER;
-      const orderB = orderMap.has(groupB)
-        ? orderMap.get(groupB)!
-        : Number.MAX_SAFE_INTEGER;
-      return orderA - orderB;
-    });
 
-    return sortedGroups.map((group) => {
-      const { name } = parseGroupString(group);
-      return {
-        id: group,
-        name: group === "bookmarks" ? t("home.bookmarks.sectionTitle") : name,
-      } as Item;
-    });
-  }, [allGroups, t, editOrderModal.isShown, tempGroupOrder, groupOrder]);
+    return { groupedItems: grouped, regularItems: sortedRegular };
+  }, [items, bookmarks, progressItems, sortBy]);
 
-  // Create a unified list of sections including both grouped and regular bookmarks
   const sortedSections = useMemo(() => {
     const sections: Array<{
       type: "grouped" | "regular";
@@ -295,38 +252,48 @@ export function BookmarksCarousel({
     }
   };
 
-  const handleEditGroupOrder = () => {
-    // Initialize with current order or default order
-    if (groupOrder.length === 0) {
-      const defaultOrder = allGroups.map((group) => group);
-      setTempGroupOrder(defaultOrder);
-    } else {
-      setTempGroupOrder([...groupOrder]);
-    }
-    editOrderModal.show();
+  const handleEditBookmark = (bookmarkId: string) => {
+    setEditingBookmarkId(bookmarkId);
+    editBookmarkModal.show();
   };
 
-  const handleReorderClick = () => {
-    handleEditGroupOrder();
-    // Keep editing state active by setting it to true
-    setEditing(true);
+  const handleSaveBookmark = (bookmarkId: string, changes: any) => {
+    modifyBookmarks([bookmarkId], changes);
+    editBookmarkModal.hide();
+    setEditingBookmarkId(null);
   };
 
-  const handleCancelOrder = () => {
-    editOrderModal.hide();
+  const handleEditGroup = (groupName: string) => {
+    setEditingGroupName(groupName);
+    editGroupModal.show();
   };
 
-  const handleSaveOrderClick = () => {
-    setGroupOrder(tempGroupOrder);
-    editOrderModal.hide();
-
-    // Save to backend
-    if (backendUrl && account) {
-      useGroupOrderStore
-        .getState()
-        .saveGroupOrderToBackend(backendUrl, account);
-    }
+  const handleSaveGroup = (oldGroupName: string, newGroupName: string) => {
+    modifyBookmarksByGroup({ oldGroupName, newGroupName });
+    editGroupModal.hide();
+    setEditingGroupName(null);
   };
+
+  const handleCancelEditBookmark = () => {
+    editBookmarkModal.hide();
+    setEditingBookmarkId(null);
+  };
+
+  const handleCancelEditGroup = () => {
+    editGroupModal.hide();
+    setEditingGroupName(null);
+  };
+
+  const sortOptions: OptionItem[] = [
+    { id: "date", name: t("home.bookmarks.sorting.options.date") },
+    { id: "title-asc", name: t("home.bookmarks.sorting.options.titleAsc") },
+    { id: "title-desc", name: t("home.bookmarks.sorting.options.titleDesc") },
+    { id: "year-asc", name: t("home.bookmarks.sorting.options.yearAsc") },
+    { id: "year-desc", name: t("home.bookmarks.sorting.options.yearDesc") },
+  ];
+
+  const selectedSortOption =
+    sortOptions.find((opt) => opt.id === sortBy) || sortOptions[0];
 
   const categorySlug = "bookmarks";
   const SKELETON_COUNT = 10;
@@ -348,16 +315,18 @@ export function BookmarksCarousel({
                     <UserIcon icon={icon} className="w-full h-full" />
                   </span>
                 }
-                className="ml-4 md:ml-12 mt-2 -mb-5"
+                className="ml-4 lg:ml-12 mt-2 -mb-5 lg:pl-[48px]"
               >
-                <div className="mr-4 md:mr-8 flex items-center gap-2">
-                  {editing && allGroups.length > 1 && (
+                <div className="mr-4 lg:mr-[88px] flex items-center gap-2">
+                  {editing && section.group && (
                     <EditButtonWithText
                       editing={editing}
-                      onEdit={handleReorderClick}
-                      id="edit-group-order-button-carousel"
-                      text={t("home.bookmarks.groups.reorder.button")}
-                      secondaryText={t("home.bookmarks.groups.reorder.done")}
+                      onEdit={() => handleEditGroup(section.group!)}
+                      id="edit-group-button"
+                      text={t("home.bookmarks.groups.editGroup.title")}
+                      secondaryText={t(
+                        "home.bookmarks.groups.editGroup.cancel",
+                      )}
                     />
                   )}
                   <EditButton
@@ -367,6 +336,65 @@ export function BookmarksCarousel({
                   />
                 </div>
               </SectionHeading>
+              {editing && (
+                <div className="mt-4 -mb-4 ml-4 lg:ml-12 lg:pl-[48px]">
+                  <Dropdown
+                    selectedItem={selectedSortOption}
+                    setSelectedItem={(item) => {
+                      const newSort = item.id as SortOption;
+                      setSortBy(newSort);
+                      localStorage.setItem("__MW::bookmarksSort", newSort);
+                    }}
+                    options={sortOptions}
+                    customButton={
+                      <button
+                        type="button"
+                        className="px-2 py-1 text-sm bg-mediaCard-hoverBackground rounded-full hover:bg-mediaCard-background transition-colors flex items-center gap-1"
+                      >
+                        <span>{selectedSortOption.name}</span>
+                        <Icon
+                          icon={Icons.UP_DOWN_ARROW}
+                          className="text-xs text-dropdown-secondary"
+                        />
+                      </button>
+                    }
+                    side="left"
+                    customMenu={
+                      <Listbox.Options static className="py-1">
+                        {sortOptions.map((opt) => (
+                          <Listbox.Option
+                            className={({ active }) =>
+                              `cursor-pointer min-w-60 flex gap-4 items-center relative select-none py-2 px-4 mx-1 rounded-lg ${
+                                active
+                                  ? "bg-background-secondaryHover text-type-link"
+                                  : "text-type-secondary"
+                              }`
+                            }
+                            key={opt.id}
+                            value={opt}
+                          >
+                            {({ selected }) => (
+                              <>
+                                <span
+                                  className={`block ${selected ? "font-medium" : "font-normal"}`}
+                                >
+                                  {opt.name}
+                                </span>
+                                {selected && (
+                                  <Icon
+                                    icon={Icons.CHECKMARK}
+                                    className="text-xs text-type-link"
+                                  />
+                                )}
+                              </>
+                            )}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    }
+                  />
+                </div>
+              )}
               <div className="relative overflow-hidden carousel-container md:pb-4">
                 <div
                   id={`carousel-${section.group}`}
@@ -376,7 +404,7 @@ export function BookmarksCarousel({
                   }}
                   onWheel={handleWheel}
                 >
-                  <div className="md:w-12" />
+                  <div className="lg:w-12" />
 
                   {section.items
                     .slice(0, MAX_ITEMS_PER_SECTION)
@@ -394,6 +422,8 @@ export function BookmarksCarousel({
                           onShowDetails={onShowDetails}
                           closable={editing}
                           onClose={() => removeBookmark(media.id)}
+                          editable={editing}
+                          onEdit={() => handleEditBookmark(media.id)}
                         />
                       </div>
                     ))}
@@ -402,7 +432,7 @@ export function BookmarksCarousel({
                     <MoreBookmarksCard />
                   )}
 
-                  <div className="md:w-12" />
+                  <div className="lg:w-12" />
                 </div>
 
                 {!isMobile && (
@@ -420,18 +450,9 @@ export function BookmarksCarousel({
             <SectionHeading
               title={t("home.bookmarks.sectionTitle")}
               icon={Icons.BOOKMARK}
-              className="ml-4 md:ml-12 mt-2 -mb-5"
+              className="ml-4 lg:ml-12 mt-2 -mb-5 lg:pl-[48px]"
             >
-              <div className="mr-4 md:mr-8 flex items-center gap-2">
-                {editing && allGroups.length > 1 && (
-                  <EditButtonWithText
-                    editing={editing}
-                    onEdit={handleReorderClick}
-                    id="edit-group-order-button-carousel"
-                    text={t("home.bookmarks.groups.reorder.button")}
-                    secondaryText={t("home.bookmarks.groups.reorder.done")}
-                  />
-                )}
+              <div className="mr-4 lg:mr-[88px] flex items-center gap-2">
                 <EditButton
                   editing={editing}
                   onEdit={setEditing}
@@ -439,6 +460,61 @@ export function BookmarksCarousel({
                 />
               </div>
             </SectionHeading>
+            {editing && (
+              <div className="mt-4 -mb-4 ml-4 lg:ml-12 lg:pl-[48px]">
+                <Dropdown
+                  selectedItem={selectedSortOption}
+                  setSelectedItem={(item) => setSortBy(item.id as SortOption)}
+                  options={sortOptions}
+                  customButton={
+                    <button
+                      type="button"
+                      className="px-2 py-1 text-sm bg-mediaCard-hoverBackground rounded-full hover:bg-mediaCard-background transition-colors flex items-center gap-1"
+                    >
+                      <span>{selectedSortOption.name}</span>
+                      <Icon
+                        icon={Icons.UP_DOWN_ARROW}
+                        className="text-xs text-dropdown-secondary"
+                      />
+                    </button>
+                  }
+                  side="left"
+                  customMenu={
+                    <Listbox.Options static className="py-1">
+                      {sortOptions.map((opt) => (
+                        <Listbox.Option
+                          className={({ active }) =>
+                            `cursor-pointer min-w-60 flex gap-4 items-center relative select-none py-2 px-4 mx-1 rounded-lg ${
+                              active
+                                ? "bg-background-secondaryHover text-type-link"
+                                : "text-type-secondary"
+                            }`
+                          }
+                          key={opt.id}
+                          value={opt}
+                        >
+                          {({ selected }) => (
+                            <>
+                              <span
+                                className={`block ${selected ? "font-medium" : "font-normal"}`}
+                              >
+                                {opt.name}
+                              </span>
+                              {selected && (
+                                <Icon
+                                  icon={Icons.CHECKMARK}
+                                  className="text-xs text-type-link"
+                                />
+                              )}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  }
+                />
+              </div>
+            )}
             <div className="relative overflow-hidden carousel-container md:pb-4">
               <div
                 id={`carousel-${categorySlug}`}
@@ -448,7 +524,7 @@ export function BookmarksCarousel({
                 }}
                 onWheel={handleWheel}
               >
-                <div className="md:w-12" />
+                <div className="lg:w-12" />
 
                 {section.items.length > 0
                   ? section.items
@@ -467,6 +543,8 @@ export function BookmarksCarousel({
                             onShowDetails={onShowDetails}
                             closable={editing}
                             onClose={() => removeBookmark(media.id)}
+                            editable={editing}
+                            onEdit={() => handleEditBookmark(media.id)}
                           />
                         </div>
                       ))
@@ -480,7 +558,7 @@ export function BookmarksCarousel({
                   <MoreBookmarksCard />
                 )}
 
-                <div className="md:w-12" />
+                <div className="lg:w-12" />
               </div>
 
               {!isMobile && (
@@ -494,17 +572,22 @@ export function BookmarksCarousel({
         );
       })}
 
-      {/* Edit Order Modal */}
-      <EditGroupOrderModal
-        id={editOrderModal.id}
-        isShown={editOrderModal.isShown}
-        items={sortableItems}
-        onCancel={handleCancelOrder}
-        onSave={handleSaveOrderClick}
-        onItemsChange={(newItems) => {
-          const newOrder = newItems.map((item) => item.id);
-          setTempGroupOrder(newOrder);
-        }}
+      {/* Edit Bookmark Modal */}
+      <EditBookmarkModal
+        id={editBookmarkModal.id}
+        isShown={editBookmarkModal.isShown}
+        bookmarkId={editingBookmarkId}
+        onCancel={handleCancelEditBookmark}
+        onSave={handleSaveBookmark}
+      />
+
+      {/* Edit Group Modal */}
+      <EditGroupModal
+        id={editGroupModal.id}
+        isShown={editGroupModal.isShown}
+        groupName={editingGroupName}
+        onCancel={handleCancelEditGroup}
+        onSave={handleSaveGroup}
       />
     </>
   );

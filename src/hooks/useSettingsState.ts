@@ -1,4 +1,3 @@
-import isEqual from "lodash.isequal";
 import {
   Dispatch,
   SetStateAction,
@@ -9,7 +8,7 @@ import {
 } from "react";
 
 import { SubtitleStyling } from "@/stores/subtitles";
-import { usePreviewThemeStore } from "@/stores/theme";
+import { usePreviewThemeStore, useThemeStore } from "@/stores/theme";
 
 export function useDerived<T>(
   initial: T,
@@ -19,7 +18,9 @@ export function useDerived<T>(
     setOverwrite(undefined);
   }, [initial]);
   const changed = useMemo(
-    () => !isEqual(overwrite, initial) && overwrite !== undefined,
+    () =>
+      JSON.stringify(overwrite) !== JSON.stringify(initial) &&
+      overwrite !== undefined,
     [overwrite, initial],
   );
   const setter = useCallback<Dispatch<SetStateAction<T>>>(
@@ -41,10 +42,13 @@ export function useSettingsState(
   appLanguage: string,
   subtitleStyling: SubtitleStyling,
   deviceName: string,
+  nickname: string,
   proxyUrls: string[] | null,
   backendUrl: string | null,
   febboxKey: string | null,
-  realDebridKey: string | null,
+  debridToken: string | null,
+  debridService: string,
+  tidbKey: string | null,
   profile:
     | {
         colorA: string;
@@ -54,21 +58,35 @@ export function useSettingsState(
     | undefined,
   enableThumbnails: boolean,
   enableAutoplay: boolean,
+  enableSkipCredits: boolean,
+  enableAutoSkipSegments: boolean,
   enableDiscover: boolean,
   enableFeatured: boolean,
   enableDetailsModal: boolean,
   sourceOrder: string[],
   enableSourceOrder: boolean,
+  lastSuccessfulSource: string | null,
+  enableLastSuccessfulSource: boolean,
+  embedOrder: string[],
+  enableEmbedOrder: boolean,
   proxyTmdb: boolean,
-  enableSkipCredits: boolean,
   enableImageLogos: boolean,
   enableCarouselView: boolean,
+  enableMinimalCards: boolean,
   forceCompactEpisodeView: boolean,
   enableLowPerformanceMode: boolean,
+  enableNativeSubtitles: boolean,
   enableHoldToBoost: boolean,
   homeSectionOrder: string[],
   manualSourceSelection: boolean,
   enableDoubleClickToSeek: boolean,
+  enableAutoResumeOnPlaybackError: boolean,
+  enablePauseOverlay: boolean,
+  customTheme: {
+    primary: string;
+    secondary: string;
+    tertiary: string;
+  },
 ) {
   const [proxyUrlsState, setProxyUrls, resetProxyUrls, proxyUrlsChanged] =
     useDerived(proxyUrls);
@@ -77,11 +95,19 @@ export function useSettingsState(
   const [febboxKeyState, setFebboxKey, resetFebboxKey, febboxKeyChanged] =
     useDerived(febboxKey);
   const [
-    realDebridKeyState,
-    setRealDebridKey,
-    resetRealDebridKey,
-    realDebridKeyChanged,
-  ] = useDerived(realDebridKey);
+    debridTokenState,
+    setdebridToken,
+    resetdebridToken,
+    debridTokenChanged,
+  ] = useDerived(debridToken);
+  const [
+    debridServiceState,
+    setdebridService,
+    _resetdebridService,
+    debridServiceChanged,
+  ] = useDerived(debridService);
+  const [tidbKeyState, setTIDBKey, resetTIDBKey, tidbKeyChanged] =
+    useDerived(tidbKey);
   const [themeState, setTheme, resetTheme, themeChanged] = useDerived(theme);
   const setPreviewTheme = usePreviewThemeStore((s) => s.setPreviewTheme);
   const resetPreviewTheme = useCallback(
@@ -102,6 +128,8 @@ export function useSettingsState(
     resetDeviceName,
     deviceNameChanged,
   ] = useDerived(deviceName);
+  const [nicknameState, setNicknameState, resetNickname, nicknameChanged] =
+    useDerived(nickname);
   const [profileState, setProfileState, resetProfile, profileChanged] =
     useDerived(profile);
   const [
@@ -122,6 +150,12 @@ export function useSettingsState(
     resetEnableSkipCredits,
     enableSkipCreditsChanged,
   ] = useDerived(enableSkipCredits);
+  const [
+    enableAutoSkipSegmentsState,
+    setEnableAutoSkipSegmentsState,
+    resetEnableAutoSkipSegments,
+    enableAutoSkipSegmentsChanged,
+  ] = useDerived(enableAutoSkipSegments);
   const [
     enableDiscoverState,
     setEnableDiscoverState,
@@ -158,6 +192,30 @@ export function useSettingsState(
     resetEnableSourceOrder,
     enableSourceOrderChanged,
   ] = useDerived(enableSourceOrder);
+  const [
+    lastSuccessfulSourceState,
+    setLastSuccessfulSourceState,
+    resetLastSuccessfulSource,
+    lastSuccessfulSourceChanged,
+  ] = useDerived(lastSuccessfulSource);
+  const [
+    enableLastSuccessfulSourceState,
+    setEnableLastSuccessfulSourceState,
+    resetEnableLastSuccessfulSource,
+    enableLastSuccessfulSourceChanged,
+  ] = useDerived(enableLastSuccessfulSource);
+  const [
+    embedOrderState,
+    setEmbedOrderState,
+    resetEmbedOrder,
+    embedOrderChanged,
+  ] = useDerived(embedOrder);
+  const [
+    enableEmbedOrderState,
+    setEnableEmbedOrderState,
+    resetEnableEmbedOrder,
+    enableEmbedOrderChanged,
+  ] = useDerived(enableEmbedOrder);
   const [proxyTmdbState, setProxyTmdbState, resetProxyTmdb, proxyTmdbChanged] =
     useDerived(proxyTmdb);
   const [
@@ -166,6 +224,12 @@ export function useSettingsState(
     resetEnableCarouselView,
     enableCarouselViewChanged,
   ] = useDerived(enableCarouselView);
+  const [
+    enableMinimalCardsState,
+    setEnableMinimalCardsState,
+    resetEnableMinimalCards,
+    enableMinimalCardsChanged,
+  ] = useDerived(enableMinimalCards);
   const [
     forceCompactEpisodeViewState,
     setForceCompactEpisodeViewState,
@@ -178,6 +242,12 @@ export function useSettingsState(
     resetEnableLowPerformanceMode,
     enableLowPerformanceModeChanged,
   ] = useDerived(enableLowPerformanceMode);
+  const [
+    enableNativeSubtitlesState,
+    setEnableNativeSubtitlesState,
+    resetEnableNativeSubtitles,
+    enableNativeSubtitlesChanged,
+  ] = useDerived(enableNativeSubtitles);
   const [
     enableHoldToBoostState,
     setEnableHoldToBoostState,
@@ -202,6 +272,25 @@ export function useSettingsState(
     resetEnableDoubleClickToSeek,
     enableDoubleClickToSeekChanged,
   ] = useDerived(enableDoubleClickToSeek);
+  const [
+    enableAutoResumeOnPlaybackErrorState,
+    setEnableAutoResumeOnPlaybackErrorState,
+    resetEnableAutoResumeOnPlaybackError,
+    enableAutoResumeOnPlaybackErrorChanged,
+  ] = useDerived(enableAutoResumeOnPlaybackError);
+  const [
+    enablePauseOverlayState,
+    setEnablePauseOverlayState,
+    resetEnablePauseOverlay,
+    enablePauseOverlayChanged,
+  ] = useDerived(enablePauseOverlay);
+  const [
+    customThemeState,
+    setCustomThemeState,
+    resetCustomTheme,
+    customThemeChanged,
+  ] = useDerived(customTheme);
+  const setCustomThemeStore = useThemeStore((s) => s.setCustomTheme);
 
   function reset() {
     resetTheme();
@@ -211,26 +300,38 @@ export function useSettingsState(
     resetProxyUrls();
     resetBackendUrl();
     resetFebboxKey();
-    resetRealDebridKey();
+    resetdebridToken();
+    resetTIDBKey();
     resetDeviceName();
+    resetNickname();
     resetProfile();
     resetEnableThumbnails();
     resetEnableAutoplay();
     resetEnableSkipCredits();
+    resetEnableAutoSkipSegments();
     resetEnableDiscover();
     resetEnableFeatured();
     resetEnableDetailsModal();
     resetEnableImageLogos();
     resetSourceOrder();
     resetEnableSourceOrder();
+    resetLastSuccessfulSource();
+    resetEnableLastSuccessfulSource();
+    resetEmbedOrder();
+    resetEnableEmbedOrder();
     resetProxyTmdb();
     resetEnableCarouselView();
+    resetEnableMinimalCards();
     resetForceCompactEpisodeView();
     resetEnableLowPerformanceMode();
+    resetEnableNativeSubtitles();
     resetEnableHoldToBoost();
     resetHomeSectionOrder();
     resetManualSourceSelection();
     resetEnableDoubleClickToSeek();
+    resetEnableAutoResumeOnPlaybackError();
+    resetEnablePauseOverlay();
+    resetCustomTheme();
   }
 
   const changed =
@@ -238,28 +339,41 @@ export function useSettingsState(
     appLanguageChanged ||
     subStylingChanged ||
     deviceNameChanged ||
+    nicknameChanged ||
     backendUrlChanged ||
     proxyUrlsChanged ||
     febboxKeyChanged ||
-    realDebridKeyChanged ||
+    debridTokenChanged ||
+    debridServiceChanged ||
+    tidbKeyChanged ||
     profileChanged ||
     enableThumbnailsChanged ||
     enableAutoplayChanged ||
     enableSkipCreditsChanged ||
+    enableAutoSkipSegmentsChanged ||
     enableDiscoverChanged ||
     enableFeaturedChanged ||
     enableDetailsModalChanged ||
     enableImageLogosChanged ||
     sourceOrderChanged ||
     enableSourceOrderChanged ||
+    lastSuccessfulSourceChanged ||
+    enableLastSuccessfulSourceChanged ||
+    embedOrderChanged ||
+    enableEmbedOrderChanged ||
     proxyTmdbChanged ||
     enableCarouselViewChanged ||
+    enableMinimalCardsChanged ||
     forceCompactEpisodeViewChanged ||
     enableLowPerformanceModeChanged ||
+    enableNativeSubtitlesChanged ||
     enableHoldToBoostChanged ||
     homeSectionOrderChanged ||
     manualSourceSelectionChanged ||
-    enableDoubleClickToSeekChanged;
+    enableDoubleClickToSeekChanged ||
+    enableAutoResumeOnPlaybackErrorChanged ||
+    enablePauseOverlayChanged ||
+    customThemeChanged;
 
   return {
     reset,
@@ -284,6 +398,11 @@ export function useSettingsState(
       set: setDeviceNameState,
       changed: deviceNameChanged,
     },
+    nickname: {
+      state: nicknameState,
+      set: setNicknameState,
+      changed: nicknameChanged,
+    },
     proxyUrls: {
       state: proxyUrlsState,
       set: setProxyUrls,
@@ -299,10 +418,20 @@ export function useSettingsState(
       set: setFebboxKey,
       changed: febboxKeyChanged,
     },
-    realDebridKey: {
-      state: realDebridKeyState,
-      set: setRealDebridKey,
-      changed: realDebridKeyChanged,
+    debridToken: {
+      state: debridTokenState,
+      set: setdebridToken,
+      changed: debridTokenChanged,
+    },
+    debridService: {
+      state: debridServiceState,
+      set: setdebridService,
+      changed: debridServiceChanged,
+    },
+    tidbKey: {
+      state: tidbKeyState,
+      set: setTIDBKey,
+      changed: tidbKeyChanged,
     },
     profile: {
       state: profileState,
@@ -323,6 +452,11 @@ export function useSettingsState(
       state: enableSkipCreditsState,
       set: setEnableSkipCreditsState,
       changed: enableSkipCreditsChanged,
+    },
+    enableAutoSkipSegments: {
+      state: enableAutoSkipSegmentsState,
+      set: setEnableAutoSkipSegmentsState,
+      changed: enableAutoSkipSegmentsChanged,
     },
     enableDiscover: {
       state: enableDiscoverState,
@@ -354,15 +488,40 @@ export function useSettingsState(
       set: setEnableSourceOrderState,
       changed: enableSourceOrderChanged,
     },
+    lastSuccessfulSource: {
+      state: lastSuccessfulSourceState,
+      set: setLastSuccessfulSourceState,
+      changed: lastSuccessfulSourceChanged,
+    },
+    enableLastSuccessfulSource: {
+      state: enableLastSuccessfulSourceState,
+      set: setEnableLastSuccessfulSourceState,
+      changed: enableLastSuccessfulSourceChanged,
+    },
     proxyTmdb: {
       state: proxyTmdbState,
       set: setProxyTmdbState,
       changed: proxyTmdbChanged,
     },
+    embedOrder: {
+      state: embedOrderState,
+      set: setEmbedOrderState,
+      changed: embedOrderChanged,
+    },
+    enableEmbedOrder: {
+      state: enableEmbedOrderState,
+      set: setEnableEmbedOrderState,
+      changed: enableEmbedOrderChanged,
+    },
     enableCarouselView: {
       state: enableCarouselViewState,
       set: setEnableCarouselViewState,
       changed: enableCarouselViewChanged,
+    },
+    enableMinimalCards: {
+      state: enableMinimalCardsState,
+      set: setEnableMinimalCardsState,
+      changed: enableMinimalCardsChanged,
     },
     forceCompactEpisodeView: {
       state: forceCompactEpisodeViewState,
@@ -373,6 +532,11 @@ export function useSettingsState(
       state: enableLowPerformanceModeState,
       set: setEnableLowPerformanceModeState,
       changed: enableLowPerformanceModeChanged,
+    },
+    enableNativeSubtitles: {
+      state: enableNativeSubtitlesState,
+      set: setEnableNativeSubtitlesState,
+      changed: enableNativeSubtitlesChanged,
     },
     enableHoldToBoost: {
       state: enableHoldToBoostState,
@@ -393,6 +557,24 @@ export function useSettingsState(
       state: enableDoubleClickToSeekState,
       set: setEnableDoubleClickToSeekState,
       changed: enableDoubleClickToSeekChanged,
+    },
+    enableAutoResumeOnPlaybackError: {
+      state: enableAutoResumeOnPlaybackErrorState,
+      set: setEnableAutoResumeOnPlaybackErrorState,
+      changed: enableAutoResumeOnPlaybackErrorChanged,
+    },
+    enablePauseOverlay: {
+      state: enablePauseOverlayState,
+      set: setEnablePauseOverlayState,
+      changed: enablePauseOverlayChanged,
+    },
+    customTheme: {
+      state: customThemeState,
+      set: (v: { primary: string; secondary: string; tertiary: string }) => {
+        setCustomThemeState(v);
+        setCustomThemeStore(v);
+      },
+      changed: customThemeChanged,
     },
   };
 }

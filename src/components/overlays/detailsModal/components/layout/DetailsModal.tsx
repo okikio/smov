@@ -23,8 +23,15 @@ import { DetailsSkeleton } from "./DetailsSkeleton";
 import { OverlayPortal } from "../../../OverlayDisplay";
 import { DetailsModalProps } from "../../types";
 
-export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
-  const { hideModal, isModalVisible, modalStack } = useOverlayStack();
+export function DetailsModal({
+  id,
+  data: _data,
+  minimal: _minimal,
+}: DetailsModalProps) {
+  // Player details modal should always be minimal (hide episode carousel and movie watch button)
+  const minimal = _minimal || id === "player-details";
+  const { hideModal, isModalVisible, modalStack, getModalData } =
+    useOverlayStack();
   const [detailsData, setDetailsData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -33,16 +40,22 @@ export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
 
   const hide = useCallback(() => hideModal(id), [hideModal, id]);
   const isShown = isModalVisible(id);
+  const modalData = getModalData(id);
+
+  // Only show modal if there's data to display
+  const shouldShow = Boolean(isShown && (modalData?.id || _data?.id));
 
   useEffect(() => {
     const fetchDetails = async () => {
+      // Use data from overlayStack or fallback to props for backward compatibility
+      const data = modalData || _data;
       if (!data?.id || !data?.type) return;
 
       setIsLoading(true);
       try {
         const type =
           data.type === "movie" ? TMDBContentTypes.MOVIE : TMDBContentTypes.TV;
-        const details = await getMediaDetails(data.id.toString(), type);
+        const details = await getMediaDetails(data.id.toString(), type, false);
         const backdropUrl = getMediaBackdrop(details.backdrop_path);
         const logoUrl = await getMediaLogo(data.id.toString(), type);
         if (type === TMDBContentTypes.MOVIE) {
@@ -66,6 +79,7 @@ export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
             id: movieDetails.id,
             imdbId: movieDetails.external_ids?.imdb_id,
             logoUrl,
+            collection: movieDetails.belongs_to_collection,
           });
         } else {
           const showDetails = details as TMDBShowData & {
@@ -112,22 +126,22 @@ export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
       }
     };
 
-    if (isShown && data?.id) {
+    if (shouldShow) {
       fetchDetails();
     }
-  }, [isShown, data]);
+  }, [shouldShow, modalData, _data]);
 
   useEffect(() => {
-    if (isShown && !data?.id && !isLoading) {
+    if (isShown && !modalData?.id && !_data?.id && !isLoading) {
       hide();
     }
-  }, [isShown, data, isLoading, hide]);
+  }, [isShown, modalData, _data, isLoading, hide]);
 
   return (
     <OverlayPortal
       darken
       close={hide}
-      show={isShown}
+      show={shouldShow}
       durationClass="duration-500"
       zIndex={zIndex}
     >
@@ -148,8 +162,8 @@ export function DetailsModal({ id, data, minimal }: DetailsModalProps) {
             <Flare.Light
               flareSize={300}
               cssColorVar="--colors-mediaCard-hoverAccent"
-              backgroundClass="bg-mediaCard-hoverBackground duration-100"
-              className="rounded-3xl bg-background-main group-hover:opacity-30 transition-opacity duration-300"
+              backgroundClass="bg-modal-background duration-100"
+              className="rounded-3xl bg-background-main group-hover:opacity-100 transition-opacity duration-300"
             />
             <div className="absolute right-4 top-4 z-50 pointer-events-auto">
               <button

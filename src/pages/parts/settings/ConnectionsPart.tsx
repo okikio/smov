@@ -3,12 +3,15 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { Button } from "@/components/buttons/Button";
 import { Toggle } from "@/components/buttons/Toggle";
+import { BackendSelector } from "@/components/form/BackendSelector";
+import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
 import { SettingsCard } from "@/components/layout/SettingsCard";
 import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
@@ -20,15 +23,19 @@ import { MwLink } from "@/components/text/Link";
 import { AuthInputBox } from "@/components/text-inputs/AuthInputBox";
 import { Divider } from "@/components/utils/Divider";
 import { Heading1, Heading2, Paragraph } from "@/components/utils/Text";
+import { useIsDesktopApp } from "@/hooks/useIsDesktopApp";
 import {
   SetupPart,
   Status,
+  fetchFebboxQuota,
   testFebboxKey,
-  testRealDebridKey,
+  testTorboxToken,
+  testdebridToken,
 } from "@/pages/parts/settings/SetupPart";
 import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
+import { useTraktStore } from "@/stores/trakt/store";
 
 import { RegionSelectorPart } from "./RegionSelectorPart";
 
@@ -46,12 +53,21 @@ interface BackendEditProps {
 
 interface FebboxKeyProps {
   febboxKey: string | null;
-  setFebboxKey: Dispatch<SetStateAction<string | null>>;
+  setFebboxKey: (value: string | null) => void;
 }
 
-interface RealDebridKeyProps {
-  realDebridKey: string | null;
-  setRealDebridKey: Dispatch<SetStateAction<string | null>>;
+interface DebridProps {
+  debridToken: string | null;
+  setdebridToken: (value: string | null) => void;
+  debridService: string;
+  setdebridService: (value: string) => void;
+  // eslint-disable-next-line react/no-unused-prop-types
+  mode?: "onboarding" | "settings";
+}
+
+interface TIDBKeyProps {
+  tidbKey: string | null;
+  setTIDBKey: (value: string | null) => void;
 }
 
 function ProxyEdit({
@@ -100,7 +116,7 @@ function ProxyEdit({
           </p>
           <p className="max-w-[30rem] font-medium">
             <Trans i18nKey="settings.connections.workers.description">
-              <MwLink to="https://docs.pstream.mov/proxy/deploy">
+              <MwLink to="https://p-stream.github.io/docs/proxy/deploy">
                 {t("settings.connections.workers.documentation")}
               </MwLink>
             </Trans>
@@ -177,16 +193,51 @@ function ProxyEdit({
 function BackendEdit({ backendUrl, setBackendUrl }: BackendEditProps) {
   const { t } = useTranslation();
   const user = useAuthStore();
+  const config = conf();
+  const availableBackends =
+    config.BACKEND_URLS.length > 0
+      ? config.BACKEND_URLS
+      : config.BACKEND_URL
+        ? [config.BACKEND_URL]
+        : [];
+  const currentBackendUrl =
+    backendUrl ?? (availableBackends.length > 0 ? availableBackends[0] : null);
+  const [pendingBackendUrl, setPendingBackendUrl] = useState<string | null>(
+    currentBackendUrl,
+  );
+  const confirmationModal = useModal("backend-change-confirmation");
+
+  const handleBackendSelect = (url: string | null) => {
+    if (!user.account) {
+      // No account - just update without confirmation
+      setBackendUrl(url);
+      setPendingBackendUrl(url);
+    } else if (url !== currentBackendUrl) {
+      // User is logged in and changing backend - show confirmation
+      setPendingBackendUrl(url);
+      confirmationModal.show();
+    } else {
+      // Same backend - just update
+      setBackendUrl(url);
+      setPendingBackendUrl(url);
+    }
+  };
+
+  const handleConfirmChange = () => {
+    setBackendUrl(pendingBackendUrl);
+    confirmationModal.hide();
+  };
+
   return (
-    <SettingsCard>
-      <div className="flex justify-between items-center gap-4">
+    <>
+      <SettingsCard>
         <div className="my-3">
           <p className="text-white font-bold mb-3">
             {t("settings.connections.server.label")}
           </p>
           <p className="max-w-[30rem] font-medium">
             <Trans i18nKey="settings.connections.server.description">
-              <MwLink to="https://docs.pstream.mov/backend/deploy">
+              <MwLink to="https://p-stream.github.io/docs/backend/deploy">
                 {t("settings.connections.server.documentation")}
               </MwLink>
             </Trans>
@@ -204,53 +255,103 @@ function BackendEdit({ backendUrl, setBackendUrl }: BackendEditProps) {
             </div>
           )}
         </div>
-        <div>
-          <Toggle
-            onClick={() => setBackendUrl((s) => (s === null ? "" : null))}
-            enabled={backendUrl !== null}
-          />
-        </div>
-      </div>
-      {backendUrl !== null ? (
-        <>
-          <Divider marginClass="my-6 px-8 box-content -mx-8" />
-          <p className="text-white font-bold mb-3">
-            {t("settings.connections.server.urlLabel")}
-          </p>
-          <AuthInputBox
-            onChange={setBackendUrl}
-            value={backendUrl ?? ""}
-            placeholder="https://"
-          />
-        </>
-      ) : null}
-    </SettingsCard>
+        {(availableBackends.length > 0 || currentBackendUrl) && (
+          <>
+            <Divider marginClass="my-6 px-8 box-content -mx-8" />
+            <p className="text-white font-bold mb-3">
+              {t("settings.connections.server.selectBackend")}
+            </p>
+            {availableBackends.length > 0 ? (
+              <BackendSelector
+                selectedUrl={currentBackendUrl}
+                onSelect={handleBackendSelect}
+                availableUrls={availableBackends}
+                showCustom
+              />
+            ) : (
+              <AuthInputBox
+                onChange={setBackendUrl}
+                value={backendUrl ?? ""}
+                placeholder="https://"
+              />
+            )}
+          </>
+        )}
+      </SettingsCard>
+      {user.account && (
+        <Modal id={confirmationModal.id}>
+          <ModalCard>
+            <Heading2 className="!mt-0 !mb-4">
+              {t("settings.connections.server.changeWarningTitle")}
+            </Heading2>
+            <Paragraph className="!mt-1 !mb-6">
+              {t("settings.connections.server.changeWarning")}
+            </Paragraph>
+            <div className="flex justify-end gap-3">
+              <Button theme="secondary" onClick={confirmationModal.hide}>
+                {t("settings.connections.server.cancel")}
+              </Button>
+              <Button theme="purple" onClick={handleConfirmChange}>
+                {t("settings.connections.server.confirm")}
+              </Button>
+            </div>
+          </ModalCard>
+        </Modal>
+      )}
+    </>
   );
 }
 
 async function getFebboxKeyStatus(febboxKey: string | null) {
   if (febboxKey) {
     const status: Status = await testFebboxKey(febboxKey);
-    return status;
+    const quota = await fetchFebboxQuota(febboxKey);
+    return { status, quota };
   }
-  return "unset";
+  return { status: "unset" as Status, quota: null };
 }
 
-function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
+interface FebboxSetupProps extends FebboxKeyProps {
+  mode: "onboarding" | "settings";
+}
+
+export function FebboxSetup({
+  febboxKey,
+  setFebboxKey,
+  mode,
+}: FebboxSetupProps) {
   const { t } = useTranslation();
   const [showVideo, setShowVideo] = useState(false);
   const user = useAuthStore();
   const preferences = usePreferencesStore();
-  const exampleModal = useModal("febbox-example-settings");
+  const exampleModal = useModal("febbox-example");
 
-  // Enable febbox token when account is loaded and we have a token
+  // Initialize expansion state for onboarding mode
+  const [isFebboxExpanded, setIsFebboxExpanded] = useState(
+    mode === "onboarding" && febboxKey !== null && febboxKey !== "",
+  );
+
+  // Expand when key is set in onboarding mode
   useEffect(() => {
-    if (user.account && febboxKey === null && preferences.febboxKey) {
+    if (mode === "onboarding" && febboxKey && febboxKey.length > 0) {
+      setIsFebboxExpanded(true);
+    }
+  }, [febboxKey, mode]);
+
+  // Enable febbox token when account is loaded in settings mode
+  useEffect(() => {
+    if (
+      mode === "settings" &&
+      user.account &&
+      febboxKey === null &&
+      preferences.febboxKey
+    ) {
       setFebboxKey(preferences.febboxKey);
     }
-  }, [user.account, febboxKey, preferences.febboxKey, setFebboxKey]);
+  }, [user.account, febboxKey, preferences.febboxKey, setFebboxKey, mode]);
 
   const [status, setStatus] = useState<Status>("unset");
+  const [quota, setQuota] = useState<any>(null);
   const statusMap: Record<Status, StatusCircleProps["type"]> = {
     error: "error",
     success: "success",
@@ -262,10 +363,31 @@ function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
   useEffect(() => {
     const checkTokenStatus = async () => {
       const result = await getFebboxKeyStatus(febboxKey);
-      setStatus(result);
+      setStatus(result.status);
+      setQuota(result.quota);
     };
     checkTokenStatus();
   }, [febboxKey]);
+
+  // Toggle handler based on mode
+  const toggleFebboxExpanded = () => {
+    if (mode === "onboarding") {
+      // Onboarding mode: expand/collapse, preserve key
+      if (isFebboxExpanded) {
+        setFebboxKey("");
+        setIsFebboxExpanded(false);
+      } else {
+        setIsFebboxExpanded(true);
+      }
+    } else {
+      // Settings mode: enable/disable
+      setFebboxKey(febboxKey === null ? "" : null);
+    }
+  };
+
+  // Determine if content is visible
+  const isFebboxVisible =
+    mode === "onboarding" ? isFebboxExpanded : febboxKey !== null;
 
   if (conf().ALLOW_FEBBOX_KEY) {
     return (
@@ -282,12 +404,14 @@ function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
             </div>
             <div>
               <Toggle
-                onClick={() => setFebboxKey((s) => (s === null ? "" : null))}
-                enabled={febboxKey !== null}
+                onClick={toggleFebboxExpanded}
+                enabled={
+                  mode === "onboarding" ? isFebboxExpanded : febboxKey !== null
+                }
               />
             </div>
           </div>
-          {febboxKey !== null ? (
+          {isFebboxVisible ? (
             <>
               <Divider marginClass="my-6 px-8 box-content -mx-8" />
 
@@ -342,27 +466,30 @@ function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
                   <br />
                   <Trans i18nKey="fedapi.setup.step.5" />
                 </p>
-                <p className="text-type-danger mt-2">
-                  <Trans i18nKey="fedapi.setup.step.warning" />
-                </p>
               </div>
 
               <Divider marginClass="my-6 px-8 box-content -mx-8" />
-              <p className="text-white font-bold">
-                {t("settings.connections.febbox.tokenLabel", "Token")}
+              <p className="text-white font-bold mb-3">
+                {mode === "settings"
+                  ? t("settings.connections.febbox.tokenLabel", "Token")
+                  : t("fedapi.setup.tokenLabel")}
               </p>
-              <div className="flex items-center w-full gap-4">
-                <StatusCircle type={statusMap[status]} className="mx-2" />
-                <AuthInputBox
-                  onChange={(newToken) => {
-                    setFebboxKey(newToken);
-                  }}
-                  value={febboxKey ?? ""}
-                  placeholder="eyJ0eXAi..."
-                  passwordToggleable
-                  className="flex-grow"
-                />
-                <RegionSelectorPart />
+              <div className="flex md:flex-row flex-col items-center w-full gap-4">
+                <div className="flex items-center w-full">
+                  <StatusCircle type={statusMap[status]} className="mx-2" />
+                  <AuthInputBox
+                    onChange={(newToken) => {
+                      setFebboxKey(newToken);
+                    }}
+                    value={febboxKey ?? ""}
+                    placeholder="eyJ0eXAi..."
+                    passwordToggleable
+                    className="flex-grow"
+                  />
+                </div>
+                <div className="flex items-center">
+                  <RegionSelectorPart />
+                </div>
               </div>
               {status === "error" && (
                 <p className="text-type-danger mt-4">
@@ -379,6 +506,41 @@ function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
                   {t("fedapi.status.invalid_token")}
                 </p>
               )}
+              {status === "success" &&
+                quota &&
+                (() => {
+                  if (!quota?.data?.flow) return null;
+                  const {
+                    traffic_usage: used,
+                    traffic_limit: limit,
+                    reset_at: reset,
+                  } = quota.data.flow;
+                  return (
+                    <>
+                      <p className="text-sm text-green-500 mt-2">
+                        {t("fedapi.setup.traffic", { used, limit, reset })}
+                      </p>
+                      <p className="max-w-[30rem] text-xs opacity-70 mt-2">
+                        {t("fedapi.setup.trafficExplanation")}
+                      </p>
+                    </>
+                  );
+                })()}
+              <div className="flex justify-between items-center gap-4 mt-6">
+                <div className="my-3">
+                  <p className="max-w-[32rem] font-medium">
+                    {t("fedapi.setup.useMp4")}
+                  </p>
+                </div>
+                <div>
+                  <Toggle
+                    onClick={() =>
+                      preferences.setFebboxUseMp4(!preferences.febboxUseMp4)
+                    }
+                    enabled={preferences.febboxUseMp4}
+                  />
+                </div>
+              </div>
             </>
           ) : null}
         </SettingsCard>
@@ -408,33 +570,69 @@ function FebboxKeyEdit({ febboxKey, setFebboxKey }: FebboxKeyProps) {
   }
 }
 
-async function getRealDebridKeyStatus(realDebridKey: string | null) {
-  if (realDebridKey) {
-    const status: Status = await testRealDebridKey(realDebridKey);
+async function getdebridTokenStatus(
+  debridToken: string | null,
+  debridService: string,
+) {
+  if (debridToken) {
+    const status: Status =
+      debridService === "torbox"
+        ? await testTorboxToken(debridToken)
+        : await testdebridToken(debridToken);
     return status;
   }
   return "unset";
 }
 
-function RealDebridKeyEdit({
-  realDebridKey,
-  setRealDebridKey,
-}: RealDebridKeyProps) {
+export function DebridEdit({
+  debridToken,
+  setdebridToken,
+  debridService,
+  setdebridService,
+  mode = "settings",
+}: DebridProps) {
   const { t } = useTranslation();
   const user = useAuthStore();
   const preferences = usePreferencesStore();
 
+  // Initialize expansion state for onboarding mode
+  const [isDebridExpanded, setIsDebridExpanded] = useState(
+    mode === "onboarding" && debridToken !== null && debridToken !== "",
+  );
+
+  // Expand when key is set in onboarding mode
+  useEffect(() => {
+    if (mode === "onboarding" && debridToken && debridToken.length > 0) {
+      setIsDebridExpanded(true);
+    }
+  }, [debridToken, mode]);
+
   // Enable Real Debrid token when account is loaded and we have a token
   useEffect(() => {
-    if (user.account && realDebridKey === null && preferences.realDebridKey) {
-      setRealDebridKey(preferences.realDebridKey);
+    if (user.account && debridToken === null && preferences.debridToken) {
+      setdebridToken(preferences.debridToken);
     }
-  }, [
-    user.account,
-    realDebridKey,
-    preferences.realDebridKey,
-    setRealDebridKey,
-  ]);
+  }, [user.account, debridToken, preferences.debridToken, setdebridToken]);
+
+  // Determine if content is visible
+  const isDebridVisible =
+    mode === "onboarding" ? isDebridExpanded : debridToken !== null;
+
+  // Toggle handler based on mode
+  const toggleDebridExpanded = () => {
+    if (mode === "onboarding") {
+      // Onboarding mode: expand/collapse, preserve key
+      if (isDebridExpanded) {
+        setdebridToken("");
+        setIsDebridExpanded(false);
+      } else {
+        setIsDebridExpanded(true);
+      }
+    } else {
+      // Settings mode: enable/disable
+      setdebridToken(debridToken === null ? "" : null);
+    }
+  };
 
   const [status, setStatus] = useState<Status>("unset");
   const statusMap: Record<Status, StatusCircleProps["type"]> = {
@@ -447,69 +645,84 @@ function RealDebridKeyEdit({
 
   useEffect(() => {
     const checkTokenStatus = async () => {
-      const result = await getRealDebridKeyStatus(realDebridKey);
+      const result = await getdebridTokenStatus(debridToken, debridService);
       setStatus(result);
     };
     checkTokenStatus();
-  }, [realDebridKey]);
+  }, [debridToken, debridService]);
 
-  if (conf().ALLOW_REAL_DEBRID_KEY) {
+  if (conf().ALLOW_DEBRID_KEY) {
     return (
       <SettingsCard>
         <div className="flex justify-between items-center gap-4">
           <div className="my-3">
-            <p className="text-white font-bold mb-3">{t("realdebrid.title")}</p>
-            <p className="max-w-[30rem] font-medium">
-              {t("realdebrid.description")}
+            <p className="text-white font-bold mb-3">{t("debrid.title")}</p>
+            <Trans i18nKey="debrid.description">
+              <MwLink to="https://real-debrid.com/" />
+              {/* fifth's referral code */}
+              <MwLink to="https://torbox.app/subscription?referral=3f665ece-0405-4012-9db7-c6f90e8567e1" />
+            </Trans>
+            <p className="text-type-danger mt-2 max-w-[30rem]">
+              {t("debrid.notice")}
             </p>
-            <MwLink>
-              <a
-                href="https://real-debrid.com/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                real-debrid.com
-              </a>
-            </MwLink>
           </div>
           <div className="flex items-center gap-3">
-            <Toggle
-              onClick={() => setRealDebridKey((s) => (s === null ? "" : null))}
-              enabled={realDebridKey !== null}
-            />
+            <Toggle onClick={toggleDebridExpanded} enabled={isDebridVisible} />
           </div>
         </div>
-        {realDebridKey !== null ? (
+        {isDebridVisible ? (
           <>
             <Divider marginClass="my-6 px-8 box-content -mx-8" />
             <p className="text-white font-bold mb-3">
-              {t("realdebrid.tokenLabel")}
+              {t("debrid.tokenLabel")}
             </p>
-            <div className="flex items-center w-full">
-              <StatusCircle type={statusMap[status]} className="mx-2 mr-4" />
-              <AuthInputBox
-                onChange={(newToken) => {
-                  setRealDebridKey(newToken);
-                }}
-                value={realDebridKey ?? ""}
-                placeholder="ABC123..."
-                passwordToggleable
-                className="flex-grow"
-              />
+            <div className="flex md:flex-row flex-col items-center w-full gap-4">
+              <div className="flex items-center w-full">
+                <StatusCircle type={statusMap[status]} className="mx-2 mr-4" />
+                <AuthInputBox
+                  onChange={(newToken) => {
+                    setdebridToken(newToken);
+                  }}
+                  value={debridToken ?? ""}
+                  placeholder="ABC123..."
+                  passwordToggleable
+                  className="flex-grow"
+                />
+              </div>
+              <div className="flex items-center">
+                <Dropdown
+                  options={[
+                    {
+                      id: "realdebrid",
+                      name: t("debrid.serviceOptions.realdebrid"),
+                    },
+                    {
+                      id: "torbox",
+                      name: t("debrid.serviceOptions.torbox"),
+                    },
+                  ]}
+                  selectedItem={{
+                    id: debridService,
+                    name: t(`debrid.serviceOptions.${debridService}`),
+                  }}
+                  setSelectedItem={(item) => setdebridService(item.id)}
+                  direction="up"
+                />
+              </div>
             </div>
             {status === "error" && (
               <p className="text-type-danger mt-4">
-                {t("realdebrid.status.failure")}
+                {t("debrid.status.failure")}
               </p>
             )}
             {status === "api_down" && (
               <p className="text-type-danger mt-4">
-                {t("realdebrid.status.api_down")}
+                {t("debrid.status.api_down")}
               </p>
             )}
             {status === "invalid_token" && (
               <p className="text-type-danger mt-4">
-                {t("realdebrid.status.invalid_token")}
+                {t("debrid.status.invalid_token")}
               </p>
             )}
           </>
@@ -520,36 +733,157 @@ function RealDebridKeyEdit({
   return null;
 }
 
+export function TIDBEdit({ tidbKey, setTIDBKey }: TIDBKeyProps) {
+  const { t } = useTranslation();
+  const preferences = usePreferencesStore();
+  const initializedRef = useRef(false);
+
+  // Enable TIDB key when component loads
+  useEffect(() => {
+    if (!initializedRef.current && tidbKey === null && preferences.tidbKey) {
+      initializedRef.current = true;
+      setTIDBKey(preferences.tidbKey);
+    }
+  }, [tidbKey, preferences.tidbKey, setTIDBKey]);
+
+  return (
+    <SettingsCard>
+      <div className="my-3">
+        <p className="text-white font-bold mb-3">TheIntroDB</p>
+        <p className="max-w-[40rem] font-medium mb-6">
+          <Trans i18nKey="settings.connections.tidb.description">
+            <MwLink to="https://theintrodb.org/" />
+          </Trans>
+        </p>
+        <p className="text-white font-bold mb-3">
+          {t("settings.connections.tidb.tokenLabel")}
+        </p>
+        <div className="flex items-center w-full">
+          <AuthInputBox
+            onChange={(newToken) => {
+              setTIDBKey(newToken);
+            }}
+            value={tidbKey ?? ""}
+            placeholder="theintrodb:user..."
+            passwordToggleable
+            className="flex-grow"
+          />
+        </div>
+      </div>
+    </SettingsCard>
+  );
+}
+
+export function TraktEdit() {
+  const { t } = useTranslation();
+  const { user, status, logout, error } = useTraktStore();
+  const config = conf();
+
+  const connect = () => {
+    const params = new URLSearchParams({
+      response_type: "code",
+      client_id: config.TRAKT_CLIENT_ID ?? "",
+      redirect_uri: config.TRAKT_REDIRECT_URI ?? "",
+    });
+    window.location.href = `https://trakt.tv/oauth/authorize?${params.toString()}`;
+  };
+
+  if (
+    !config.TRAKT_CLIENT_ID ||
+    !config.TRAKT_CLIENT_SECRET ||
+    !config.TRAKT_REDIRECT_URI
+  )
+    return null;
+
+  return (
+    <SettingsCard>
+      <div className="flex justify-between items-center gap-4">
+        <div className="my-3">
+          <p className="text-white font-bold mb-3">
+            {t("settings.connections.trakt.title")}
+          </p>
+          <p className="max-w-[30rem] font-medium">
+            {t("settings.connections.trakt.description")}
+            <p className="text-type-secondary text-xs mt-2">
+              {t("settings.connections.trakt.details")}
+            </p>
+          </p>
+          {error && <p className="text-type-danger mt-2">{error}</p>}
+        </div>
+        <div>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                {user.images?.avatar?.full && (
+                  <img
+                    src={user.images.avatar.full}
+                    alt={user.username}
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <span className="font-bold">{user.name || user.username}</span>
+              </div>
+              <Button theme="danger" onClick={logout}>
+                {t("settings.connections.trakt.disconnect")}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              theme="purple"
+              onClick={connect}
+              disabled={status === "syncing"}
+            >
+              {status === "syncing"
+                ? t("settings.connections.trakt.syncing")
+                : t("settings.connections.trakt.connect")}
+            </Button>
+          )}
+        </div>
+      </div>
+    </SettingsCard>
+  );
+}
+
 export function ConnectionsPart(
   props: BackendEditProps &
     ProxyEditProps &
     FebboxKeyProps &
-    RealDebridKeyProps,
+    DebridProps &
+    TIDBKeyProps,
 ) {
   const { t } = useTranslation();
+  const isDesktopApp = useIsDesktopApp();
   return (
     <div>
       <Heading1 border>{t("settings.connections.title")}</Heading1>
       <div className="space-y-6">
-        <SetupPart /> {/* I was wondering what happened to this badddev >:( */}
-        <ProxyEdit
-          proxyUrls={props.proxyUrls}
-          setProxyUrls={props.setProxyUrls}
-          proxyTmdb={props.proxyTmdb}
-          setProxyTmdb={props.setProxyTmdb}
-        />
+        <SetupPart />
+        {!isDesktopApp && (
+          <ProxyEdit
+            proxyUrls={props.proxyUrls}
+            setProxyUrls={props.setProxyUrls}
+            proxyTmdb={props.proxyTmdb}
+            setProxyTmdb={props.setProxyTmdb}
+          />
+        )}
         <BackendEdit
           backendUrl={props.backendUrl}
           setBackendUrl={props.setBackendUrl}
         />
-        <RealDebridKeyEdit
-          realDebridKey={props.realDebridKey}
-          setRealDebridKey={props.setRealDebridKey}
-        />
-        <FebboxKeyEdit
+        <FebboxSetup
           febboxKey={props.febboxKey}
           setFebboxKey={props.setFebboxKey}
+          mode="settings"
         />
+        <DebridEdit
+          debridToken={props.debridToken}
+          setdebridToken={props.setdebridToken}
+          debridService={props.debridService}
+          setdebridService={props.setdebridService}
+          mode="settings"
+        />
+        <TIDBEdit tidbKey={props.tidbKey} setTIDBKey={props.setTIDBKey} />
+        <TraktEdit />
       </div>
     </div>
   );

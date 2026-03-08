@@ -8,7 +8,7 @@ import { Title } from "@/components/text/Title";
 import { ErrorContainer, ErrorLayout } from "@/pages/layouts/ErrorLayout";
 import { PlayerMeta } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
-import { useProgressStore } from "@/stores/progress";
+import { getProgressPercentage, useProgressStore } from "@/stores/progress";
 
 export interface ResumePartProps {
   onResume: () => void;
@@ -30,13 +30,19 @@ export function ResumePart(props: ResumePartProps) {
 
     if (meta.type === "movie") {
       if (!item.progress) return 0;
-      return (item.progress.watched / item.progress.duration) * 100;
+      return getProgressPercentage(
+        item.progress.watched,
+        item.progress.duration,
+      );
     }
 
     if (meta.type === "show" && meta.episode?.tmdbId) {
       const episode = item.episodes?.[meta.episode.tmdbId];
       if (!episode) return 0;
-      return (episode.progress.watched / episode.progress.duration) * 100;
+      return getProgressPercentage(
+        episode.progress.watched,
+        episode.progress.duration,
+      );
     }
 
     return 0;

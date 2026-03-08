@@ -10,6 +10,7 @@ import {
 } from "@/components/player/hooks/useSourceSelection";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
+import { usePreferencesStore } from "@/stores/preferences";
 
 // Embed option component
 function EmbedOption(props: {
@@ -27,15 +28,33 @@ function EmbedOption(props: {
     return sourceMeta?.name ?? unknownEmbedName;
   }, [props.embedId, unknownEmbedName]);
 
-  const { run, errored, loading } = useEmbedScraping(
+  const { run, errored, loading, notFound } = useEmbedScraping(
     props.routerId,
     props.sourceId,
     props.url,
     props.embedId,
   );
 
+  let rightSide;
+  if (loading) {
+    rightSide = undefined; // Let SelectableLink handle loading
+  } else if (notFound) {
+    rightSide = (
+      <div className="flex items-center text-video-scraping-noresult">
+        <div className="w-4 h-4 rounded-full border-2 border-current bg-current flex items-center justify-center">
+          <div className="w-2 h-0.5 bg-background-main rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <SelectableLink loading={loading} error={errored} onClick={run}>
+    <SelectableLink
+      loading={loading}
+      error={errored && !notFound}
+      onClick={run}
+      rightSide={rightSide}
+    >
       <span className="flex flex-col">
         <span>{embedName}</span>
       </span>
@@ -126,14 +145,71 @@ export function SourceSelectPart(props: { media: ScrapeMedia }) {
     null,
   );
   const routerId = "manualSourceSelect";
+  const preferredSourceOrder = usePreferencesStore((s) => s.sourceOrder);
+  const enableSourceOrder = usePreferencesStore((s) => s.enableSourceOrder);
+  const lastSuccessfulSource = usePreferencesStore(
+    (s) => s.lastSuccessfulSource,
+  );
+  const enableLastSuccessfulSource = usePreferencesStore(
+    (s) => s.enableLastSuccessfulSource,
+  );
 
   const sources = useMemo(() => {
     const metaType = props.media.type;
     if (!metaType) return [];
-    return getCachedMetadata()
+    const allSources = getCachedMetadata()
       .filter((v) => v.type === "source")
       .filter((v) => v.mediaTypes?.includes(metaType));
-  }, [props.media.type]);
+
+    if (!enableSourceOrder || preferredSourceOrder.length === 0) {
+      // Even without custom source order, prioritize last successful source if enabled
+      if (enableLastSuccessfulSource && lastSuccessfulSource) {
+        const lastSourceIndex = allSources.findIndex(
+          (s) => s.id === lastSuccessfulSource,
+        );
+        if (lastSourceIndex !== -1) {
+          const lastSource = allSources.splice(lastSourceIndex, 1)[0];
+          return [lastSource, ...allSources];
+        }
+      }
+      return allSources;
+    }
+
+    // Sort sources according to preferred order, but prioritize last successful source
+    const orderedSources = [];
+    const remainingSources = [...allSources];
+
+    // First, add the last successful source if it exists, is available, and the feature is enabled
+    if (enableLastSuccessfulSource && lastSuccessfulSource) {
+      const lastSourceIndex = remainingSources.findIndex(
+        (s) => s.id === lastSuccessfulSource,
+      );
+      if (lastSourceIndex !== -1) {
+        orderedSources.push(remainingSources[lastSourceIndex]);
+        remainingSources.splice(lastSourceIndex, 1);
+      }
+    }
+
+    // Add sources in preferred order
+    for (const sourceId of preferredSourceOrder) {
+      const sourceIndex = remainingSources.findIndex((s) => s.id === sourceId);
+      if (sourceIndex !== -1) {
+        orderedSources.push(remainingSources[sourceIndex]);
+        remainingSources.splice(sourceIndex, 1);
+      }
+    }
+
+    // Add remaining sources that weren't in the preferred order
+    orderedSources.push(...remainingSources);
+
+    return orderedSources;
+  }, [
+    props.media.type,
+    preferredSourceOrder,
+    enableSourceOrder,
+    lastSuccessfulSource,
+    enableLastSuccessfulSource,
+  ]);
 
   if (selectedSourceId) {
     return (

@@ -9,7 +9,11 @@ import {
   DisplayInterfaceEvents,
   DisplayMeta,
 } from "@/components/player/display/displayInterface";
-import { conf } from "@/setup/config";
+import {
+  createM3U8ProxyUrl,
+  createMP4ProxyUrl,
+  isUrlAlreadyProxied,
+} from "@/components/player/utils/proxy";
 import { LoadableSource } from "@/stores/player/utils/qualities";
 import { processCdnLink } from "@/utils/cdn";
 import { canFullscreen, canFullscreenAnyElement } from "@/utils/detectFeatures";
@@ -113,31 +117,24 @@ export function makeChromecastDisplayInterface(
 
     let contentUrl = processCdnLink(source.url);
 
-    // When casting HLS, use an enabled M3U8 proxy so the Chromecast device can fetch the manifest
+    // Only proxy streams if they need it:
+    // 1. Not already proxied AND
+    // 2. Has headers (either preferredHeaders or headers)
+    const allHeaders = {
+      ...source.preferredHeaders,
+      ...source.headers,
+    };
+    const hasHeaders = Object.keys(allHeaders).length > 0;
+
+    // Handle HLS streams
     if (source.type === "hls") {
-      try {
-        const all = conf().M3U8_PROXY_URLS;
-        let enabledMap: Record<string, boolean> = {};
-        const enabledRaw = localStorage.getItem("m3u8-proxy-enabled");
-        if (enabledRaw) {
-          try {
-            enabledMap = JSON.parse(enabledRaw) as Record<string, boolean>;
-          } catch {
-            enabledMap = {};
-          }
-        }
-        const enabled = all.filter(
-          (_url, idx) => enabledMap[idx.toString()] !== false,
-        );
-        const list = enabled.length > 0 ? enabled : all;
-        if (list.length > 0) {
-          const base = list[Math.floor(Math.random() * list.length)];
-          const trimmed = base.endsWith("/") ? base.slice(0, -1) : base;
-          contentUrl = `${trimmed}/?destination=${encodeURIComponent(contentUrl)}`;
-        }
-      } catch {
-        // If anything goes wrong, fall back to direct URL
+      if (!isUrlAlreadyProxied(source.url) && hasHeaders) {
+        contentUrl = createM3U8ProxyUrl(source.url, allHeaders);
       }
+    }
+    // Handle MP4 streams with headers
+    else if (source.type === "mp4" && hasHeaders) {
+      contentUrl = createMP4ProxyUrl(source.url, source.headers || {});
     }
 
     const mediaInfo = new chrome.cast.media.MediaInfo(contentUrl, type);

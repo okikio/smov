@@ -4,6 +4,7 @@ import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { VideoPlayerTimeFormat } from "@/stores/player/slices/interface";
 import { usePlayerStore } from "@/stores/player/store";
 import { durationExceedsHour, formatSeconds } from "@/utils/formatSeconds";
+import { uses12HourClock } from "@/utils/uses12HourClock";
 
 export function Time(props: { short?: boolean }) {
   const timeFormat = usePlayerStore((s) => s.interface.timeFormat);
@@ -63,7 +64,11 @@ export function Time(props: { short?: boolean }) {
           timeLeft,
           duration,
           formatParams: {
-            timeFinished: { hour: "numeric", minute: "numeric" },
+            timeFinished: {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: uses12HourClock(),
+            },
           },
         })}
       </span>

@@ -26,7 +26,7 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarProps>(
     const [showTooltip, setShowTooltip] = useState(false);
 
     function setSearch(value: string) {
-      props.onChange(value, true);
+      props.onChange(value, false);
     }
 
     useEffect(() => {
@@ -104,24 +104,9 @@ export const SearchBarInput = forwardRef<HTMLInputElement, SearchBarProps>(
             {showTooltip && !props.hideTooltip && (
               <div className="py-4">
                 <p className="font-bold text-sm mb-1 text-search-text">
-                  Advanced Search:
+                  Search:
                 </p>
                 <div className="space-y-1.5 text-xs text-search-text">
-                  <div>
-                    <p className="mb-0.5">Year search:</p>
-                    <p className="text-type-secondary italic pl-2">
-                      Inception year:2010
-                    </p>
-                  </div>
-                  <div>
-                    <p className="mb-0.5">Type search:</p>
-                    <p className="text-type-secondary italic pl-2">
-                      Marvel type:movie
-                    </p>
-                    <p className="text-type-secondary italic pl-2">
-                      Friends type:tv
-                    </p>
-                  </div>
                   <div>
                     <p className="mb-0.5">TMDB ID search:</p>
                     <p className="text-type-secondary italic pl-2">

@@ -1,13 +1,17 @@
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { BrandPill } from "@/components/layout/BrandPill";
 import { Player } from "@/components/player";
-import { SkipIntroButton } from "@/components/player/atoms/SkipIntroButton";
-import { UnreleasedEpisodeOverlay } from "@/components/player/atoms/UnreleasedEpisodeOverlay";
+import { SkipSegmentButton } from "@/components/player/atoms/SkipSegmentButton";
+import { ThumbsFeedback } from "@/components/player/atoms/ThumbsFeedback";
 import { WatchPartyStatus } from "@/components/player/atoms/WatchPartyStatus";
-import { Widescreen } from "@/components/player/atoms/Widescreen";
 import { useShouldShowControls } from "@/components/player/hooks/useShouldShowControls";
-import { useSkipTime } from "@/components/player/hooks/useSkipTime";
+import {
+  SegmentData,
+  useSkipTime,
+} from "@/components/player/hooks/useSkipTime";
+import { PauseOverlay } from "@/components/player/overlays/PauseOverlay";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { PlayerMeta, playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
@@ -32,6 +36,8 @@ export function PlayerPart(props: PlayerPartProps) {
   );
   const isLoading = usePlayerStore((s) => s.mediaPlaying.isLoading);
   const { isHost, enabled } = useWatchPartyStore();
+  const { t } = useTranslation();
+  const meta = usePlayerStore((s) => s.meta);
 
   const inControl = !enabled || isHost;
 
@@ -72,11 +78,29 @@ export function PlayerPart(props: PlayerPartProps) {
     }, 1000);
   };
 
-  const skiptime = useSkipTime();
+  // State for thumbs feedback
+  const [thumbsFeedbackData, setThumbsFeedbackData] = useState<{
+    segment: SegmentData;
+    skipTime: number;
+  } | null>(null);
+
+  const segments = useSkipTime();
+
+  const handleSkipTriggered = useCallback(
+    (segment: SegmentData, skipTime: number) => {
+      setThumbsFeedbackData({ segment, skipTime });
+    },
+    [],
+  );
+
+  const handleThumbsFeedback = useCallback(() => {
+    setThumbsFeedbackData(null);
+  }, []);
 
   return (
     <Player.Container onLoad={props.onLoad} showingControls={showTargets}>
       {props.children}
+      <PauseOverlay />
       <Player.BlackOverlay
         show={showTargets && status === playerStatus.PLAYING}
       />
@@ -119,6 +143,15 @@ export function PlayerPart(props: PlayerPartProps) {
             <span className="text mx-3 text-type-secondary">/</span>
             <Player.Title />
 
+            {isMobile && meta?.type === "show" && (
+              <span className="text-type-secondary text-sm whitespace-nowrap flex-shrink-0">
+                {t("media.episodeDisplay", {
+                  season: meta?.season?.number,
+                  episode: meta?.episode?.number,
+                })}
+              </span>
+            )}
+
             <Player.InfoButton />
 
             <Player.BookmarkButton />
@@ -126,10 +159,10 @@ export function PlayerPart(props: PlayerPartProps) {
           <div className="text-center hidden xl:flex justify-center items-center">
             <Player.EpisodeTitle />
           </div>
-          <div className="hidden sm:flex items-center justify-end">
+          <div className="hidden lg:flex items-center justify-end">
             <BrandPill />
           </div>
-          <div className="flex sm:hidden items-center justify-end">
+          <div className="flex lg:hidden items-center justify-end">
             {status === playerStatus.PLAYING ? (
               <>
                 <Player.Airplay />
@@ -183,14 +216,10 @@ export function PlayerPart(props: PlayerPartProps) {
               <Player.Captions />
             ) : null}
             <Player.Settings />
-            {/* Fullscreen on when not shifting */}
-            {!isShifting && <Player.Fullscreen />}
-
-            {/* Expand button visible when shifting */}
-            {isShifting && (
-              <div>
-                <Widescreen />
-              </div>
+            {isShifting || isHoldingFullscreen ? (
+              <Player.Widescreen />
+            ) : (
+              <Player.Fullscreen />
             )}
           </div>
         </div>
@@ -198,7 +227,7 @@ export function PlayerPart(props: PlayerPartProps) {
           <div />
           <div className="flex justify-center space-x-3">
             {/* Disable PiP for iOS PWA */}
-            {!isPWA && !isIOS && status === playerStatus.PLAYING && (
+            {!(isPWA && isIOS) && status === playerStatus.PLAYING && (
               <Player.Pip />
             )}
             <Player.Episodes inControl={inControl} />
@@ -210,16 +239,18 @@ export function PlayerPart(props: PlayerPartProps) {
             <Player.Settings />
           </div>
           <div>
-            {isPWA && status === playerStatus.PLAYING ? (
-              <Widescreen />
-            ) : (
+            {status === playerStatus.PLAYING && (
               <div
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
                 className="select-none touch-none"
                 style={{ WebkitTapHighlightColor: "transparent" }}
               >
-                {isHoldingFullscreen ? <Widescreen /> : <Player.Fullscreen />}
+                {isHoldingFullscreen ? (
+                  <Player.Widescreen />
+                ) : (
+                  <Player.Fullscreen />
+                )}
               </div>
             )}
           </div>
@@ -229,7 +260,8 @@ export function PlayerPart(props: PlayerPartProps) {
       <Player.VolumeChangedPopout />
       <Player.SubtitleDelayPopout />
       <Player.SpeedChangedPopout />
-      <UnreleasedEpisodeOverlay />
+      <Player.TIDBSubmissionSuccessPopout />
+      <Player.UnreleasedEpisodeOverlay />
 
       <Player.NextEpisodeButton
         controlsShowing={showTargets}
@@ -237,10 +269,18 @@ export function PlayerPart(props: PlayerPartProps) {
         inControl={inControl}
       />
 
-      <SkipIntroButton
+      <SkipSegmentButton
         controlsShowing={showTargets}
-        skipTime={skiptime}
+        segments={segments}
         inControl={inControl}
+        onChangeMeta={props.onMetaChange}
+        onSkipTriggered={handleSkipTriggered}
+      />
+
+      <ThumbsFeedback
+        controlsShowing={showTargets}
+        feedbackData={thumbsFeedbackData}
+        onAction={handleThumbsFeedback}
       />
     </Player.Container>
   );

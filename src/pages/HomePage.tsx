@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { To, useNavigate } from "react-router-dom";
 
 import { WideContainer } from "@/components/layout/WideContainer";
-import { DetailsModal } from "@/components/overlays/detailsModal";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useRandomTranslation } from "@/hooks/useRandomTranslation";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
@@ -26,6 +25,7 @@ import { MediaItem } from "@/utils/mediaTypes";
 
 import { Button } from "./About";
 import { AdsPart } from "./parts/home/AdsPart";
+import { SupportBar } from "./parts/home/SupportBar";
 
 function useSearch(search: string) {
   const [searching, setSearching] = useState<boolean>(false);
@@ -62,7 +62,6 @@ export function HomePage() {
   const s = useSearch(search);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [showWatching, setShowWatching] = useState(false);
-  const [detailsData, setDetailsData] = useState<any>();
   const { showModal } = useOverlayStack();
   const enableDiscover = usePreferencesStore((state) => state.enableDiscover);
   const enableFeatured = usePreferencesStore((state) => state.enableFeatured);
@@ -83,11 +82,10 @@ export function HomePage() {
   };
 
   const handleShowDetails = async (media: MediaItem | FeaturedMedia) => {
-    setDetailsData({
+    showModal("details", {
       id: Number(media.id),
       type: media.type === "movie" ? "movie" : "show",
     });
-    showModal("details");
   };
 
   const renderHomeSections = () => {
@@ -174,6 +172,8 @@ export function HomePage() {
           />
         )}
 
+        {conf().SHOW_SUPPORT_BAR ? <SupportBar /> : null}
+
         {conf().SHOW_AD ? <AdsPart /> : null}
       </div>
 
@@ -235,8 +235,6 @@ export function HomePage() {
           </div>
         )}
       </WideContainer>
-
-      {detailsData && <DetailsModal id="details" data={detailsData} />}
     </HomeLayout>
   );
 }

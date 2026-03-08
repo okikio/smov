@@ -128,7 +128,7 @@ export function Navigation(props: NavigationProps) {
 
       {/* content */}
       <div
-        className="top-content fixed pointer-events-none left-0 right-0 z-[60] top-0 min-h-[150px]"
+        className="top-content fixed pointer-events-none left-0 right-0 z-[500] top-0 min-h-[150px]"
         style={{
           top: `${bannerHeight}px`,
         }}
@@ -144,17 +144,12 @@ export function Navigation(props: NavigationProps) {
                 <BrandPill clickable header />
               </Link>
               <a
-                href={conf().DISCORD_LINK}
+                href={conf().FLUXER_LINK}
                 target="_blank"
                 rel="noreferrer"
                 className="text-xl text-white tabbable rounded-full backdrop-blur-lg"
               >
-                <IconPatch
-                  icon={Icons.DISCORD}
-                  clickable
-                  downsized
-                  navigation
-                />
+                <IconPatch icon={Icons.FLUXER} clickable downsized navigation />
               </a>
               {!enableLowPerformanceMode &&
                 (window.location.pathname !== "/discover" ? (

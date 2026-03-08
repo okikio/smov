@@ -1,8 +1,6 @@
 # P-Stream
-[![P-Stream Image](.github/P-Stream.png)](https://docs.pstream.mov)  
 
-**I *do not* endorse piracy of any kind I simply enjoy programming and large user counts.**
-
+[![P-Stream Image](.github/P-Stream.png)](https://p-stream.github.io/docs/)
 
 ## Quick Deploy
 
@@ -10,33 +8,27 @@
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/p-stream/p-stream)
 
-**NOTE: To self-host, more setup is required. Check the [docs](https://docs.pstream.mov) to properly set up!!!!**
-
+**NOTE: To self-host, more setup is required. Check the [docs](https://p-stream.github.io/docs/) to properly set up!!!!**
 
 ## Links And Resources
-| Service        | Link                                                             | Source Code                                              |
-|----------------|------------------------------------------------------------------|----------------------------------------------------------|
-| P-Stream Docs | [docs](https://docs.pstream.mov)                          | [source code](https://github.com/p-stream/docs)        |
-| Extension      | [extension](https://docs.pstream.mov/extension)                | [source code](https://github.com/p-stream/browser-ext) |
-| Proxy          | [simple-proxy](https://docs.pstream.mov/proxy)              | [source code](https://github.com/p-stream/sudo-proxy)  |             
-| Backend        | [backend](https://server.fifthwit.net)                    | [source code](https://github.com/p-stream/backend)     |
-| Frontend       | [P-Stream](https://docs.pstream.mov/instances)                | [source code](https://github.com/p-stream/p-stream)        |
-| Weblate        | [weblate](https://weblate.pstream.mov)         | |
 
-***I provide these if you are not able to host yourself, though I do encourage hosting the frontend.***
-
+| Service       | Link                                            | Source Code                                             |
+| ------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| P-Stream Docs | [docs](https://p-stream.github.io/docs/)                | [source code](https://github.com/p-stream/docs)         |
+| Extension     | [extension](https://p-stream.github.io/docs/extension) | [source code](https://github.com/p-stream/browser-ext)  |
+| Proxy         | [simple-proxy](https://p-stream.github.io/docs/proxy)  | [source code](https://github.com/p-stream/simple-proxy) |
+| Backend       | [backend](https://github.com/p-stream/backend)          | [source code](https://github.com/p-stream/backend)      |
+| Frontend      | [P-Stream](https://p-stream.github.io/docs/instances)  | [source code](https://github.com/p-stream/p-stream)     |
+| Weblate       | [weblate](https://p-stream.github.io/docs/weblate)          |                                                         |
 
 ## Referrers
-- [FMHY (Voted as #1 multi-server streaming site of 2024)](https://fmhy.net)
-- [Piracy Subreddit Megathread](https://www.reddit.com/r/Piracy/s/iymSloEpXn)
-- [Toon's Instances](https://erynith.github.io/movie-web-instances)
-- [Entertainment Empire](https://discord.gg/8NSDNEMfja)
-- Search Engines: DuckDuckGo, Bing, Google
-- Rentry.co
 
+- [FMHY (Voted as #1 streaming site of 2024, 2025)](https://fmhy.net)
 
 ## Running Locally
+
 Type the following commands into your terminal / command line to run P-Stream locally
+
 ```bash
 git clone https://github.com/p-stream/p-stream.git
 cd smov
@@ -44,11 +36,13 @@ git pull
 pnpm install
 pnpm run dev
 ```
+
 Then you can visit the local instance [here](http://localhost:5173) or, at local host on port 5173.
 
-
 ## Updating a P-Stream Instance
+
 To update a P-Stream instance you can type the below commands into a terminal at the root of your project.
+
 ```bash
 git remote add upstream https://github.com/p-stream/p-stream.git
 git fetch upstream # Grab the contents of the new remote source
@@ -60,6 +54,8 @@ git commit -m "Update p-stream instance (merge upstream/production)"
 git push  # Push to YOUR repository
 ```
 
+## Contact Me / Fluxer
 
-## Contact Me / Discord
-[Discord](https://discord.gg/7z6znYgrTG)
+[Fluxer](https://fluxer.gg/rEBQ3B8E)
+
+(Fluxer is an OSS Discord alternative platform)

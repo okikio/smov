@@ -39,7 +39,7 @@ export interface ListViewProps {
   unreadCount: number;
   loading: boolean;
   error: string | null;
-  containerRef: React.RefObject<HTMLDivElement | null>;
+  containerRef: React.RefObject<HTMLDivElement>;
   markAllAsRead: () => void;
   markAllAsUnread: () => void;
   isShiftHeld: boolean;

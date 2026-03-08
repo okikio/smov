@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { usePlayerStore } from "@/stores/player/store";
 import { useVolumeStore } from "@/stores/volume";
@@ -26,12 +26,9 @@ export function useInitializeSource() {
   );
   const { selectLastUsedLanguageIfEnabled } = useCaptions();
 
-  const funRef = useRef(selectLastUsedLanguageIfEnabled);
   useEffect(() => {
-    funRef.current = selectLastUsedLanguageIfEnabled;
-  }, [selectLastUsedLanguageIfEnabled]);
-
-  useEffect(() => {
-    if (sourceIdentifier) funRef.current();
-  }, [sourceIdentifier]);
+    if (sourceIdentifier) {
+      selectLastUsedLanguageIfEnabled();
+    }
+  }, [sourceIdentifier, selectLastUsedLanguageIfEnabled]);
 }

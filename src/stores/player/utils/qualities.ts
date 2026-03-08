@@ -99,7 +99,15 @@ export function selectQuality(
     const availableQualities = Object.entries(source.qualities)
       .filter((entry) => (entry[1].url.length ?? 0) > 0)
       .map((entry) => entry[0]) as SourceQuality[];
-    const quality = getPreferredQuality(availableQualities, qualityPreferences);
+    // For file sources (MP4), always use manual quality selection since they don't support switching
+    const manualQualityPreferences = {
+      ...qualityPreferences,
+      automaticQuality: false,
+    };
+    const quality = getPreferredQuality(
+      availableQualities,
+      manualQualityPreferences,
+    );
     if (quality) {
       const stream = source.qualities[quality];
       if (stream) {

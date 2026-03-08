@@ -20,7 +20,15 @@ export function M3U8ProxyItem(props: {
   enabled?: boolean;
   onToggle?: (enabled: boolean) => void;
 }) {
-  const urlWithoutProtocol = props.url ? new URL(props.url).host : null;
+  const urlWithoutProtocol = useMemo(() => {
+    if (!props.url) return null;
+    try {
+      return new URL(props.url).host;
+    } catch {
+      // Handle malformed URLs gracefully
+      return props.url;
+    }
+  }, [props.url]);
 
   return (
     <div className="flex mb-2">

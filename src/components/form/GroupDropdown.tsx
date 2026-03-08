@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Icon, Icons } from "@/components/Icon";
 import { UserIcon, UserIcons } from "@/components/UserIcon";
 
+import { Button } from "../buttons/Button";
+
 interface GroupDropdownProps {
   groups: string[];
   currentGroups: string[];
@@ -83,7 +85,7 @@ export function GroupDropdown({
     <div ref={dropdownRef} className="relative min-w-[200px]">
       <button
         type="button"
-        className="w-full px-3 py-2 text-xs bg-background-main border border-background-secondary rounded-lg text-white flex justify-between items-center hover:bg-mediaCard-hoverBackground transition-colors"
+        className="w-full px-3 py-2 text-xs bg-background-main border border-background-secondary rounded-xl text-white flex justify-between items-center hover:bg-mediaCard-hoverBackground transition-colors"
         onClick={() => setOpen((v) => !v)}
       >
         {currentGroups.length > 0 ? (
@@ -114,7 +116,7 @@ export function GroupDropdown({
         </span>
       </button>
       {open && (
-        <div className="absolute min-w-full z-[150] mt-1 end-0 bg-background-main border border-background-secondary rounded-lg shadow-lg py-1 pb-3 text-sm">
+        <div className="absolute min-w-full z-[150] mt-1 end-0 bg-background-main border border-background-secondary rounded-xl shadow-lg py-1 pb-3 text-sm max-h-80 overflow-auto scrollbar-thin scrollbar-track-background-secondary scrollbar-thumb-type-secondary">
           {groups.length === 0 && !showInput && (
             <div className="px-4 py-2 text-type-secondary">
               {t("home.bookmarks.groups.dropdown.empty")}
@@ -122,18 +124,35 @@ export function GroupDropdown({
           )}
           {groups.map((group) => {
             const { icon, name } = parseGroupString(group);
+            const isChecked = currentGroups.includes(group);
             return (
               <label
                 key={group}
-                className="flex items-center gap-2 mx-1 px-3 py-2 hover:bg-mediaCard-hoverBackground rounded-md cursor-pointer transition-colors text-type-link/80"
+                className="flex items-center gap-2 mx-1 px-3 py-2 hover:bg-mediaCard-hoverBackground rounded-lg cursor-pointer transition-colors text-type-link/80"
               >
                 <input
                   type="checkbox"
-                  checked={currentGroups.includes(group)}
+                  checked={isChecked}
                   onChange={() => handleToggleGroup(group)}
-                  className="accent-type-link"
+                  className="sr-only"
                 />
-                <span className="w-5 h-5 flex items-center justify-center ml-1">
+                <div
+                  className={`relative w-4 h-4 rounded border-2 transition-all duration-200 flex items-center justify-center ${
+                    isChecked
+                      ? "bg-buttons-purple border-buttons-purple"
+                      : "border-background-secondary hover:border-buttons-purple/50"
+                  }`}
+                >
+                  <Icon
+                    icon={Icons.CHECKMARK}
+                    className={`w-4 h-4 transition-all duration-200 ${
+                      isChecked
+                        ? "text-white opacity-100 scale-75"
+                        : "opacity-0"
+                    }`}
+                  />
+                </div>
+                <span className="w-4 h-4 flex items-center justify-center ml-1">
                   <UserIcon
                     icon={icon}
                     className="inline-block w-full h-full"
@@ -149,7 +168,7 @@ export function GroupDropdown({
                 type="text"
                 value={newGroup}
                 onChange={(e) => setNewGroup(e.target.value)}
-                className="flex-1 px-2 py-1 rounded bg-background-main text-white border border-background-secondary text-xs min-w-0 placeholder:text-type-secondary"
+                className="flex-1 px-2 py-1 rounded bg-background-main text-white border border-background-secondary outline-none text-xs min-w-0 placeholder:text-type-secondary"
                 placeholder="Group name"
                 autoFocus
                 onKeyDown={(e) => {
@@ -158,15 +177,14 @@ export function GroupDropdown({
                 }}
                 style={{ minWidth: 0 }}
               />
-              <button
-                type="button"
-                className="text-type-link font-bold px-2 py-1 min-w-[2.5rem]"
+              <Button
+                theme="purple"
                 onClick={() => handleCreate(newGroup, selectedIcon)}
                 disabled={!newGroup.trim()}
-                style={{ flexShrink: 0 }}
+                className="h-6 w-6 min-w-12 md:min-w-6 justify-center items-center"
               >
-                {t("home.bookmarks.groups.dropdown.addButton")}
-              </button>
+                <Icon icon={Icons.PLUS} className="text-white w-4 h-4" />
+              </Button>
             </div>
             {newGroup.trim().length > 0 && (
               <div className="flex items-center gap-2 flex-wrap pt-2 w-full justify-center">

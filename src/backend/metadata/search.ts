@@ -1,3 +1,5 @@
+import Fuse from "fuse.js";
+
 import { SimpleCache } from "@/utils/cache";
 import { MediaItem } from "@/utils/mediaTypes";
 
@@ -7,10 +9,12 @@ import {
   getMediaDetails,
   getMediaPoster,
   multiSearch,
-  searchMovies,
-  searchTVShows,
 } from "./tmdb";
-import { TMDBContentTypes } from "./types/tmdb";
+import {
+  TMDBContentTypes,
+  TMDBMovieSearchResult,
+  TMDBShowSearchResult,
+} from "./types/tmdb";
 
 export interface MWQuery {
   searchQuery: string;
@@ -24,12 +28,76 @@ cache.initialize();
 
 // detect "tmdb:123456" or "tmdb:123456:movie" or "tmdb:123456:tv"
 const tmdbIdPattern = /^tmdb:(\d+)(?::(movie|tv))?$/i;
+const trailingYearPattern = /\s+\b(19|20)\d{2}\b$/;
 
-// detect "year:YYYY"
-const yearPattern = /(.+?)\s+year:(\d{4})$/i;
+function normalizeQuery(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-// detect "type:movie" or "type:tv"
-const typePattern = /(.+?)\s+type:(movie|tv)$/i;
+function getLenientQueries(searchQuery: string): string[] {
+  const base = searchQuery.trim();
+  if (base.length < 3) return [base];
+
+  const normalized = normalizeQuery(base);
+  const withoutTrailingYear = base.replace(trailingYearPattern, "").trim();
+  const normalizedWithoutYear = normalizeQuery(withoutTrailingYear);
+
+  const variants = [
+    ...new Set([base, normalized, withoutTrailingYear, normalizedWithoutYear]),
+  ].filter((q) => q.length > 0);
+
+  // Keep fanout small to avoid TMDB rate-limit pressure.
+  return variants.slice(0, 2);
+}
+
+function dedupeTMDBResults(
+  items: (TMDBMovieSearchResult | TMDBShowSearchResult)[],
+): (TMDBMovieSearchResult | TMDBShowSearchResult)[] {
+  const deduped = new Map<
+    string,
+    TMDBMovieSearchResult | TMDBShowSearchResult
+  >();
+
+  items.forEach((item) => {
+    deduped.set(`${item.media_type}:${item.id}`, item);
+  });
+
+  return Array.from(deduped.values());
+}
+
+function rankTMDBResultsFuzzy(
+  items: (TMDBMovieSearchResult | TMDBShowSearchResult)[],
+  query: string,
+): (TMDBMovieSearchResult | TMDBShowSearchResult)[] {
+  if (items.length <= 1) return items;
+
+  const fuse = new Fuse(items, {
+    includeScore: true,
+    ignoreLocation: true,
+    threshold: 0.45,
+    minMatchCharLength: 2,
+    keys: [
+      { name: "title", weight: 0.6 },
+      { name: "name", weight: 0.6 },
+      { name: "original_title", weight: 0.2 },
+      { name: "original_name", weight: 0.2 },
+    ],
+  });
+
+  const ranked = fuse.search(query).map((result) => result.item);
+  const rankedSet = new Set(
+    ranked.map((item) => `${item.media_type}:${item.id}`),
+  );
+  const remainder = items.filter(
+    (item) => !rankedSet.has(`${item.media_type}:${item.id}`),
+  );
+
+  return ranked.concat(remainder);
+}
 
 export async function searchForMedia(query: MWQuery): Promise<MediaItem[]> {
   if (cache.has(query)) return cache.get(query) as MediaItem[];
@@ -77,47 +145,31 @@ export async function searchForMedia(query: MWQuery): Promise<MediaItem[]> {
     }
   }
 
-  // year extract logic
-  let yearValue: string | undefined;
-  let queryWithoutYear = searchQuery;
+  const queryVariants = getLenientQueries(searchQuery);
+  const settledResults = await Promise.allSettled(
+    queryVariants.map((q) => multiSearch(q)),
+  );
+  const fulfilledResults = settledResults
+    .filter(
+      (
+        result,
+      ): result is PromiseFulfilledResult<
+        (TMDBMovieSearchResult | TMDBShowSearchResult)[]
+      > => result.status === "fulfilled",
+    )
+    .map((result) => result.value);
 
-  const yearMatch = searchQuery.match(yearPattern);
-  if (yearMatch && yearMatch[2]) {
-    queryWithoutYear = yearMatch[1].trim();
-    yearValue = yearMatch[2];
+  if (fulfilledResults.length === 0) {
+    return [];
   }
 
-  // type extract logic
-  let typeValue: string | undefined;
-  let queryWithoutType = queryWithoutYear;
+  const data = dedupeTMDBResults(fulfilledResults.flat());
+  const rankedData = rankTMDBResultsFuzzy(data, searchQuery);
 
-  const typeMatch = queryWithoutYear.match(typePattern);
-  if (typeMatch && typeMatch[2]) {
-    queryWithoutType = typeMatch[1].trim();
-    typeValue = typeMatch[2].toLowerCase();
-  }
-
-  let data: any[];
-  if (typeValue === "movie") {
-    data = await searchMovies(queryWithoutType);
-  } else if (typeValue === "tv") {
-    data = await searchTVShows(queryWithoutType);
-  } else {
-    data = await multiSearch(queryWithoutType);
-  }
-
-  let results = data.map((v) => {
+  const results = rankedData.map((v) => {
     const formattedResult = formatTMDBSearchResult(v, v.media_type);
     return formatTMDBMetaToMediaItem(formattedResult);
   });
-
-  // filter year
-  if (yearValue) {
-    results = results.filter((item) => {
-      const releaseYear = item.release_date?.getFullYear().toString();
-      return releaseYear === yearValue;
-    });
-  }
 
   const movieWithPosters = results.filter((movie) => movie.poster);
   const movieWithoutPosters = results.filter((movie) => !movie.poster);

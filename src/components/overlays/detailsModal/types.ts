@@ -46,6 +46,12 @@ export interface DetailsContent {
     }>;
   };
   logoUrl?: string;
+  collection?: {
+    id: number;
+    name: string;
+    poster_path: string | null;
+    backdrop_path: string | null;
+  } | null;
 }
 
 export interface DetailsModalProps {
@@ -99,12 +105,12 @@ export interface EpisodeCarouselProps {
   mediaId?: number;
   mediaTitle?: string;
   mediaPosterUrl?: string;
+  totalEpisodes?: number;
 }
 
 export interface DetailsBodyProps {
   data: DetailsContent;
   onPlayClick: () => void;
-  onTrailerClick: () => void;
   onShareClick: () => void;
   showProgress: ShowProgressResult | null;
   voteAverage?: number;
@@ -123,6 +129,7 @@ export interface DetailsInfoProps {
   imdbData?: any;
   rtData?: any;
   provider?: string;
+  onCollectionClick?: () => void;
 }
 
 export interface DetailsRatingsProps {

@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import classNames from "classnames";
+import { FetchError } from "ofetch";
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ import {
   StatusCircleProps,
 } from "@/components/player/internals/StatusCircle";
 import { Heading3 } from "@/components/utils/Text";
+import { useIsDesktopApp } from "@/hooks/useIsDesktopApp";
 import { conf } from "@/setup/config";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
@@ -42,7 +44,7 @@ type SetupData = {
   proxy: Status;
   defaultProxy: Status;
   febboxKeyTest?: Status;
-  realDebridKeyTest?: Status;
+  debridTokenTest?: Status;
 };
 
 function testProxy(url: string) {
@@ -57,8 +59,35 @@ function testProxy(url: string) {
   });
 }
 
+export async function fetchFebboxQuota(febboxKey: string | null): Promise<any> {
+  if (!febboxKey) {
+    return null;
+  }
+
+  console.log("SetupPart.tsx: Fetching Febbox quota");
+  try {
+    const response = await fetch("https://fed-api.pstream.mov/quota", {
+      headers: {
+        "ui-token": febboxKey,
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Febbox quota API failed with status:", response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log("SetupPart.tsx: Febbox quota fetched successfully");
+    return data;
+  } catch (error) {
+    console.error("SetupPart.tsx: Error fetching Febbox quota:", error);
+    return null;
+  }
+}
+
 export async function testFebboxKey(febboxKey: string | null): Promise<Status> {
-  const febboxApiTestUrl = `https://fed-api.pstream.mov/movie/tt13654226`;
+  const febboxApiTestUrl = `https://fed-api.pstream.mov/movie/tt0325980`;
 
   if (!febboxKey) {
     return "unset";
@@ -106,9 +135,9 @@ export async function testFebboxKey(febboxKey: string | null): Promise<Status> {
         continue;
       }
 
-      const isVIPLink = Object.values(data.streams).some((link: any) => {
-        if (typeof link === "string") {
-          return link.toLowerCase().includes("vip");
+      const isVIPLink = Object.values(data.streams).some((stream: any) => {
+        if (typeof stream === "object" && stream.download) {
+          return stream.download.includes("/vip/");
         }
         return false;
       });
@@ -142,10 +171,10 @@ export async function testFebboxKey(febboxKey: string | null): Promise<Status> {
   return "api_down";
 }
 
-export async function testRealDebridKey(
-  realDebridKey: string | null,
+export async function testdebridToken(
+  debridToken: string | null,
 ): Promise<Status> {
-  if (!realDebridKey) {
+  if (!debridToken) {
     return "unset";
   }
 
@@ -160,7 +189,7 @@ export async function testRealDebridKey(
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${realDebridKey}`,
+            Authorization: `Bearer ${debridToken}`,
             "Content-Type": "application/json",
           },
         },
@@ -174,12 +203,32 @@ export async function testRealDebridKey(
 
       console.log("RD response did not indicate premium status");
       attempts += 1;
-      if (attempts === maxAttempts) {
+      if (attempts === maxAttempts || data?.error_code === 8) {
         return "invalid_token";
       }
       await sleep(3000);
     } catch (error) {
       console.error("RD API error:", error);
+
+      // Check if it's a FetchError with error_code 8 (bad_token)
+      if (error instanceof FetchError) {
+        try {
+          const errorData = error.data;
+          if (errorData?.error_code === 8) {
+            console.log("RD token is invalid (error_code 8)");
+            return "invalid_token";
+          }
+        } catch (parseError) {
+          console.error("Failed to parse RD error response:", parseError);
+        }
+
+        // For other HTTP errors (like 500, 502, etc.), treat as API down
+        if (error.statusCode && error.statusCode >= 500) {
+          console.log(`RD API down (status ${error.statusCode})`);
+          return "api_down";
+        }
+      }
+
       attempts += 1;
       if (attempts === maxAttempts) {
         return "api_down";
@@ -191,10 +240,22 @@ export async function testRealDebridKey(
   return "api_down";
 }
 
+export async function testTorboxToken(
+  torboxToken: string | null,
+): Promise<Status> {
+  if (!torboxToken) {
+    return "unset";
+  }
+
+  // TODO: Implement Torbox token test
+  return "success";
+}
+
 function useIsSetup() {
   const proxyUrls = useAuthStore((s) => s.proxySet);
   const febboxKey = usePreferencesStore((s) => s.febboxKey);
-  const realDebridKey = usePreferencesStore((s) => s.realDebridKey);
+  const debridToken = usePreferencesStore((s) => s.debridToken);
+  const debridService = usePreferencesStore((s) => s.debridService);
   const { loading, value } = useAsync(async (): Promise<SetupData> => {
     const extensionStatus: Status = (await isExtensionActive())
       ? "success"
@@ -210,7 +271,10 @@ function useIsSetup() {
     }
 
     const febboxKeyStatus: Status = await testFebboxKey(febboxKey);
-    const realDebridKeyStatus: Status = await testRealDebridKey(realDebridKey);
+    const debridTokenStatus: Status =
+      debridService === "torbox"
+        ? await testTorboxToken(debridToken)
+        : await testdebridToken(debridToken);
 
     return {
       extension: extensionStatus,
@@ -219,23 +283,23 @@ function useIsSetup() {
       ...(conf().ALLOW_FEBBOX_KEY && {
         febboxKeyTest: febboxKeyStatus,
       }),
-      realDebridKeyTest: realDebridKeyStatus,
+      debridTokenTest: debridTokenStatus,
     };
-  }, [proxyUrls, febboxKey, realDebridKey]);
+  }, [proxyUrls, febboxKey, debridToken, debridService]);
 
   let globalState: Status = "unset";
   if (
     value?.extension === "success" ||
     value?.proxy === "success" ||
     value?.febboxKeyTest === "success" ||
-    value?.realDebridKeyTest === "success"
+    value?.debridTokenTest === "success"
   )
     globalState = "success";
   if (
     value?.proxy === "error" ||
     value?.extension === "error" ||
     value?.febboxKeyTest === "error" ||
-    value?.realDebridKeyTest === "error"
+    value?.debridTokenTest === "error"
   )
     globalState = "error";
 
@@ -296,6 +360,7 @@ export function SetupPart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { loading, setupStates, globalState } = useIsSetup();
+  const isDesktopApp = useIsDesktopApp();
   if (loading || !setupStates) {
     return (
       <SettingsCard>
@@ -362,22 +427,30 @@ export function SetupPart() {
           <p className="max-w-[20rem] font-medium mb-6">
             {t(textLookupMap[globalState].desc)}
           </p>
-          <SetupCheckList status={setupStates.extension}>
-            {t("settings.connections.setup.items.extension")}
-          </SetupCheckList>
-          <SetupCheckList status={setupStates.proxy}>
-            {t("settings.connections.setup.items.proxy")}
-          </SetupCheckList>
-          <SetupCheckList
-            grey
-            highlight={globalState === "unset"}
-            status={setupStates.defaultProxy}
-          >
-            {t("settings.connections.setup.items.default")}
-          </SetupCheckList>
-          {conf().ALLOW_REAL_DEBRID_KEY && (
-            <SetupCheckList status={setupStates.realDebridKeyTest || "unset"}>
-              Real Debrid token
+          {!isDesktopApp ? (
+            <>
+              <SetupCheckList status={setupStates.extension}>
+                {t("settings.connections.setup.items.extension")}
+              </SetupCheckList>
+              <SetupCheckList status={setupStates.proxy}>
+                {t("settings.connections.setup.items.proxy")}
+              </SetupCheckList>
+              <SetupCheckList
+                grey
+                highlight={globalState === "unset"}
+                status={setupStates.defaultProxy}
+              >
+                {t("settings.connections.setup.items.default")}
+              </SetupCheckList>
+            </>
+          ) : (
+            <SetupCheckList status={setupStates.extension}>
+              {t("settings.connections.setup.items.desktopapp")}
+            </SetupCheckList>
+          )}
+          {conf().ALLOW_DEBRID_KEY && (
+            <SetupCheckList status={setupStates.debridTokenTest || "unset"}>
+              Debrid Service
             </SetupCheckList>
           )}
           {conf().ALLOW_FEBBOX_KEY && (

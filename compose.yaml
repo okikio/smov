@@ -1,0 +1,109 @@
+# compose.yaml — Docker Compose v2 (no `version:` key required)
+#
+# Usage:
+#   docker compose up -d
+#
+# By default this pulls the pre-built image from GHCR.
+# To build locally instead, uncomment the `build:` block.
+#
+# ── Secrets ───────────────────────────────────────────────────────────────────
+# Sensitive values (API keys, tokens) can be provided two ways:
+#
+#   1. Environment variables (simplest, works everywhere):
+#        VITE_TMDB_READ_API_KEY=your_key docker compose up -d
+#      or add them to a .env file in this directory.
+#
+#   2. Docker secrets (recommended for production):
+#      Create a secrets/ directory (it is gitignored) and populate text files:
+#        mkdir -p secrets
+#        echo -n "your_tmdb_key" > secrets/TMDB_READ_API_KEY
+#      Then uncomment the `secrets:` blocks below.
+#      Secret files are mounted at /run/secrets/<NAME> inside the container
+#      and read by docker-entrypoint.sh with higher security than env vars.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  pstream:
+    image: ghcr.io/okikio/smov:latest
+
+    # Uncomment to build locally (standard build):
+    # build:
+    #   context: .
+    #   args:
+    #     PWA_ENABLED: "false"   # "true" enables the PWA service worker
+
+    ports:
+      - "4331:80"
+
+    restart: unless-stopped
+
+    # ── Option 2: Docker secrets (uncomment + create secrets/ files) ─────────
+    # secrets:
+    #   - TMDB_READ_API_KEY
+    #   - CORS_PROXY_URL
+    #   - M3U8_PROXY_URL
+    #   - BACKEND_URL
+    #   - TRAKT_CLIENT_ID
+    #   - TRAKT_CLIENT_SECRET
+
+    environment:
+      # ── Core (non-sensitive — safe as env vars) ───────────────────────────
+      VITE_DMCA_EMAIL: ""           # DMCA contact shown in footer (empty = hide)
+      VITE_NORMAL_ROUTER: "false"   # true = path routing; false = hash routing
+      VITE_ALLOW_AUTOPLAY: "false"
+      VITE_DISALLOWED_IDS: ""       # comma-separated, e.g. "movie-123,series-456"
+      VITE_CDN_REPLACEMENTS: ""     # e.g. "old.cdn.com:new.cdn.com"
+
+      # ── Onboarding ────────────────────────────────────────────────────────
+      VITE_HAS_ONBOARDING: "false"
+      VITE_ONBOARDING_CHROME_EXTENSION_INSTALL_LINK: ""
+      VITE_ONBOARDING_FIREFOX_EXTENSION_INSTALL_LINK: ""
+      VITE_ONBOARDING_PROXY_INSTALL_LINK: ""
+      VITE_HIDE_PROXY_ONBOARDING: "false"
+
+      # ── Optional features ─────────────────────────────────────────────────
+      VITE_ALLOW_FEBBOX_KEY: "false"
+      VITE_ALLOW_DEBRID_KEY: "false"
+
+      # ── Trakt (non-secret config) ─────────────────────────────────────────
+      VITE_USE_TRAKT: "false"
+      VITE_TRAKT_REDIRECT_URI: ""
+
+      # ── Ads / banners ─────────────────────────────────────────────────────
+      VITE_SHOW_AD: "false"
+      VITE_AD_CONTENT_URL: ""
+      VITE_BANNER_MESSAGE: ""
+      VITE_BANNER_ID: ""
+      VITE_SHOW_SUPPORT_BAR: "false"
+      VITE_SUPPORT_BAR_VALUE: ""
+
+      # ── Tracking ──────────────────────────────────────────────────────────
+      VITE_TRACK_SCRIPT: ""
+
+      # ── Sensitive values — prefer Docker secrets above; env vars are a
+      #    fallback for simple single-host deployments ─────────────────────
+      VITE_TMDB_READ_API_KEY: ""    # https://www.themoviedb.org/settings/api
+      VITE_CORS_PROXY_URL: ""       # must NOT end with a slash
+      VITE_M3U8_PROXY_URL: ""
+      VITE_BACKEND_URL: ""          # single URL or comma-separated list
+      VITE_TRAKT_CLIENT_ID: ""
+      VITE_TRAKT_CLIENT_SECRET: ""
+
+# ── Docker secrets definitions (Option 2) ─────────────────────────────────────
+# Uncomment the block below when using file-based secrets.
+# Each file should contain just the secret value, no trailing newline.
+#
+# secrets:
+#   TMDB_READ_API_KEY:
+#     file: ./secrets/TMDB_READ_API_KEY
+#   CORS_PROXY_URL:
+#     file: ./secrets/CORS_PROXY_URL
+#   M3U8_PROXY_URL:
+#     file: ./secrets/M3U8_PROXY_URL
+#   BACKEND_URL:
+#     file: ./secrets/BACKEND_URL
+#   TRAKT_CLIENT_ID:
+#     file: ./secrets/TRAKT_CLIENT_ID
+#   TRAKT_CLIENT_SECRET:
+#     file: ./secrets/TRAKT_CLIENT_SECRET

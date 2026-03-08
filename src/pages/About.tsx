@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { useRef, useState } from "react";
+import type { JSX } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +12,6 @@ import { Heading1, Heading2, Paragraph } from "@/components/utils/Text";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
-import type { JSX } from "react";
 
 function Question(props: { title: string; children: React.ReactNode }) {
   return (
