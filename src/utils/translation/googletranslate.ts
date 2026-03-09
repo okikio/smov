@@ -59,8 +59,9 @@ export default {
       return [];
     }
     if (!BATCH_API_KEY) {
-      throw new Error(
-        "Google Translate batch API key is not configured. Set VITE_GOOGLE_TRANSLATE_API_KEY in your environment.",
+      // Fallback: use single-translate endpoint per item when batch API key is not configured.
+      return Promise.all(
+        batch.map((item) => this.translate(item, targetLang, abortSignal)),
       );
     }
     batch = batch.map((s) => s.replaceAll("\n", "<br />"));
