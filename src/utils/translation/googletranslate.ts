@@ -3,7 +3,7 @@ import { TranslateService } from ".";
 const SINGLE_API_URL =
   "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&oe=UTF-8&sl=auto";
 const BATCH_API_URL = "https://translate-pa.googleapis.com/v1/translateHtml";
-const BATCH_API_KEY = "AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520";
+const BATCH_API_KEY = import.meta.env.VITE_GOOGLE_TRANSLATE_API_KEY;
 
 export default {
   getName() {
@@ -57,6 +57,11 @@ export default {
   async translateMulti(batch, targetLang, abortSignal) {
     if (!batch || batch.length === 0) {
       return [];
+    }
+    if (!BATCH_API_KEY) {
+      throw new Error(
+        "Google Translate batch API key is not configured. Set VITE_GOOGLE_TRANSLATE_API_KEY in your environment.",
+      );
     }
     batch = batch.map((s) => s.replaceAll("\n", "<br />"));
 
